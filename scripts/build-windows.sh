@@ -12,7 +12,7 @@ cargo build --release -p ytm-native --target x86_64-pc-windows-gnu
 exe=target/x86_64-pc-windows-gnu/release/ytm-native.exe
 out="dist/YT Music native"
 mkdir -p dist
-[[ -d "$out" ]] && mv "$out" "dist/.old-windows-folder-$$"   # no rm -rf of user-visible paths
+rm -rf "$out"   # the unpacked folder is rebuilt from scratch every time
 mkdir -p "$out/data"
 cp "$exe" "$out/ytm-native.exe"
 cp "$exe" "dist/ytm-native-$version-windows-x86_64.exe"
@@ -29,6 +29,6 @@ Sign in: start ytm-native.exe and follow the steps on screen.
 Updates install themselves (Settings > Updates); unpacking a newer .7z over this folder works too.
 TXT
 archive="dist/ytm-native-$version-windows-x86_64.7z"
-[[ -e "$archive" ]] && mv "$archive" "$archive.previous"
+rm -f "$archive"
 (cd dist && 7z a -t7z -mx=9 "$(basename "$archive")" "YT Music native" >/dev/null)
 ls -l "$archive" "dist/ytm-native-$version-windows-x86_64.exe"

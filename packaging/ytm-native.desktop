@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=YT Music native
+GenericName=Music Player
+Comment=Unofficial native YouTube Music player
+Exec=ytm-native
+Icon=ytm-native
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+StartupWMClass=ytm-native

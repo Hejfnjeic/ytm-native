@@ -1,0 +1,10 @@
+[workspace]
+resolver = "3"
+# app: the player. probe: early research tools for YouTube's API. xtask: release helpers.
+members = ["app", "probe", "xtask"]
+# `cargo run` / `cargo build` / `cargo test` without -p mean the player.
+default-members = ["app"]
+
+[profile.release]
+# Ship without debug symbols (the Windows .exe was 60 MB with them).
+strip = true

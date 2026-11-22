@@ -1,0 +1,9 @@
+/target
+# Credentials and captured API responses never go into git.
+*.cookies.txt
+cookies.txt
+/probe-output
+/dist
+
+# Notes for AI coding sessions about the maintainer (local only, never published).
+FOR_CLAUDE_READ_PLEASE.md

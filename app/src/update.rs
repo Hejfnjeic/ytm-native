@@ -102,6 +102,8 @@ pub struct Release {
     pub version: String,
     /// The release's web page (notes, manual downloads).
     pub page: String,
+    /// The release notes (GitHub Markdown).
+    pub notes: String,
     manifest: Manifest,
     /// Asset name -> download URL.
     urls: HashMap<String, String>,
@@ -150,6 +152,7 @@ impl Updater {
     }
 
     /// The latest release, if it's newer than this build.
+    /// (Its notes are shown with `note_lines`.)
     pub async fn check(&self) -> Result<Option<Release>> {
         let url = format!("{}/repos/{REPO}/releases/latest", self.api);
         let resp = self.http.get(&url).header("Accept", "application/vnd.github+json").send().await?;
@@ -167,7 +170,8 @@ impl Updater {
         let page = v["html_url"].as_str().unwrap_or_default().to_string();
         let murl = urls.get(MANIFEST).ok_or_else(|| anyhow!("release {tag} has no {MANIFEST}"))?;
         let manifest: Manifest = self.http.get(murl).send().await?.error_for_status()?.json().await?;
-        Ok(Some(Release { version: manifest.version.clone(), page, manifest, urls }))
+        let notes = v["body"].as_str().unwrap_or_default().to_string();
+        Ok(Some(Release { version: manifest.version.clone(), page, notes, manifest, urls }))
     }
 
     async fn download(&self, asset: &Asset, urls: &HashMap<String, String>) -> Result<Vec<u8>> {
@@ -323,9 +327,67 @@ pub fn bspatch(old: &[u8], patch: &[u8]) -> Result<Vec<u8>> {
     Ok(new)
 }
 
+/// Kind of a line in the release notes, as shown in the "What's new" window.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NoteKind {
+    Heading,
+    Bullet,
+    Text,
+}
+
+/// Release notes (GitHub Markdown) as plain lines for the "What's new" window: headings,
+/// bullets (wrapped lines joined) and text, without the "Install" section (it's about the
+/// downloads) or Markdown marks. Links keep their text.
+pub fn note_lines(md: &str) -> Vec<(NoteKind, String)> {
+    let link = regex::Regex::new(r"\[([^\]]*)\]\([^)]*\)").unwrap();
+    let clean = |t: &str| link.replace_all(t, "$1").replace('*', "").replace('`', "").replace("__", "").trim().to_string();
+    let mut out: Vec<(NoteKind, String)> = Vec::new();
+    let mut joinable = false;
+    for raw in md.lines() {
+        let line = raw.trim_end();
+        let t = line.trim_start();
+        if let Some(h) = t.strip_prefix('#') {
+            let h = clean(h.trim_start_matches('#'));
+            if h.eq_ignore_ascii_case("install") || h.eq_ignore_ascii_case("installation") {
+                break;
+            }
+            out.push((NoteKind::Heading, h));
+            joinable = false;
+        } else if let Some(b) = t.strip_prefix("- ").or_else(|| t.strip_prefix("* ")) {
+            out.push((NoteKind::Bullet, clean(b)));
+            joinable = true;
+        } else if t.is_empty() {
+            joinable = false;
+        } else if joinable || (line.starts_with(' ') && matches!(out.last(), Some((NoteKind::Bullet, _)))) {
+            // A wrapped line of the previous bullet/paragraph.
+            if let Some((_, prev)) = out.last_mut() {
+                prev.push(' ');
+                prev.push_str(&clean(t));
+            }
+        } else {
+            out.push((NoteKind::Text, clean(t)));
+            joinable = true;
+        }
+    }
+    out.retain(|(_, t)| !t.is_empty());
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn release_notes() {
+        let md = "## What's new\n\n- **Library page**: *saved* things,\n  in one place.\n- See [the page](https://example.com) and `code`.\n\nSome text.\n\n## Install\n- download it\n";
+        let lines = note_lines(md);
+        assert_eq!(lines, vec![
+            (NoteKind::Heading, "What's new".to_string()),
+            (NoteKind::Bullet, "Library page: saved things, in one place.".to_string()),
+            (NoteKind::Bullet, "See the page and code.".to_string()),
+            (NoteKind::Text, "Some text.".to_string()),
+        ]);
+    }
 
     fn sample(seed: u64, len: usize) -> Vec<u8> {
         let mut x = seed;

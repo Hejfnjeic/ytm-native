@@ -101,7 +101,10 @@ Currently: import from the GUI (below). Dev override: `cookies.txt` argument or 
 - [x] Arch package: `packaging/arch/PKGBUILD`, `scripts/build-arch.sh`.
 - [x] Self-updates from GitHub releases with bsdiff patches (release builds only).
 - [x] Release tooling: `scripts/release.sh`, `cargo xtask release-files`; README, HACKING.md.
-- [ ] AUR package (the PKGBUILD is ready; needs an AUR account and a checksum per release).
+- ~~AUR package~~: not planned (the owner decided against it).
+- [x] "What's new" window: the release notes, from the sidebar notice / Settings, with
+      Restart now / Update now / Later. Updates still download on their own and never restart
+      the app by themselves.
 - [ ] Windows: test the self-update swap on a real machine (renames the running .exe aside).
 
 ## UI polish

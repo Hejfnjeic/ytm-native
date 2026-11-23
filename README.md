@@ -37,7 +37,8 @@ looks like the rest of a KDE desktop. Linux first; Windows builds are made too.
 - **Desktop**: media keys and KDE's media controls (MPRIS; on Windows the system media
   controls), colors, font and icons from your KDE
   settings (follows changes live), keyboard shortcuts, remembers the queue and position.
-- **Updates itself** with small binary patches (a few MB) checked against SHA-256 sums.
+- **Updates itself** with small binary patches (a few MB) checked against SHA-256 sums; a
+  "What's new" window shows the changes, and the app restarts only when you say so.
 
 ## Install
 

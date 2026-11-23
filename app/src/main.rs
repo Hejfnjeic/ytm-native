@@ -871,11 +871,24 @@ impl App {
         let available = self.update.is_some() && !self.update_ready && update::mode() == update::Mode::SelfUpdate;
         let notice = match (&self.update, self.update_ready) {
             (Some(r), true) => format!("Version {} installed", r.version),
-            (Some(r), false) if update::mode() != update::Mode::SelfUpdate => format!("Version {} available", r.version),
+            // Being downloaded on its own: the notice comes once it's installed.
+            (Some(_), false) if self.update_busy && self.settings.auto_update => String::new(),
+            (Some(r), false) => format!("Version {} available", r.version),
             _ => String::new(),
         };
         let (busy, ready) = (self.update_busy, self.update_ready);
+        let version = self.update.as_ref().map(|r| r.version.clone()).unwrap_or_default();
+        let notes: Vec<NoteLine> = self.update.as_ref().map(|r| update::note_lines(&r.notes)).unwrap_or_default().into_iter()
+            .map(|(k, t)| NoteLine { kind: match k { update::NoteKind::Heading => 0, update::NoteKind::Bullet => 1, update::NoteKind::Text => 2 }, text: t.into() })
+            .collect();
+        let notes = if notes.is_empty() && !version.is_empty() {
+            vec![NoteLine { kind: 2, text: "This release has no notes.".into() }]
+        } else {
+            notes
+        };
         self.ui(move |ui| {
+            ui.set_update_version(version.into());
+            ui.set_update_notes(ModelRc::new(VecModel::from(notes)));
             ui.set_update_status(status.into());
             ui.set_update_busy(busy);
             ui.set_update_available(available);

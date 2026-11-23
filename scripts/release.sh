@@ -38,6 +38,8 @@ echo "== 2. builds"
 # Source paths end up in the binaries (panic locations): don't publish this machine's home
 # directory (it holds the user name). Checked after the builds.
 export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$HOME=/build"
+# Same for the bundled C code (QuickJS; libopus on Windows): __FILE__ in its assertions.
+export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$HOME=/build"
 no_home() {
     if grep -qaF -e "$HOME" -e "/$(id -un)/" "$1"; then
         echo "$1 still contains paths from $HOME: not publishing" >&2

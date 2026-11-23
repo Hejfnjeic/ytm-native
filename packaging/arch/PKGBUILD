@@ -32,6 +32,8 @@ build() {
     # pacman owns the installed files: the app only tells about new versions, it doesn't
     # replace itself.
     export YTM_PACKAGED=pacman
+    # Keep the builder's home directory out of the binary (source paths of panic messages).
+    export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$HOME=/build"
     cargo build --frozen --release -p ytm-native
 }
 

@@ -35,6 +35,15 @@ if [[ "$current" != "$version" ]]; then
 fi
 
 echo "== 2. builds"
+# Source paths end up in the binaries (panic locations): don't publish this machine's home
+# directory (it holds the user name). Checked after the builds.
+export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$HOME=/build"
+no_home() {
+    if grep -qaF -e "$HOME" -e "/$(id -un)/" "$1"; then
+        echo "$1 still contains paths from $HOME: not publishing" >&2
+        exit 1
+    fi
+}
 export YTM_RELEASE_BUILD=1
 cargo test -q --release -p ytm-native
 cargo build --release -p ytm-native
@@ -45,6 +54,12 @@ mv "dist/ytm-native-$version-windows-x86_64.exe" "dist/ytm-native-$version-windo
 unset YTM_RELEASE_BUILD
 scripts/build-arch.sh
 mv dist/ytm-native-"$version"-*-x86_64.pkg.tar.zst "$out/"
+no_home "$linux"
+no_home "$out/ytm-native-$version-windows-x86_64.exe"
+pkgbin="$out/.pkg-bin"
+tar -xOf "$out"/ytm-native-"$version"-*-x86_64.pkg.tar.zst usr/bin/ytm-native > "$pkgbin"
+no_home "$pkgbin"
+rm "$pkgbin"
 
 echo "== 3. Linux tarball"
 stage="$out/ytm-native-$version"

@@ -145,10 +145,10 @@ impl Icon {
     }
 }
 
-/// "YT Music", with the song under it. Windows cuts a tooltip off at 127 characters
+/// "ytm-native", with the song under it. Windows cuts a tooltip off at 127 characters
 /// (UTF-16 ones), so a long one ends in "…" there instead.
 fn tooltip(song: Option<&str>) -> String {
-    let Some(song) = song else { return "YT Music".to_owned() };
+    let Some(song) = song else { return "ytm-native".to_owned() };
     cut(&format!("YT Music\n{song}"), 127, |g| g.encode_utf16().count())
 }
 
@@ -207,7 +207,7 @@ fn build(png: image::RgbaImage) -> anyhow::Result<Icon> {
     #[allow(unused_mut)]
     let mut builder = TrayIconBuilder::new()
         .with_icon(tray_icon::Icon::from_rgba(png.into_raw(), w, h)?)
-        .with_tooltip("YT Music")
+        .with_tooltip("ytm-native")
         .with_menu(Box::new(menu))
         .with_menu_on_left_click(false);
     #[cfg(target_os = "linux")]
@@ -372,8 +372,8 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn a_flatpak_keeps_its_icon_in_its_own_runtime_folder() {
-        let dir = flatpak_icon_dir(Some("/run/user/1000".into()), Some("io.github.grapedjuice.ytm-rs".into()));
-        assert_eq!(dir.as_deref(), Some(std::path::Path::new("/run/user/1000/app/io.github.grapedjuice.ytm-rs/tray-icon")));
+        let dir = flatpak_icon_dir(Some("/run/user/1000".into()), Some("io.github.hejfnjeic.ytm-native".into()));
+        assert_eq!(dir.as_deref(), Some(std::path::Path::new("/run/user/1000/app/io.github.hejfnjeic.ytm-native/tray-icon")));
         // Without either, the library's own default.
         assert!(flatpak_icon_dir(None, Some("x".into())).is_none());
         assert!(flatpak_icon_dir(Some("/run/user/1000".into()), Some("".into())).is_none());
@@ -381,7 +381,7 @@ mod tests {
 
     #[test]
     fn tooltip_fits_windows() {
-        assert_eq!(tooltip(None), "YT Music");
+        assert_eq!(tooltip(None), "ytm-native");
         assert_eq!(tooltip(Some("Song — Artist")), "YT Music\nSong — Artist");
         // Just fits: left as it is.
         let fits = "a".repeat(127 - 9);
@@ -412,7 +412,7 @@ mod tests {
     /// version must be read again before this is changed.
     #[test]
     fn appindicator_names_are_from_the_locked_version() {
-        let lock: Vec<&str> = include_str!("../Cargo.lock").lines().map(str::trim).collect();
+        let lock: Vec<&str> = include_str!("../../Cargo.lock").lines().map(str::trim).collect();
         let versions: Vec<&str> = lock.windows(2).filter(|w| w[0] == "name = \"libappindicator-sys\"").map(|w| w[1]).collect();
         assert_eq!(versions, ["version = \"0.9.0\""]);
     }

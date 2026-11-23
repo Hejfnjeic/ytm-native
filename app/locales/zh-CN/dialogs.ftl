@@ -33,7 +33,4 @@ dialog-collaborators = 合作者
 dialog-no-collaborators = 尚未有人加入。
 dialog-delete-playlist-body = “{ $title }”将从您的 YouTube Music 库中删除。这无法撤消。
 dialog-delete-upload-body = “{ $title }”已从您上传的 YouTube Music 中删除。这无法撤消。
-dialog-download-count = 下载({ $count })
 dialog-edit-playlist = 编辑播放列表
-dialog-download-body = 尚待下载的曲目：{ $count }。下载在后台运行并从当前曲目开始。
-dialog-download-collection-body = 剩余曲目可从“{ $title }”下载：{ $count }。下载在后台运行并从当前曲目开始。

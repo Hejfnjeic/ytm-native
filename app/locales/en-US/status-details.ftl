@@ -22,14 +22,6 @@ status-like-success = Likes added: { $count }
 status-like-refused = YouTube Music didn't accept the change. Try again in a while.
 status-refused-count = YouTube Music refused: { $count }
 status-removed-liked = Removed from liked songs
-status-download-batch = Downloading tracks: { $count }
-status-download-collection = Downloading from “{ $title }”: { $count }
-status-download-stopped = Stopped downloading{ $name }: { $songs } saved
-status-download-already = Downloaded already
-status-download-name-already = “{ $title }” is downloaded already
-status-download-done = Downloaded{ $name }: { $songs }
-status-download-already-count = { $count } already there
-status-download-fail-count = { $count } couldn't be downloaded ({ $details })
 status-play-premium = “{ $title }” needs YouTube Music Premium
 status-play-sign-in = Sign in to play “{ $title }”
 status-age-restricted = it's age-restricted
@@ -41,6 +33,3 @@ status-episodes = { $count ->
     [one] { $count } episode
    *[other] { $count } episodes
 }
-status-download-quoted-title = “{ $title }”
-discord-view-artist = View artist
-discord-view-album = View album

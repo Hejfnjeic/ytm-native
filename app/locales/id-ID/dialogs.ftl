@@ -33,7 +33,4 @@ dialog-collaborators = Kolaborator
 dialog-no-collaborators = Belum ada yang gabung.
 dialog-delete-playlist-body = “{ $title }” akan dihapus dari koleksi YouTube Music kamu. Ini nggak bisa dibatalkan.
 dialog-delete-upload-body = “{ $title }” akan dihapus dari unggahan YouTube Music kamu. Ini nggak bisa dibatalkan.
-dialog-download-count = Unduh ({ $count })
 dialog-edit-playlist = Edit playlist
-dialog-download-body = Lagu yang belum diunduh: { $count }. Unduhan jalan di latar belakang dan dimulai dari lagu yang lagi diputar.
-dialog-download-collection-body = Lagu yang belum diunduh dari “{ $title }”: { $count }. Unduhan jalan di latar belakang dan dimulai dari lagu yang lagi diputar.

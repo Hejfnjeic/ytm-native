@@ -10,7 +10,6 @@
 settings-playback = Pemutaran
 settings-lyrics = Lirik
 settings-appearance = Tampilan
-settings-connections = Koneksi
 settings-account = Akun
 settings-general = Umum
 settings-keyboard-shortcuts = Pintasan keyboard
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Masuk dengan Google
 settings-sign-in-finish = Selesaikan proses masuk di jendela yang baru kebuka.
 settings-no-channel = { $name } (Tanpa channel)
 settings-another-channel = Channel lain
-settings-channel-not-during-transfer = Nggak bisa saat transfer lagi jalan
 settings-switching = Lagi pindah…
 
 ## Playback
@@ -117,21 +115,12 @@ settings-playback-speed-desc = Putar lagu lebih cepat atau lebih lambat, bisa ju
 settings-speed = Kecepatan
 settings-keep-pitch = Jaga nada
 settings-keep-pitch-desc = Lebih cepat atau lebih lambat tanpa bunyinya jadi lebih tinggi atau lebih rendah. Kalau dimatiin, nadanya ikut berubah sama kecepatan, kayak piringan hitam.
-settings-playback-speed-jam-note = Balik normal selama kamu di jam, biar semua orang dengar lagu yang sama.
 
 ## Music videos
 
 settings-music-videos = Video musik
 settings-songs-not-videos = Putar lagu, bukan video musik
 settings-songs-not-videos-desc = Video musik resmi diputar lagunya aja, diambil dari rekaman albumnya, hanya kalau YouTube Music nya punya. tanpa intro, skit, atau versi khusus video. Daftar lagu tetap menampilkan isi aslinya.
-settings-show-music-videos = Tampilkan video musik
-settings-show-music-videos-desc = Video musik diputar sebagai video, dengan suaranya sendiri dan tanpa lirik. Kalau cuma lagunya yang lagi diputar, sebagai gantinya, lagu nggak punya tombol switch Lagu dan Video di halaman Sedang diputar; video musik tetap punya.
-settings-video-quality = Kualitas video
-settings-video-quality-desc = Video musik diputar setajam ini, atau sedekat mungkin di bawahnya sesuai yang tersedia. 1080p butuh tenaga sekitar tiga kali lipat dari 720p, yang mungkin nggak kuat di komputer kentang.
-settings-ambient-light = Cahaya ambien
-settings-ambient-light-desc = Lampu di belakang yang warnanya berubah sesuai video
-settings-animated-covers = Sampul bergerak
-settings-animated-covers-desc = Sampul beberapa album bergerak di layar Sedang diputar kalau Apple Music punya klip-nya.
 settings-hide-videos-in-search = Sembunyikan video dari pencarian
 settings-hide-videos-in-search-desc = Hasil pencarian cuma menampilkan lagu, album, artis, dan playlist.
 settings-skip-non-music-parts = Lewati bagian non-musik
@@ -139,8 +128,6 @@ settings-skip-non-music-parts-desc = Lompati bagian ngobrol, skit, dan jeda spon
 
 ## Lyrics
 
-settings-romanization = Romanisasi
-settings-romanization-desc = Aksara Jepang, Korea, Mandarin, Kiril, dan lainnya ditampilkan dalam huruf Latin. Sinkron dengan lirik kalau sumbernya menyediakan.
 settings-translation = Terjemahan
 settings-translation-desc = Diterjemahkan oleh Unison, atau Google kalau Unison nggak bisa. Lirik yang bawa terjemahannya sendiri pakai terjemahan itu.
 settings-translate-into = Terjemahkan ke
@@ -233,18 +220,6 @@ settings-app-icon-named = Ikon aplikasi: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Izinkan plugin Stream Deck di komputer ini buat mengontrol pemutaran.
-settings-lastfm-connected = Lagu yang kamu putar di-scrobble ke profil { $name }.
-settings-lastfm-allow = Izinkan ytm-rs di halaman Last.fm yang kebuka di browsermu.
-settings-lastfm-desc = Scrobble lagu yang kamu putar ke profil Last.fm kamu.
-settings-disconnect = Putuskan
-settings-connect = Sambungkan
-settings-listenbrainz-connected = Lagu yang kamu putar dikirim ke profil { $name }.
-settings-listenbrainz-desc = Kirim lagu yang kamu putar ke profil ListenBrainz kamu.
-settings-user-token = Token pengguna
-settings-listenbrainz-token-hint = Tempel token pengguna ListenBrainz kamu
-settings-listenbrainz-token-link = Ambil tokenmu di listenbrainz.org
 
 ## Language
 
@@ -287,18 +262,8 @@ settings-renderer-restart-desc = Aplikasi menggambar pakai renderer baru mulai d
 
 ## Downloads
 
-settings-downloads = Unduhan
-settings-downloads-note = Unduh lagu dari menunya, atau satu album dan playlist utuh dari halamannya. Disimpan dengan kualitas terbaik yang didapat akunmu, lengkap dengan sampul, dan diputar dari file-nya, bahkan tanpa internet.
-settings-download-folder = Folder unduhan
 settings-change = Ubah
 settings-open = Buka
-settings-folder-per-list = Taruh album dan playlist di foldernya sendiri
-settings-folder-per-list-desc = Kalau kamu mengunduh album atau playlist dari halaman atau menunya, lagunya disimpan di folder yang dinamai sesuai album atau playlist itu. Lagu yang sudah diunduh sebelumnya tetap di tempatnya.
-settings-file-lyrics = Lirik di file
-settings-file-lyrics-desc = Lagu yang diunduh membawa lirik yang kamu lihat untuk lagu itu, untuk pemutar musik lain. Lirik tersinkron disimpan sebagai LRC.
-settings-file-lyrics-synced = Tersinkron
-settings-file-lyrics-plain = Teks saja
-settings-file-lyrics-off = Tidak ada
 
 ## Network
 

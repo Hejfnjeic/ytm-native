@@ -1389,10 +1389,10 @@ fn lyrics_panel(app: &mut App, ui: &mut Ui, rect: Rect, now: f64, centered: bool
     app.lyrics = Some((id, set));
 }
 
-/// Romanization and translation for each line, the way the extension picks them: what
-/// the lyrics ship (Apple-style TTML) first, then Unison/Google.
+/// The translation for each line, the way the extension picks it: what the lyrics ship
+/// (Apple-style TTML) first, then Unison/Google. No romanization: ytm-native leaves it out
+/// (its listeners read the script), so that slot is always empty.
 fn decorations<'a>(
-    show_roman: bool,
     show_trans: bool,
     target: &'a str,
     extras: Option<&'a (String, String, String, crate::translate::Extras)>,
@@ -1401,21 +1401,7 @@ fn decorations<'a>(
 ) -> (Vec<Option<karaoke::Roman<'a>>>, Vec<Option<&'a str>>) {
     let extras = extras.filter(|(v, s, t, _)| v == id && s == lyrics.provider.key() && t == target).map(|(_, _, _, e)| e);
     let same = |a: &str, b: &str| a.trim().eq_ignore_ascii_case(b.trim());
-    let roman = lyrics
-        .lines
-        .iter()
-        .enumerate()
-        .map(|(i, l)| {
-            if !show_roman || l.instrumental {
-                return None;
-            }
-            if let Some(r) = l.romanization.as_deref().filter(|r| !same(r, &l.text)) {
-                return Some(if l.timed_roman.is_empty() { karaoke::Roman::Text(r) } else { karaoke::Roman::Timed(&l.timed_roman, r) });
-            }
-            let r = extras?.roman.get(i)?.as_deref()?;
-            (!same(r, &l.text)).then_some(karaoke::Roman::Text(r))
-        })
-        .collect();
+    let roman = lyrics.lines.iter().map(|_| None).collect();
     let trans = lyrics
         .lines
         .iter()
@@ -1440,7 +1426,7 @@ fn synced(app: &mut App, ui: &mut Ui, rect: Rect, id: &str, lyrics: &Lyrics, now
     let pos = app.audio.status.position_smooth().as_secs_f64() - app.audio.status.latency().as_secs_f64();
     let pos = app.lyric_clock.tick(pos, playing, now, app.audio.status.speed() as f64);
     let t = pos - app.lyric_prefs.offset(id, lyrics.provider, lyrics.sync == Sync::Word);
-    let (roman, trans) = decorations(app.show_roman, app.show_trans, &app.lyric_prefs.target, app.lyrics_extras.as_ref(), id, lyrics);
+    let (roman, trans) = decorations(app.show_trans, &app.lyric_prefs.target, app.lyrics_extras.as_ref(), id, lyrics);
     let key = {
         use std::hash::{Hash, Hasher};
         let mut h = std::collections::hash_map::DefaultHasher::new();
@@ -1669,7 +1655,6 @@ fn lyric_options(app: &mut App, ui: &mut Ui) {
     let name = crate::i18n::lyrics_name(&app.lyric_prefs.target);
     let tip = crate::tr!("player-translation-language", language = name.as_ref());
     switch_row(ui, &tip, &mut app.show_trans);
-    switch_row(ui, crate::tr!("settings-romanization"), &mut app.show_roman);
     // This song's timing for the shown source: ‹ +0.0s ›
     let off = app.lyric_prefs.song_offset(&id, shown);
     let (row, _) = ui.allocate_exact_size(vec2(ui.available_width(), ROW), Sense::hover());

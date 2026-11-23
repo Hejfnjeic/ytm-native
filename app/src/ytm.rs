@@ -3185,11 +3185,11 @@ mod tests {
     }
 
     /// Looks up the plays of a real song an album page lists without them. Run alone:
-    /// `cargo test --bin ytm-rs -- --ignored ytm::tests::song_plays_live --exact --nocapture`
+    /// `cargo test --bin ytm-native -- --ignored ytm::tests::song_plays_live --exact --nocapture`
     #[tokio::test]
     #[ignore]
     async fn song_plays_live() {
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-rs-song-plays-test"));
+        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-song-plays-test"));
         let artist = |name: &str| vec![Link { name: name.into(), id: None }];
         let song = |id: &str, title: &str, by: &str| Track { id: id.into(), title: title.into(), artists: artist(by), ..Default::default() };
         for t in [song("L3XPdkm2F9Q", "独り言 - Hitori Goto", "Asagaya Romantics")] {
@@ -3200,21 +3200,21 @@ mod tests {
     }
 
     /// A song's Lyrics tab, signed out. Run alone:
-    /// `cargo test --bin ytm-rs -- --ignored ytm::tests::lyrics_live --exact`
+    /// `cargo test --bin ytm-native -- --ignored ytm::tests::lyrics_live --exact`
     #[tokio::test]
     #[ignore]
     async fn lyrics_live() {
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-rs-lyrics-test"));
+        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-lyrics-test"));
         let text = lyrics(&api, "fJ9rUzIMcZQ").await.unwrap().expect("Bohemian Rhapsody has lyrics");
         assert!(text.starts_with("Is this the real life?"), "{text}");
     }
 
     /// Asks the Android VR client for a real album (no sign-in). Run alone:
-    /// `cargo test --bin ytm-rs -- --ignored ytm::tests::album_songs_live --exact`
+    /// `cargo test --bin ytm-native -- --ignored ytm::tests::album_songs_live --exact`
     #[tokio::test]
     #[ignore]
     async fn album_songs_live() {
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-rs-album-songs-test"));
+        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-album-songs-test"));
         let a = album(&api, "MPREb_dcYZhAh5urI").await.unwrap();
         println!("{:?}", a.tracks.iter().map(|t| (&t.id, &t.title, t.duration)).collect::<Vec<_>>());
         assert_eq!(a.tracks[0].id, "lYBUbBu4W08", "Never Gonna Give You Up should be the song, not the music video");
@@ -3701,11 +3701,11 @@ mod tests {
     }
 
     /// A signed-out search for the songs of a few music videos. Run alone:
-    /// `cargo test --bin ytm-rs -- --ignored ytm::tests::searched_song_live --exact --nocapture`
+    /// `cargo test --bin ytm-native -- --ignored ytm::tests::searched_song_live --exact --nocapture`
     #[tokio::test]
     #[ignore]
     async fn searched_song_live() {
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-rs-album-songs-test"));
+        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-album-songs-test"));
         for v in [
             video("Never Gonna Give You Up", &["Rick Astley"], 214),
             video("Take On Me (Official Video)", &["a-ha"], 244),
@@ -3718,11 +3718,11 @@ mod tests {
     }
 
     /// A signed-out search for the music videos of a few songs. Run alone:
-    /// `cargo test --bin ytm-rs -- --ignored ytm::tests::searched_video_live --exact --nocapture`
+    /// `cargo test --bin ytm-native -- --ignored ytm::tests::searched_video_live --exact --nocapture`
     #[tokio::test]
     #[ignore]
     async fn searched_video_live() {
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-rs-album-songs-test"));
+        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-album-songs-test"));
         for s in [
             song("Never Gonna Give You Up", &["Rick Astley"], 214),
             song("Take On Me", &["a-ha"], 226),
@@ -3814,7 +3814,7 @@ mod podcast_tests {
     #[ignore]
     async fn podcasts_live() {
         set_podcasts(true);
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-rs-podcasts-test"));
+        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-podcasts-test"));
         let page = home(&api, None, false).await.unwrap();
         let chip = page.chips.iter().find(|c| c.title == "Podcasts").expect("no Podcasts chip on Home");
         let feed = home(&api, chip.params.as_deref(), false).await.unwrap();

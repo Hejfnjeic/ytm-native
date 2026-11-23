@@ -10,7 +10,6 @@
 settings-playback = Wiedergabe
 settings-lyrics = Liedtexte
 settings-appearance = Darstellung
-settings-connections = Verbindungen
 settings-account = Konto
 settings-general = Allgemein
 settings-keyboard-shortcuts = Tastenkürzel
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Mit Google anmelden
 settings-sign-in-finish = Schließe die Anmeldung im geöffneten Fenster ab.
 settings-no-channel = { $name } (kein Kanal)
 settings-another-channel = Anderer Kanal
-settings-channel-not-during-transfer = Während der Übertragung nicht verfügbar
 settings-switching = Wird gewechselt…
 
 ## Playback
@@ -119,21 +117,12 @@ settings-playback-speed-desc = Spiele Titel schneller oder langsamer ab, auch ü
 settings-speed = Geschwindigkeit
 settings-keep-pitch = Tonhöhe beibehalten
 settings-keep-pitch-desc = Schneller oder langsamer, ohne dass es höher oder tiefer klingt. Ausgeschaltet ändert sich die Tonhöhe mit der Geschwindigkeit, wie bei einer Schallplatte.
-settings-playback-speed-jam-note = Beim gemeinsamen Hören gilt die normale Geschwindigkeit, damit alle dasselbe hören.
 
 ## Music videos
 
 settings-music-videos = Musikvideos
 settings-songs-not-videos = Songs statt Musikvideos abspielen
 settings-songs-not-videos-desc = Wenn YouTube Music eine Albumaufnahme hat, spielt sie anstelle des offiziellen Videos, ohne dessen Intros, Einlagen oder Extraschnitte. Die Listen behalten ihre Einträge.
-settings-show-music-videos = Musikvideos anzeigen
-settings-show-music-videos-desc = Musikvideos laufen als Bewegtbild mit eigenem Ton und ohne Liedtext. Ist das aus und werden Songs bevorzugt, fehlt bei Songs der Umschalter „Titel / Video“. Musikvideos behalten ihn.
-settings-video-quality = Videoqualität
-settings-video-quality-desc = Musikvideos nutzen diese Auflösung oder die nächstniedrigere verfügbare. 1080p benötigt etwa dreimal so viel Leistung wie 720p und kann langsamere Rechner überfordern.
-settings-ambient-light = Umgebungsbeleuchtung
-settings-ambient-light-desc = Lässt die aktuelle Wiedergabe in den Farben des Videos leuchten.
-settings-animated-covers = Animierte Cover
-settings-animated-covers-desc = Animiert Albumcover in der aktuellen Wiedergabe, wenn Apple Music einen Clip hat. Dafür werden Titel und Interpret jedes Songs an Apple Music gesendet.
 settings-hide-videos-in-search = Videos in der Suche ausblenden
 settings-hide-videos-in-search-desc = Zeigt in der Suche nur Titel, Alben, Interpreten und Playlists.
 settings-skip-non-music-parts = Passagen ohne Musik überspringen
@@ -141,8 +130,6 @@ settings-skip-non-music-parts-desc = Überspringt von der SponsorBlock-Community
 
 ## Lyrics
 
-settings-romanization = Umschrift
-settings-romanization-desc = Schreibt Japanisch, Koreanisch, Chinesisch, Kyrillisch und andere Schriften in lateinischen Buchstaben. Läuft synchron zum Liedtext, wenn die Quelle Zeitdaten liefert.
 settings-translation = Übersetzung
 settings-translation-desc = Übersetzungen stammen von Unison oder ersatzweise von Google. Mitgelieferte Übersetzungen haben Vorrang.
 settings-translate-into = Übersetzen in
@@ -256,18 +243,6 @@ settings-app-icon-named = App-Symbol: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Erlaubt einem Stream-Deck-Plug-in auf diesem Computer, die Wiedergabe zu steuern.
-settings-lastfm-connected = Deine Wiedergaben werden an das Profil von { $name } gescrobbelt.
-settings-lastfm-allow = Erlaube ytm-rs den Zugriff auf der Last.fm-Seite, die sich im Browser geöffnet hat.
-settings-lastfm-desc = Scrobbelt deine Wiedergaben an dein Last.fm-Profil.
-settings-disconnect = Verbindung trennen
-settings-connect = Verbinden
-settings-listenbrainz-connected = Deine Wiedergaben werden an das Profil von { $name } gesendet.
-settings-listenbrainz-desc = Sendet deine Wiedergaben an dein ListenBrainz-Profil.
-settings-user-token = Benutzertoken
-settings-listenbrainz-token-hint = ListenBrainz-Benutzertoken einfügen
-settings-listenbrainz-token-link = Token auf listenbrainz.org abrufen
 
 ## Language
 
@@ -302,9 +277,6 @@ settings-renderer-restart-desc = Die App rendert beim nächsten Start mit dem ne
 
 ## Downloads
 
-settings-downloads = Downloads
-settings-downloads-note = Lade Titel aus ihrem Menü oder ganze Alben und Playlists von ihrer Seite herunter. Sie werden mit Cover in der für dein Konto besten Qualität gespeichert und lassen sich auch offline abspielen.
-settings-download-folder = Downloadordner
 settings-change = Ändern
 settings-open = Öffnen
 
@@ -419,15 +391,6 @@ settings-song-info-language = Sprache der Songinformationen
 settings-song-info-language-desc = Sprache für Songtitel, Künstler- und Albumnamen und Inhaltsbereiche von YouTube Music, soweit Übersetzungen verfügbar sind.
 settings-song-info-country = Land für Charts und Empfehlungen
 settings-song-info-country-desc = Das Land, für das Charts und Empfehlungen angezeigt werden.
-settings-download-liked = Titel mit „Gefällt mir“ herunterladen
-settings-download-liked-desc = Songs, die dir gefallen, werden sofort heruntergeladen. Beim Einschalten und bei jedem Start der App auch alle, die noch fehlen. Nur angemeldet; etwa 4 MB pro Song.
-settings-folder-per-list = Alben und Playlists in eigenen Ordnern speichern
-settings-folder-per-list-desc = Beim Herunterladen eines Albums oder einer Playlist über die Seite oder das Menü werden die Songs in einem gleichnamigen Ordner gespeichert. Bereits heruntergeladene Songs bleiben an ihrem bisherigen Ort.
-settings-file-lyrics = Liedtext in der Datei
-settings-file-lyrics-desc = Heruntergeladene Titel enthalten den Liedtext, den du dazu siehst, für andere Musikplayer. Synchrone Liedtexte werden als LRC gespeichert.
-settings-file-lyrics-synced = Synchron
-settings-file-lyrics-plain = Nur Text
-settings-file-lyrics-off = Keiner
 settings-backup-stream = Ersatzstream bei Wiedergabeabbrüchen
 settings-backup-stream-desc = Wenn du angemeldet bist und YouTube einen Song wegen einer Bot-Prüfung stoppt (etwa bei einer VPN-Verbindung), wird ein Stream mit Video verwendet. Verbraucht mehr Daten.
 settings-backup-stream-prompt-title = Wiedergabe angehalten

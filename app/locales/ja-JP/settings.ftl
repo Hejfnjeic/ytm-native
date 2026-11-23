@@ -10,7 +10,6 @@
 settings-playback = 再生
 settings-lyrics = 歌詞
 settings-appearance = 外観
-settings-connections = 連携
 settings-account = アカウント
 settings-general = 一般
 settings-keyboard-shortcuts = キーボード ショートカット
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Google でログイン
 settings-sign-in-finish = 開いたウィンドウでログインを完了してください。
 settings-no-channel = { $name }（チャンネルなし）
 settings-another-channel = 別のチャンネル
-settings-channel-not-during-transfer = 転送中は利用できません
 settings-switching = 切り替え中…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 dB
 settings-playback-speed = 再生速度
 settings-playback-speed-desc = 曲の再生速度を変えます。プレーヤーバーからも操作できます。レコードのように、速くすると音程が上がり、遅くすると下がります。歌詞は同期したままです。ytm-rs の起動時に 1× に戻ります。
 settings-speed = 速度
-settings-playback-speed-jam-note = 一緒に聴くセッション中は通常の速度に戻り、全員が同じ曲を同じ速度で聴きます。
 
 ## Music videos
 
 settings-music-videos = ミュージック ビデオ
 settings-songs-not-videos = ミュージック ビデオより音源を優先
 settings-songs-not-videos-desc = YouTube Music にアルバム音源があれば、公式ミュージック ビデオの代わりにその音源を再生します。動画だけのイントロや寸劇、編集は入りません。一覧の項目は変わりません。
-settings-show-music-videos = ミュージック ビデオを表示
-settings-show-music-videos-desc = ミュージック ビデオを映像と専用音声で再生します。歌詞は表示されません。この設定をオフにして音源を優先すると、曲の「曲 / 動画」切り替えが非表示になります。ミュージック ビデオでは切り替えられます。
-settings-video-quality = 動画の画質
-settings-video-quality-desc = 指定した画質か、それ以下で最も近い画質を使います。1080p は 720p の約 3 倍の処理が必要なため、性能の低い PC では再生が追いつかないことがあります。
-settings-ambient-light = アンビエント ライト
-settings-ambient-light-desc = 再生中の画面を動画の色で照らします。
-settings-animated-covers = アニメーション カバー
-settings-animated-covers-desc = Apple Music に動画があるアルバムは、再生中の画面でカバーが動きます。動画を探すために曲名とアーティスト名を Apple Music に送信します。
 settings-hide-videos-in-search = 検索で動画を非表示
 settings-hide-videos-in-search-desc = 検索結果に曲、アルバム、アーティスト、プレイリストだけを表示します。
 settings-skip-non-music-parts = 音楽以外の部分をスキップ
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = SponsorBlock のコミュニティが指定
 
 ## Lyrics
 
-settings-romanization = ローマ字表記
-settings-romanization-desc = 日本語、韓国語、中国語、キリル文字などをラテン文字で表記します。配信元にタイミング情報があれば歌詞と同期します。
 settings-translation = 翻訳
 settings-translation-desc = 歌詞に付属する翻訳を優先します。それ以外は Unison で翻訳し、利用できない場合は Google を使います。
 settings-translate-into = 翻訳先の言語
@@ -229,18 +216,6 @@ settings-app-icon-named = アプリアイコン：{ $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = この PC の Stream Deck プラグインから再生を操作できるようにします。
-settings-lastfm-connected = 再生履歴を { $name } のプロフィールに Scrobble しています。
-settings-lastfm-allow = ブラウザーで開いた Last.fm のページで ytm-rs を許可してください。
-settings-lastfm-desc = 再生履歴を Last.fm のプロフィールに Scrobble します。
-settings-disconnect = 接続を解除
-settings-connect = 接続
-settings-listenbrainz-connected = 再生履歴を { $name } のプロフィールに送信しています。
-settings-listenbrainz-desc = 再生履歴を ListenBrainz のプロフィールに送信します。
-settings-user-token = ユーザー トークン
-settings-listenbrainz-token-hint = ListenBrainz のユーザー トークンを貼り付け
-settings-listenbrainz-token-link = listenbrainz.org でトークンを取得
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = 次回の起動時から新しい描画方式�
 
 ## Downloads
 
-settings-downloads = ダウンロード
-settings-downloads-note = 曲はメニューから、アルバムやプレイリストは各ページからまとめてダウンロードできます。アカウントで使える最高音質でカバー画像付きのファイルに保存され、オフラインでも再生できます。
-settings-download-folder = ダウンロード フォルダ
 settings-change = 変更
 settings-open = 開く
 
@@ -384,8 +356,6 @@ settings-song-info-language = 曲情報の言語
 settings-song-info-language-desc = 曲名、アーティスト名、アルバム名、YouTube Musicのコンテンツを表示する言語です。翻訳がある場合に適用されます。
 settings-song-info-country = ランキングとおすすめの国
 settings-song-info-country-desc = ランキングやおすすめの対象となる国です。
-settings-folder-per-list = アルバムやプレイリストごとにフォルダーを作成
-settings-folder-per-list-desc = アルバムやプレイリストのページやメニューからダウンロードすると、その名前のフォルダーに曲を保存します。ダウンロード済みの曲は移動しません。
 settings-backup-stream = 曲が停止したときに代替ストリームを使用
 settings-backup-stream-desc = ログイン中にYouTubeがボット確認で曲を停止した場合（VPN使用時など）、動画付きのストリームで再生します。データ通信量が増えます。
 settings-backup-stream-prompt-title = 再生が停止しました

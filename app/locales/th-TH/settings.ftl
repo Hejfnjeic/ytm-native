@@ -10,7 +10,6 @@
 settings-playback = การเล่น
 settings-lyrics = เนื้อเพลง
 settings-appearance = รูปลักษณ์
-settings-connections = การเชื่อมต่อ
 settings-account = บัญชี
 settings-general = ทั่วไป
 settings-keyboard-shortcuts = แป้นพิมพ์ลัด
@@ -32,7 +31,6 @@ settings-sign-in-with-google = ลงชื่อเข้าใช้ด้ว�
 settings-sign-in-finish = ลงชื่อเข้าใช้ให้เสร็จสิ้นในหน้าต่างที่เปิดขึ้นมา
 settings-no-channel = { $name } (ไม่มีช่อง)
 settings-another-channel = อีกช่อง
-settings-channel-not-during-transfer = ไม่ใช่ในขณะที่ดำเนินการถ่ายโอน
 settings-switching = กำลังสลับ...
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 เดซิเบล
 settings-playback-speed = ความเร็วในการเล่น
 settings-playback-speed-desc = เล่นเพลงเร็วขึ้นหรือช้าลงจากปุ่มในแถบเครื่องเล่น เสียงเร็วขึ้นและช้าลงต่ำเหมือนแผ่นเสียง เนื้อเพลงคงอยู่ในกาลเวลา กลับไปที่ 1× แต่ละครั้งที่ ytm-rs เริ่มทำงาน
 settings-speed = ความเร็ว
-settings-playback-speed-jam-note = กลับมาเป็นปกติในขณะที่คุณติดขัด ทุกคนจึงได้ยินเพลงเดียวกัน
 
 ## Music videos
 
 settings-music-videos = มิวสิควิดีโอ
 settings-songs-not-videos = เล่นเพลง ไม่ใช่มิวสิควิดีโอ
 settings-songs-not-videos-desc = มิวสิกวิดีโออย่างเป็นทางการจะเล่นเป็นเพลง ซึ่งเป็นการบันทึกอัลบั้ม เมื่อ YouTube Music มีอย่างใดอย่างหนึ่ง: ไม่มีอินโทร การละเล่น หรือการแก้ไขเฉพาะวิดีโอเท่านั้น รายการยังคงแสดงสิ่งที่พวกเขาถืออยู่
-settings-show-music-videos = แสดงมิวสิควิดีโอ
-settings-show-music-videos-desc = มิวสิกวิดีโอเล่นเป็นวิดีโอที่เคลื่อนไหว โดยมีเสียงของตัวเองและไม่มีเนื้อเพลง ปิดในขณะที่เล่นเพลงแทน เพลงไม่มีสวิตช์เพลงและวิดีโอในกำลังเล่น มิวสิควิดีโอเก็บไว้
-settings-video-quality = คุณภาพวิดีโอ
-settings-video-quality-desc = มิวสิควิดีโอเล่นได้คมชัดขนาดนี้ หรือใกล้เคียงด้านล่างสุดเมื่อวิดีโอมา 1080p ใช้เวลาประมาณสามเท่าของ 720p ซึ่งคอมพิวเตอร์ที่ช้ากว่าอาจตามไม่ทัน
-settings-ambient-light = แสงโดยรอบ
-settings-ambient-light-desc = ตอนนี้เล่นเรืองแสงโดยมีสีของวิดีโออยู่รอบๆ
-settings-animated-covers = ปกภาพเคลื่อนไหว
-settings-animated-covers-desc = เพลงคัฟเวอร์ของบางอัลบั้มย้ายไปอยู่ใน "กำลังเล่น" ซึ่ง Apple Music มีคลิปสำหรับพวกเขา การค้นหาเพลงเหล่านั้นจะส่งชื่อเพลงและศิลปินแต่ละเพลงไปที่ Apple Music
 settings-hide-videos-in-search = ซ่อนวิดีโอในการค้นหา
 settings-hide-videos-in-search-desc = เฉพาะเพลง อัลบั้ม ศิลปิน และเพลย์ลิสต์ในผลการค้นหา
 settings-skip-non-music-parts = ข้ามส่วนที่ไม่ใช่เพลง
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = กระโดดข้ามการพ�
 
 ## Lyrics
 
-settings-romanization = ถอดเสียงเป็นอักษรละติน
-settings-romanization-desc = อักษรญี่ปุ่น เกาหลี จีน ซีริลลิก และอักษรอื่นๆ ที่เป็นอักษรละติน จับเวลาด้วยเนื้อเพลงเมื่อแหล่งที่มามี
 settings-translation = คำแปล
 settings-translation-desc = ใช้คำแปลที่มากับเนื้อเพลงเมื่อมี สำหรับเพลงอื่นจะใช้ Unison หรือ Google หาก Unison แปลไม่ได้
 settings-translate-into = ภาษาที่แปล
@@ -229,18 +216,6 @@ settings-app-icon-named = ไอคอนแอป: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = ให้ปลั๊กอิน Stream Deck บนคอมพิวเตอร์เครื่องนี้ควบคุมการเล่น
-settings-lastfm-connected = กำลังเล่นสิ่งที่คุณเล่นในโปรไฟล์ของ { $name }
-settings-lastfm-allow = อนุญาต ytm-rs บนเพจ Last.fm ที่เปิดในเบราว์เซอร์ของคุณ
-settings-lastfm-desc = เลื่อนสิ่งที่คุณเล่นไปยังโปรไฟล์ Last.fm ของคุณ
-settings-disconnect = ตัดการเชื่อมต่อ
-settings-connect = เชื่อมต่อ
-settings-listenbrainz-connected = กำลังส่งสิ่งที่คุณเล่นไปที่โปรไฟล์ของ { $name }
-settings-listenbrainz-desc = ส่งสิ่งที่คุณเล่นไปที่โปรไฟล์ ListenBrainz ของคุณ
-settings-user-token = โทเค็นผู้ใช้
-settings-listenbrainz-token-hint = วางโทเค็นผู้ใช้ ListenBrainz ของคุณ
-settings-listenbrainz-token-link = รับโทเค็นของคุณบน Listenbrainz.org
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = แอปจะวาดด้วยตัว�
 
 ## Downloads
 
-settings-downloads = ดาวน์โหลด
-settings-downloads-note = ดาวน์โหลดเพลงจากเมนูหรือทั้งอัลบั้มและเพลย์ลิสต์จากหน้าของพวกเขา พวกเขาจะถูกบันทึกด้วยคุณภาพที่ดีที่สุดที่บัญชีของคุณได้รับ ติดแท็กด้วยภาพหน้าปก และเล่นจากไฟล์ แม้กระทั่งออฟไลน์
-settings-download-folder = ดาวน์โหลดโฟลเดอร์
 settings-change = เปลี่ยน
 settings-open = เปิด
 
@@ -385,8 +357,6 @@ settings-song-info-language = ภาษาของข้อมูลเพล�
 settings-song-info-language-desc = ภาษาของชื่อเพลง ชื่อศิลปิน ชื่ออัลบั้ม และหมวดหมู่ YouTube Music เมื่อมีคำแปล
 settings-song-info-country = ประเทศสำหรับชาร์ตและเพลงแนะนำ
 settings-song-info-country-desc = ประเทศที่ใช้สำหรับชาร์ตและเพลงแนะนำ
-settings-folder-per-list = บันทึกแต่ละอัลบั้มและเพลย์ลิสต์ในโฟลเดอร์แยก
-settings-folder-per-list-desc = เมื่อดาวน์โหลดอัลบั้มหรือเพลย์ลิสต์จากหน้าหรือเมนูของรายการนั้น เพลงจะถูกบันทึกในโฟลเดอร์ที่ใช้ชื่อเดียวกัน เพลงที่ดาวน์โหลดแล้วจะอยู่ที่เดิม
 settings-backup-stream = สตรีมสำรองเมื่อเพลงหยุด
 settings-backup-stream-desc = เมื่อเข้าสู่ระบบแล้ว หาก YouTube หยุดเพลงเพื่อตรวจสอบว่าคุณไม่ใช่บอท (อาจเกิดขึ้นเมื่อใช้ VPN) จะเล่นจากสตรีมที่มีวิดีโอรวมอยู่ด้วย จึงใช้ข้อมูลมากขึ้น
 settings-backup-stream-prompt-title = การเล่นหยุดลง

@@ -43,7 +43,6 @@ window-keyboard-volume-up = 音量を上げる
 window-keyboard-volume-down = 音量を下げる
 widget-pin-playlist = プレイリストを固定
 widget-unpin-playlist = プレイリストの固定を解除
-widget-show-in-folder = フォルダで表示
 palette-pages = ページ
 palette-actions = 操作
 palette-title = コマンド パレット

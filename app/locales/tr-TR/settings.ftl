@@ -10,7 +10,6 @@
 settings-playback = Oynatma
 settings-lyrics = Şarkı sözleri
 settings-appearance = Görünüm
-settings-connections = Bağlantılar
 settings-account = Hesap
 settings-general = Genel
 settings-keyboard-shortcuts = Klavye kısayolları
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Google ile oturum açın
 settings-sign-in-finish = Açılan pencerede oturum açmayı tamamlayın.
 settings-no-channel = { $name } (Kanal yok)
 settings-another-channel = Başka bir kanal
-settings-channel-not-during-transfer = Aktarım yürütülürken olmaz
 settings-switching = Değiştiriliyor…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 dB
 settings-playback-speed = Oynatma hızı
 settings-playback-speed-desc = Oynatıcı çubuğundaki bir düğmeyi kullanarak şarkıları daha hızlı veya daha yavaş çalın. Bir plak gibi, daha hızlı daha yüksek, daha yavaş ise daha alçak ses çıkarır. Şarkı sözleri, zamanın içinde kalıyor. ytm-rs her başlatıldığında 1×'e geri döner.
 settings-speed = Hız
-settings-playback-speed-jam-note = Sıkışıklık içindeyken normale dönün, böylece herkes aynı şarkıyı duyar.
 
 ## Music videos
 
 settings-music-videos = Müzik videoları
 settings-songs-not-videos = Müzik videolarını değil şarkıları oynatın
 settings-songs-not-videos-desc = YouTube Music'de bir resmi müzik videosu varsa, şarkı, albüm kaydı olarak oynatılır: giriş, skeç veya yalnızca video düzenlemesi yoktur. Listeler hâlâ neleri tuttuklarını gösteriyor.
-settings-show-music-videos = Müzik videolarını göster
-settings-show-music-videos-desc = Müzik videoları hareketli video olarak, kendi sesleriyle ve şarkı sözleri olmadan oynatılıyor. Şarkılar yerinde çalınırken kapatılır; şarkıların Şimdi yürütülüyor'da Şarkı ve Video anahtarı yoktur; müzik videoları kendilerine ait olmaya devam ediyor.
-settings-video-quality = Video kalitesi
-settings-video-quality-desc = Müzik videoları bu kadar keskin veya video yaklaştıkça bu keskinliğin altında oynatılıyor. 1080p, 720p'nin yaklaşık üç katı iş gerektirir; daha yavaş bir bilgisayar buna yetişemeyebilir.
-settings-ambient-light = Ortam ışığı
-settings-ambient-light-desc = Artık oynatılıyor ve çevresindeki video renkleri parlıyor.
-settings-animated-covers = Animasyonlu kapaklar
-settings-animated-covers-desc = Bazı albümlerin kapakları, Apple Music'in onlar için bir klibinin bulunduğu Şimdi yürütülüyor'a taşınır. Bunları bulduğunuzda her şarkının adı ve sanatçısı Apple Music'e gönderilir.
 settings-hide-videos-in-search = Aramada videoları gizle
 settings-hide-videos-in-search-desc = Arama sonuçlarında yalnızca şarkılar, albümler, sanatçılar ve çalma listeleri.
 settings-skip-non-music-parts = Müzik dışı kısımları atla
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = SponsorBlock topluluğu tarafından işaret
 
 ## Lyrics
 
-settings-romanization = Latin harfleriyle yazım
-settings-romanization-desc = Japonca, Korece, Çince, Kiril ve Latin harfleriyle yazılmış diğer alfabeler. Kaynakta mevcut olduğunda şarkı sözleriyle zamanlanmıştır.
 settings-translation = Çeviri
 settings-translation-desc = Varsa şarkı sözlerinin kendi çevirisi gösterilir. Diğer durumlarda Unison, o çeviremezse Google kullanılır.
 settings-translate-into = Çeviri dili
@@ -229,18 +216,6 @@ settings-app-icon-named = Uygulama simgesi: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Bu bilgisayardaki bir Stream Deck eklentisinin oynatmayı kontrol etmesine izin verin.
-settings-lastfm-connected = Oynadığınız içerik { $name }'nin profiline aktarılıyor.
-settings-lastfm-allow = Tarayıcınızda açılan Last.fm sayfasında ytm-rs'ye izin verin.
-settings-lastfm-desc = Oynattığınız şeyi Last.fm profilinize scrobble yapın.
-settings-disconnect = Bağlantıyı kes
-settings-connect = Bağlan
-settings-listenbrainz-connected = Oynadığınız içerik { $name }'nin profiline gönderiliyor.
-settings-listenbrainz-desc = Oynadıklarınızı ListenBrainz profilinize gönderin.
-settings-user-token = Kullanıcı jetonu
-settings-listenbrainz-token-hint = ListenBrainz kullanıcı belirtecinizi yapıştırın
-settings-listenbrainz-token-link = Listenbrainz.org'dan jetonunuzu alın
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = Uygulama, bir sonraki başlangıçtan itibaren 
 
 ## Downloads
 
-settings-downloads = İndirilenler
-settings-downloads-note = Menülerinden şarkıları veya sayfalarından tüm albümleri ve çalma listelerini indirin. Hesabınızın aldığı en iyi kalitede kaydedilirler, kapak resimleriyle etiketlenirler ve çevrimdışıyken bile dosyadan oynatılırlar.
-settings-download-folder = İndirme klasörü
 settings-change = Değişiklik
 settings-open = Aç
 
@@ -385,8 +357,6 @@ settings-song-info-language = Şarkı bilgilerinin dili
 settings-song-info-language-desc = Çeviri mevcutsa şarkı adlarının, sanatçı ve albüm adlarının ve YouTube Music bölümlerinin gösterileceği dil.
 settings-song-info-country = Listeler ve öneriler için ülke
 settings-song-info-country-desc = Listelerin ve önerilerin hazırlanacağı ülke.
-settings-folder-per-list = Her albümü ve çalma listesini ayrı klasöre kaydet
-settings-folder-per-list-desc = Bir albümü veya çalma listesini sayfasından ya da menüsünden indirirken şarkıları aynı adlı klasöre kaydeder. Önceden indirilen şarkılar yerlerinde kalır.
 settings-backup-stream = Şarkı durduğunda yedek akış kullan
 settings-backup-stream-desc = Oturum açıkken YouTube bot kontrolü nedeniyle bir şarkıyı durdurursa (VPN kullanırken olabilir), videoyu da içeren bir akıştan çalar. Daha fazla veri kullanır.
 settings-backup-stream-prompt-title = Oynatma durduruldu

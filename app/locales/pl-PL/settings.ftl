@@ -10,7 +10,6 @@
 settings-playback = Odtwarzanie
 settings-lyrics = Teksty utworów
 settings-appearance = Wygląd
-settings-connections = Połączenia
 settings-account = Konto
 settings-general = Ogólne
 settings-keyboard-shortcuts = Skróty klawiszowe
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Zaloguj się przez Google
 settings-sign-in-finish = Dokończ logowanie w otwartym oknie.
 settings-no-channel = { $name } (brak kanału)
 settings-another-channel = Inny kanał
-settings-channel-not-during-transfer = Niedostępne podczas przenoszenia
 settings-switching = Przełączanie…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 dB
 settings-playback-speed = Szybkość odtwarzania
 settings-playback-speed-desc = Przyspiesza lub zwalnia utwory, także przyciskiem na pasku odtwarzacza. Jak na płycie, przyspieszenie podwyższa dźwięk, a zwolnienie go obniża. Tekst pozostaje zsynchronizowany. Przy starcie ytm-rs prędkość wraca do 1×.
 settings-speed = Szybkość
-settings-playback-speed-jam-note = Podczas wspólnego słuchania prędkość wraca do normalnej, aby wszyscy słyszeli ten sam utwór.
 
 ## Music videos
 
 settings-music-videos = Teledyski
 settings-songs-not-videos = Preferuj utwory zamiast teledysków
 settings-songs-not-videos-desc = Jeśli YouTube Music ma wersję albumową, odtwarza ją zamiast oficjalnego teledysku, bez jego wstępów, scenek i dodatkowego montażu. Zawartość list pozostaje taka sama.
-settings-show-music-videos = Pokazuj teledyski
-settings-show-music-videos-desc = Teledyski są odtwarzane jako ruchomy obraz z własnym dźwiękiem i bez tekstu. Gdy opcja jest wyłączona i preferujesz wersje audio, przełącznik Utwór / Wideo pozostaje na ekranie odtwarzania tylko dla teledysków.
-settings-video-quality = Jakość wideo
-settings-video-quality-desc = Teledyski używają tej rozdzielczości lub najwyższej dostępnej poniżej niej. 1080p wymaga około trzykrotnie więcej mocy niż 720p, co może obciążyć wolniejsze komputery.
-settings-ambient-light = Oświetlenie otoczenia
-settings-ambient-light-desc = Podświetla otoczenie ekranu odtwarzania kolorami wideo.
-settings-animated-covers = Animowane okładki
-settings-animated-covers-desc = Animuje niektóre okładki podczas odtwarzania, jeśli Apple Music ma odpowiedni klip. Wyszukiwanie wysyła tytuł i wykonawcę każdego utworu do Apple Music.
 settings-hide-videos-in-search = Ukryj filmy w wynikach wyszukiwania
 settings-hide-videos-in-search-desc = Wyniki wyszukiwania pokazują tylko utwory, albumy, wykonawców i playlisty.
 settings-skip-non-music-parts = Pomijaj fragmenty bez muzyki
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = Pomija rozmowy, scenki i reklamy oznaczone 
 
 ## Lyrics
 
-settings-romanization = Romanizacja
-settings-romanization-desc = Zapisuje pismo japońskie, koreańskie, chińskie, cyrylicę i inne pisma alfabetem łacińskim. Synchronizuje się z tekstem, jeśli źródło udostępnia dane czasowe.
 settings-translation = Tłumaczenie
 settings-translation-desc = Pierwszeństwo ma tłumaczenie dostarczone z tekstem. W przeciwnym razie tłumaczy Unison, a gdy to niemożliwe, Google.
 settings-translate-into = Tłumacz na
@@ -229,18 +216,6 @@ settings-app-icon-named = Ikona aplikacji: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Pozwala wtyczce Stream Deck na tym komputerze sterować odtwarzaniem.
-settings-lastfm-connected = Odsłuchy są scrobblowane na profil użytkownika { $name }.
-settings-lastfm-allow = Autoryzuj ytm-rs na stronie Last.fm otwartej w przeglądarce.
-settings-lastfm-desc = Scrobbluj odsłuchy na swój profil Last.fm.
-settings-disconnect = Rozłącz
-settings-connect = Połącz
-settings-listenbrainz-connected = Odsłuchy są wysyłane na profil użytkownika { $name }.
-settings-listenbrainz-desc = Wysyłaj odsłuchy na swój profil ListenBrainz.
-settings-user-token = Token użytkownika
-settings-listenbrainz-token-hint = Wklej token użytkownika ListenBrainz
-settings-listenbrainz-token-link = Pobierz token z listenbrainz.org
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = Aplikacja użyje nowego mechanizmu renderowania
 
 ## Downloads
 
-settings-downloads = Pobrane
-settings-downloads-note = Pobieraj utwory z ich menu, a całe albumy i playlisty z ich stron. Pliki są zapisywane z okładką w najlepszej jakości dostępnej dla konta. Można je odtwarzać również offline.
-settings-download-folder = Folder pobierania
 settings-change = Zmień
 settings-open = Otwórz
 
@@ -390,8 +362,6 @@ settings-song-info-language = Język informacji o utworach
 settings-song-info-language-desc = Język tytułów utworów, nazw wykonawców i albumów oraz sekcji YouTube Music, jeśli dostępne jest tłumaczenie.
 settings-song-info-country = Kraj list przebojów i rekomendacji
 settings-song-info-country-desc = Kraj, dla którego wyświetlane są listy przebojów i rekomendacje.
-settings-folder-per-list = Zapisuj każdy album i playlistę w osobnym folderze
-settings-folder-per-list-desc = Pobranie albumu lub playlisty z jej strony albo menu zapisuje utwory w folderze o tej samej nazwie. Wcześniej pobrane utwory pozostają na swoim miejscu.
 settings-backup-stream = Zapasowy strumień przy przerwaniu odtwarzania
 settings-backup-stream-desc = Po zalogowaniu, gdy YouTube zatrzyma utwór, aby sprawdzić, czy nie jesteś botem (może się to zdarzyć przy VPN), używa strumienia z wideo. Zużywa więcej danych.
 settings-backup-stream-prompt-title = Odtwarzanie przerwane

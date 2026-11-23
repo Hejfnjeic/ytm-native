@@ -10,7 +10,6 @@
 settings-playback = 재생
 settings-lyrics = 가사
 settings-appearance = 모양
-settings-connections = 연결
 settings-account = 계정
 settings-general = 일반
 settings-keyboard-shortcuts = 키보드 단축키
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Google로 로그인
 settings-sign-in-finish = 열린 창에서 로그인을 완료하세요.
 settings-no-channel = { $name }(채널 없음)
 settings-another-channel = 다른 채널
-settings-channel-not-during-transfer = 전송이 실행되는 동안은 아님
 settings-switching = 전환 중…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0dB
 settings-playback-speed = 재생 속도
 settings-playback-speed-desc = 플레이어 바에 있는 버튼으로도 노래를 더 빠르게 또는 느리게 재생할 수 있습니다. 레코드처럼 빠르게 들릴수록 높고 느리게 들립니다. 가사는 제 시간에 머물러 있습니다. ytm-rs가 시작될 때마다 1×로 돌아갑니다.
 settings-speed = 속도
-settings-playback-speed-jam-note = 잼 중에도 정상으로 돌아가서 모두가 같은 노래를 듣게 됩니다.
 
 ## Music videos
 
 settings-music-videos = 뮤직 비디오
 settings-songs-not-videos = 뮤직 비디오가 아닌 노래를 재생하세요
 settings-songs-not-videos-desc = 공식 뮤직 비디오는 YouTube Music에 인트로, 촌극 또는 비디오 전용 편집이 없는 노래인 앨범 녹음으로 재생됩니다. 목록에는 여전히 보유하고 있는 내용이 표시됩니다.
-settings-show-music-videos = 뮤직 비디오 표시
-settings-show-music-videos-desc = 뮤직 비디오는 가사 없이 자체 사운드로 움직이는 비디오로 재생됩니다. 노래가 제자리에서 재생되는 동안에는 꺼져 있으며, 지금 재생 중인 노래에는 노래 및 비디오 스위치가 없습니다. 뮤직 비디오는 그대로 유지됩니다.
-settings-video-quality = 비디오 품질
-settings-video-quality-desc = 뮤직비디오는 영상만큼 선명하게 재생되거나 그 아래로 가깝게 재생됩니다. 1080p는 720p 작업의 약 3배를 차지하므로 느린 컴퓨터에서는 이를 따라잡지 못할 수 있습니다.
-settings-ambient-light = 주변광
-settings-ambient-light-desc = 이제 주변의 비디오 색상으로 빛납니다.
-settings-animated-covers = 애니메이션 표지
-settings-animated-covers-desc = 일부 앨범의 커버는 Apple Music에 클립이 있는 지금 재생 중으로 이동됩니다. 이를 찾으면 각 노래의 제목과 아티스트가 Apple Music으로 전송됩니다.
 settings-hide-videos-in-search = 검색에서 동영상 숨기기
 settings-hide-videos-in-search-desc = 검색결과에는 노래, 앨범, 아티스트, 재생목록만 표시됩니다.
 settings-skip-non-music-parts = 음악이 아닌 부분 건너뛰기
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = SponsorBlock 커뮤니티에서 표시한 �
 
 ## Lyrics
 
-settings-romanization = 로마자 표기
-settings-romanization-desc = 일본어, 한국어, 중국어, 키릴 문자 및 라틴 문자로 된 기타 스크립트. 소스에 가사가 있는 경우 해당 가사로 시간을 측정합니다.
 settings-translation = 번역
 settings-translation-desc = 가사에 번역이 포함되어 있으면 해당 번역을 표시합니다. 그 외에는 Unison으로 번역하고, 불가능하면 Google을 사용합니다.
 settings-translate-into = 번역 언어
@@ -229,18 +216,6 @@ settings-app-icon-named = 앱 아이콘: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = 이 컴퓨터의 Stream Deck 플러그인으로 재생을 제어할 수 있습니다.
-settings-lastfm-connected = 플레이하는 내용을 { $name }의 프로필로 스크롤합니다.
-settings-lastfm-allow = 브라우저에서 열린 Last.fm 페이지에서 ytm-rs를 허용합니다.
-settings-lastfm-desc = 연주하는 내용을 Last.fm 프로필로 스크롤하세요.
-settings-disconnect = 연결 끊기
-settings-connect = 연결하다
-settings-listenbrainz-connected = 플레이한 내용을 { $name }의 프로필로 보냅니다.
-settings-listenbrainz-desc = 플레이한 내용을 ListenBrainz 프로필로 보내세요.
-settings-user-token = 사용자 토큰
-settings-listenbrainz-token-hint = ListenBrainz 사용자 토큰을 붙여넣으세요.
-settings-listenbrainz-token-link = Listenbrainz.org에서 토큰을 받으세요.
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = 앱은 다음 시작부터 새 렌더러를 사
 
 ## Downloads
 
-settings-downloads = 다운로드
-settings-downloads-note = 메뉴에서 노래를 다운로드하거나 페이지에서 전체 앨범과 재생 목록을 다운로드하세요. 계정에서 얻을 수 있는 최고 품질로 저장되고 표지 아트로 태그가 지정되며 오프라인에서도 파일에서 재생됩니다.
-settings-download-folder = 다운로드 폴더
 settings-change = 변경
 settings-open = 열려 있는
 
@@ -385,8 +357,6 @@ settings-song-info-language = 노래 정보 언어
 settings-song-info-language-desc = 번역이 제공되는 경우 노래 제목, 아티스트 및 앨범 이름, YouTube Music 콘텐츠에 사용할 언어입니다.
 settings-song-info-country = 차트 및 추천 국가
 settings-song-info-country-desc = 차트와 추천의 기준이 되는 국가입니다.
-settings-folder-per-list = 앨범과 재생목록을 각각 별도 폴더에 저장
-settings-folder-per-list-desc = 앨범이나 재생목록의 페이지 또는 메뉴에서 다운로드하면 같은 이름의 폴더에 노래를 저장합니다. 이미 다운로드한 노래는 기존 위치에 유지됩니다.
 settings-backup-stream = 노래가 멈추면 대체 스트림 사용
 settings-backup-stream-desc = 로그인한 상태에서 YouTube가 봇 확인으로 노래를 중지하면(VPN 사용 시 발생할 수 있음) 동영상이 포함된 스트림으로 재생합니다. 데이터를 더 많이 사용합니다.
 settings-backup-stream-prompt-title = 재생이 중단되었습니다

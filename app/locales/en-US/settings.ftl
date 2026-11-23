@@ -10,7 +10,6 @@
 settings-playback = Playback
 settings-lyrics = Lyrics
 settings-appearance = Appearance
-settings-connections = Connections
 settings-account = Account
 settings-general = General
 settings-keyboard-shortcuts = Keyboard shortcuts
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Sign in with Google
 settings-sign-in-finish = Finish signing in in the window that opened.
 settings-no-channel = { $name } (No channel)
 settings-another-channel = Another channel
-settings-channel-not-during-transfer = Not while a transfer runs
 settings-switching = Switching…
 
 ## Playback
@@ -92,7 +90,6 @@ settings-output-device = Output device
 settings-output-device-desc = Where the music plays: this computer's speakers or headphones, or an AirPlay speaker on your network (with Settings › Network › Allow local network scan on). A picked device that isn't connected leaves it to Windows' default until it's back.
 settings-windows-default = Windows default
 settings-not-connected = { $name } (not connected)
-settings-airplay-device = { $name } (AirPlay)
 settings-normalization-off-desc = Songs play as loud as they were made. Normal brings them all to the same level, and Quiet to the same, lower one.
 settings-normalization-normal-desc = Songs play at the same level: loud ones turned down, as on YouTube Music, and quiet ones up by as much as 6 dB.
 settings-normalization-quiet-desc = Songs play at the same, lower level: loud ones turned down further, so quiet ones rarely need turning up.
@@ -124,21 +121,12 @@ settings-playback-speed-desc = Play songs faster or slower, also from a button i
 settings-speed = Speed
 settings-keep-pitch = Keep the pitch
 settings-keep-pitch-desc = Faster or slower without sounding higher or lower. Off, the pitch changes with the speed, like a record.
-settings-playback-speed-jam-note = Back to normal while you're in a jam, so everyone hears the same song.
 
 ## Music videos
 
 settings-music-videos = Music videos
 settings-songs-not-videos = Play songs, not music videos
 settings-songs-not-videos-desc = An official music video plays as its song, the album recording, when YouTube Music has one: no intros, skits or video-only edits. Lists still show what they hold.
-settings-show-music-videos = Show music videos
-settings-show-music-videos-desc = Music videos play as moving video, with their own sound and no lyrics. Turned off while songs play in their place, songs have no Song and Video switch in Now playing; music videos keep theirs.
-settings-video-quality = Video quality
-settings-video-quality-desc = Music videos play this sharp, or as close below it as the video comes. 1080p takes about three times the work of 720p, which a slower computer may not keep up with.
-settings-ambient-light = Ambient light
-settings-ambient-light-desc = Now playing glows with the video's colours around it.
-settings-animated-covers = Animated covers
-settings-animated-covers-desc = Some albums' covers move in Now playing, where Apple Music has a clip for them. Finding them sends each song's title and artist to Apple Music.
 settings-hide-videos-in-search = Hide videos in search
 settings-hide-videos-in-search-desc = Only songs, albums, artists and playlists in search results.
 settings-skip-non-music-parts = Skip non-music parts
@@ -146,8 +134,6 @@ settings-skip-non-music-parts-desc = Jump over talking, skits and sponsor breaks
 
 ## Lyrics
 
-settings-romanization = Romanization
-settings-romanization-desc = Japanese, Korean, Chinese, Cyrillic and other scripts in Latin letters. Timed with the lyrics when the source has it.
 settings-translation = Translation
 settings-translation-desc = Translated by Unison, or Google when it can't. Lyrics that ship their own translation use it.
 settings-translate-into = Translate into
@@ -266,18 +252,6 @@ settings-app-icon-named = App icon: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Let a Stream Deck plugin on this computer control playback.
-settings-lastfm-connected = Scrobbling what you play to { $name }'s profile.
-settings-lastfm-allow = Allow ytm-rs on the Last.fm page that opened in your browser.
-settings-lastfm-desc = Scrobble what you play to your Last.fm profile.
-settings-disconnect = Disconnect
-settings-connect = Connect
-settings-listenbrainz-connected = Sending what you play to { $name }'s profile.
-settings-listenbrainz-desc = Send what you play to your ListenBrainz profile.
-settings-user-token = User token
-settings-listenbrainz-token-hint = Paste your ListenBrainz user token
-settings-listenbrainz-token-link = Get your token on listenbrainz.org
 
 ## Language
 
@@ -320,29 +294,14 @@ settings-renderer-restart-desc = The app draws with the new renderer from the ne
 
 ## Downloads
 
-settings-downloads = Downloads
-settings-downloads-note = Download songs from their menu, or whole albums and playlists from their page. They're saved at the best quality your account gets, tagged with their cover art, and play from the file, even offline.
-settings-download-folder = Download folder
 settings-change = Change
 settings-open = Open
-settings-download-liked = Download liked songs
-settings-download-liked-desc = Songs you like are downloaded right away. When this is switched on, and each time the app starts, the liked songs not downloaded yet are too. Signed in only; about 4 MB a song.
-settings-folder-per-list = Put albums and playlists in their own folder
-settings-folder-per-list-desc = Downloading an album or playlist from its page or menu saves its songs in a folder named after it. Songs downloaded already stay where they are.
-settings-file-lyrics = Lyrics in the file
-settings-file-lyrics-desc = Downloaded songs carry the lyrics you see for them, for other music players. Timed lyrics are saved as LRC.
-settings-file-lyrics-synced = Timed
-settings-file-lyrics-plain = Words only
-settings-file-lyrics-off = None
 
 ## Network
 
 settings-network = Network
 settings-backup-stream = Backup stream when songs stop
 settings-backup-stream-desc = Signed in, when YouTube stops a song with a bot check (this can happen on a VPN), play it from a stream that comes with the video. Uses more data.
-settings-local-network = Allow local network scan
-settings-local-network-desc = Look for AirPlay speakers on your network, so the music can play on them. Your firewall may ask once to let the app through.
-settings-airplay-searching = Looking for AirPlay speakers…
 settings-backup-stream-prompt-title = Playback stopped
 settings-backup-stream-prompt-body = YouTube stopped this song with a bot check, which can happen on a VPN. A backup stream can play it instead. It comes with the video, so it uses more data.
 settings-backup-stream-prompt-enable = Turn on and retry
@@ -436,7 +395,9 @@ settings-whats-new-in = What's new in { $version }
 
 ## About
 
-settings-about-tagline = A fast, native YouTube Music client.
+settings-about-tagline = A fast, native YouTube Music player.
+settings-about-based-on = Based on ytm-rs
+settings-about-based-on-credit = The interface and lyrics come from ytm-rs by grapedjuice (GPL-3.0)
 settings-about-lyrics-sources = Better Lyrics API: Musixmatch, LRCLIB, QQ, KuGou and Better Lyrics TTML
 settings-about-themes-credit = Adapted from the Better Lyrics theme store; each card credits its creators
 settings-background = Background

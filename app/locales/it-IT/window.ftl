@@ -43,7 +43,6 @@ window-keyboard-volume-up = Alza il volume
 window-keyboard-volume-down = Abbassa il volume
 widget-pin-playlist = Fissa playlist
 widget-unpin-playlist = Sblocca playlist
-widget-show-in-folder = Mostra nella cartella
 palette-pages = Pagine
 palette-actions = Azioni
 palette-title = Tavolozza dei comandi

@@ -43,7 +43,6 @@ window-keyboard-volume-up = เพิ่มระดับเสียง
 window-keyboard-volume-down = ลดระดับเสียง
 widget-pin-playlist = ปักหมุดเพลย์ลิสต์
 widget-unpin-playlist = เลิกปักหมุดเพลย์ลิสต์
-widget-show-in-folder = แสดงในโฟลเดอร์
 palette-pages = หน้า
 palette-actions = การดำเนินการ
 palette-title = ชุดคำสั่ง

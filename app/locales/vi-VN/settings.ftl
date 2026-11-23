@@ -10,7 +10,6 @@
 settings-playback = Phát nhạc
 settings-lyrics = Lời bài hát
 settings-appearance = Giao diện
-settings-connections = Kết nối
 settings-account = Tài khoản
 settings-general = Chung
 settings-keyboard-shortcuts = Phím tắt
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Đăng nhập bằng Google
 settings-sign-in-finish = Hoàn tất đăng nhập trong cửa sổ đã mở.
 settings-no-channel = { $name } (Không có kênh)
 settings-another-channel = Một kênh khác
-settings-channel-not-during-transfer = Không trong khi quá trình truyền đang diễn ra
 settings-switching = Đang chuyển đổi…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 dB
 settings-playback-speed = Tốc độ phát lại
 settings-playback-speed-desc = Phát bài hát nhanh hơn hoặc chậm hơn, cũng từ một nút trên thanh trình phát. Âm thanh nhanh hơn sẽ cao hơn và thấp hơn chậm hơn, giống như một bản ghi âm. Lời bài hát ở lại trong thời gian. Quay lại 1× mỗi lần ytm-rs khởi động.
 settings-speed = Tốc độ
-settings-playback-speed-jam-note = Trở lại bình thường khi bạn đang gặp khó khăn, nên mọi người đều nghe cùng một bài hát.
 
 ## Music videos
 
 settings-music-videos = Video ca nhạc
 settings-songs-not-videos = Phát bài hát chứ không phải video nhạc
 settings-songs-not-videos-desc = Một video âm nhạc chính thức phát dưới dạng bài hát, bản ghi album, khi YouTube Music có một: không có phần giới thiệu, tiểu phẩm hoặc chỉ chỉnh sửa video. Danh sách vẫn hiển thị những gì họ nắm giữ.
-settings-show-music-videos = Hiển thị video ca nhạc
-settings-show-music-videos-desc = Video nhạc phát dưới dạng video chuyển động, có âm thanh riêng và không có lời bài hát. Bị tắt khi các bài hát đang phát ở vị trí của chúng, các bài hát không có nút chuyển Bài hát và Video trong Đang phát; video âm nhạc giữ của họ.
-settings-video-quality = Chất lượng video
-settings-video-quality-desc = Video nhạc phát ở mức sắc nét này hoặc gần như ở mức thấp hơn khi video xuất hiện. 1080p mất khoảng ba lần công việc của 720p, điều mà một máy tính chậm hơn có thể không theo kịp.
-settings-ambient-light = Ánh sáng xung quanh
-settings-ambient-light-desc = Hiện đang phát ánh sáng với màu sắc của video xung quanh.
-settings-animated-covers = Bìa hoạt hình
-settings-animated-covers-desc = Bìa của một số album chuyển sang phần Đang phát, trong đó Apple Music có một đoạn clip cho chúng. Việc tìm thấy chúng sẽ gửi tên và nghệ sĩ của từng bài hát tới Apple Music.
 settings-hide-videos-in-search = Ẩn video trong tìm kiếm
 settings-hide-videos-in-search-desc = Chỉ các bài hát, album, nghệ sĩ và danh sách phát trong kết quả tìm kiếm.
 settings-skip-non-music-parts = Bỏ qua những phần không phải âm nhạc
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = Chuyển qua phần trò chuyện, tiểu p
 
 ## Lyrics
 
-settings-romanization = Phiên âm sang chữ Latinh
-settings-romanization-desc = Chữ viết tiếng Nhật, tiếng Hàn, tiếng Trung, chữ Cyrillic và các chữ viết khác bằng chữ Latinh. Tính thời gian với lời bài hát khi có nguồn.
 settings-translation = Bản dịch
 settings-translation-desc = Dùng bản dịch đi kèm lời bài hát nếu có. Trong các trường hợp khác, Unison sẽ dịch và Google sẽ thay thế khi Unison không dịch được.
 settings-translate-into = Ngôn ngữ bản dịch
@@ -229,18 +216,6 @@ settings-app-icon-named = Biểu tượng ứng dụng: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Cho phép plugin Stream Deck trên máy tính này điều khiển quá trình phát lại.
-settings-lastfm-connected = Ghi lại những gì bạn chơi vào hồ sơ của { $name }.
-settings-lastfm-allow = Cho phép ytm-rs trên trang Last.fm đã mở trong trình duyệt của bạn.
-settings-lastfm-desc = Ghi nhanh nội dung bạn chơi vào hồ sơ Last.fm của bạn.
-settings-disconnect = Ngắt kết nối
-settings-connect = Kết nối
-settings-listenbrainz-connected = Gửi những gì bạn chơi tới hồ sơ của { $name }.
-settings-listenbrainz-desc = Gửi nội dung bạn chơi tới hồ sơ ListenBrainz của bạn.
-settings-user-token = Mã thông báo của người dùng
-settings-listenbrainz-token-hint = Dán mã thông báo người dùng ListenBrainz của bạn
-settings-listenbrainz-token-link = Nhận mã thông báo của bạn trên listenbrainz.org
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = Ứng dụng vẽ bằng trình kết xuất m�
 
 ## Downloads
 
-settings-downloads = Tải xuống
-settings-downloads-note = Tải xuống các bài hát từ menu của họ hoặc toàn bộ album và danh sách phát từ trang của họ. Chúng được lưu ở chất lượng tốt nhất mà tài khoản của bạn có được, được gắn thẻ ảnh bìa và phát từ tệp, ngay cả khi ngoại tuyến.
-settings-download-folder = Thư mục tải xuống
 settings-change = Thay đổi
 settings-open = Mở
 
@@ -385,8 +357,6 @@ settings-song-info-language = Ngôn ngữ thông tin bài hát
 settings-song-info-language-desc = Ngôn ngữ của tên bài hát, nghệ sĩ, album và các mục nội dung YouTube Music khi có bản dịch.
 settings-song-info-country = Quốc gia cho bảng xếp hạng và đề xuất
 settings-song-info-country-desc = Quốc gia dùng cho bảng xếp hạng và nội dung đề xuất.
-settings-folder-per-list = Lưu mỗi album và danh sách phát vào thư mục riêng
-settings-folder-per-list-desc = Khi tải album hoặc danh sách phát từ trang hay menu của nó, các bài hát được lưu trong thư mục cùng tên. Các bài đã tải vẫn ở vị trí cũ.
 settings-backup-stream = Luồng dự phòng khi bài hát bị dừng
 settings-backup-stream-desc = Khi đã đăng nhập, nếu YouTube dừng bài hát để kiểm tra bạn có phải bot không (có thể xảy ra khi dùng VPN), phát bằng luồng có kèm video. Tốn nhiều dữ liệu hơn.
 settings-backup-stream-prompt-title = Đã dừng phát

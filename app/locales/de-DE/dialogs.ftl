@@ -33,7 +33,4 @@ dialog-collaborators = Mitwirkende
 dialog-no-collaborators = Noch niemand ist beigetreten.
 dialog-delete-playlist-body = „{ $title }“ wird aus deiner YouTube-Music-Mediathek entfernt. Das lässt sich nicht rückgängig machen.
 dialog-delete-upload-body = „{ $title }“ wird aus deinen YouTube-Music-Uploads gelöscht. Das lässt sich nicht rückgängig machen.
-dialog-download-count = Herunterladen ({ $count })
 dialog-edit-playlist = Playlist bearbeiten
-dialog-download-body = Noch { $count } Titel herunterzuladen. Downloads laufen im Hintergrund und beginnen mit dem aktuellen Titel.
-dialog-download-collection-body = Aus „{ $title }“ sind noch { $count } Titel herunterzuladen. Downloads laufen im Hintergrund und beginnen mit dem aktuellen Titel.

@@ -43,7 +43,6 @@ window-keyboard-volume-up = Zwiększ głośność
 window-keyboard-volume-down = Zmniejsz głośność
 widget-pin-playlist = Przypnij playlistę
 widget-unpin-playlist = Odepnij playlistę
-widget-show-in-folder = Pokaż w folderze
 palette-pages = Strony
 palette-actions = Działania
 palette-title = Paleta poleceń

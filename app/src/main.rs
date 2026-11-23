@@ -97,8 +97,8 @@ fn main() -> eframe::Result {
     let background = std::env::var_os("YTM_BACKGROUND").is_some();
     ui::init_titlebar(&data_dir());
     let mut viewport = egui::ViewportBuilder::default()
-        .with_title("YT Music")
-        .with_app_id("ytm-rs")
+        .with_title("ytm-native")
+        .with_app_id("ytm-native")
         .with_inner_size(DEFAULT_SIZE)
         .with_min_inner_size(MIN_SIZE)
         // Windows, and Linux where the desktop draws none: the app draws its own title
@@ -143,7 +143,7 @@ fn main() -> eframe::Result {
     };
 
     let run = eframe::run_native(
-        "ytm-rs",
+        "ytm-native",
         options,
         Box::new(|cc| {
             let language = cc.storage.and_then(|storage| storage.get_string("language")).filter(|l| !l.is_empty());
@@ -283,8 +283,8 @@ fn hwnd(_: &eframe::CreationContext) -> Option<*mut std::ffi::c_void> {
 /// next to the settings (overwritten each launch).
 fn init_logging() {
     let mut builder = env_logger::Builder::from_env(
-        // A test build can be made more talkative: YTM_DEFAULT_LOG=warn,ytm_rs=debug cargo build.
-        env_logger::Env::default().default_filter_or(option_env!("YTM_DEFAULT_LOG").unwrap_or("warn,ytm_rs=info")),
+        // A test build can be made more talkative: YTM_DEFAULT_LOG=warn,ytm_native=debug cargo build.
+        env_logger::Env::default().default_filter_or(option_env!("YTM_DEFAULT_LOG").unwrap_or("warn,ytm_native=info")),
     );
     // Dev hook: YTM_LOG=<path> logs there (test runs beside a running copy).
     if let Some(path) = std::env::var_os("YTM_LOG") {
@@ -295,8 +295,8 @@ fn init_logging() {
         let dir = data_dir();
         let _ = std::fs::create_dir_all(&dir);
         // The last run's log too: reopening the app after a problem would otherwise wipe it.
-        let _ = std::fs::rename(dir.join("ytm-rs.log"), dir.join("ytm-rs.prev.log"));
-        if let Ok(file) = std::fs::File::create(dir.join("ytm-rs.log")) {
+        let _ = std::fs::rename(dir.join("ytm-native.log"), dir.join("ytm-native.prev.log"));
+        if let Ok(file) = std::fs::File::create(dir.join("ytm-native.log")) {
             builder.target(env_logger::Target::Pipe(Box::new(file)));
         }
     }
@@ -448,7 +448,13 @@ fn data_dir() -> std::path::PathBuf {
     if let Some(dir) = update::portable_dir() {
         return dir.join("data");
     }
-    directories::ProjectDirs::from("", "", "ytm-rs").expect("no home directory").data_dir().to_path_buf()
+    default_data_dir().expect("no home directory")
+}
+
+/// The user's own data folder (`~/.local/share/ytm-native` on Linux), shared with the
+/// Slint version of ytm-native, whose login carries over from there.
+pub fn default_data_dir() -> Option<std::path::PathBuf> {
+    directories::ProjectDirs::from("", "", "ytm-native").map(|d| d.data_dir().to_path_buf())
 }
 
 #[cfg(test)]

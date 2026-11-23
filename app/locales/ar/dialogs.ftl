@@ -33,7 +33,4 @@ dialog-collaborators = المساهمون
 dialog-no-collaborators = لم ينضم أحد بعد.
 dialog-delete-playlist-body = ستتم إزالة “{ $title }” من مكتبتك على YouTube Music. لا يمكن التراجع عن هذا الإجراء.
 dialog-delete-upload-body = سيتم حذف “{ $title }” من ملفاتك المرفوعة على YouTube Music. لا يمكن التراجع عن هذا الإجراء.
-dialog-download-count = تنزيل ({ $count })
 dialog-edit-playlist = تعديل قائمة التشغيل
-dialog-download-body = الأغاني المتبقية للتنزيل: { $count }. تعمل التنزيلات في الخلفية وتبدأ بالأغنية الحالية.
-dialog-download-collection-body = الأغاني المتبقية للتنزيل من “{ $title }”: { $count }. تعمل التنزيلات في الخلفية وتبدأ بالأغنية الحالية.

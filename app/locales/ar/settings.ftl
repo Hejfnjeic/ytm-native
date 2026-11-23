@@ -10,7 +10,6 @@
 settings-playback = التشغيل
 settings-lyrics = الكلمات
 settings-appearance = المظهر
-settings-connections = الاتصالات
 settings-account = الحساب
 settings-general = عام
 settings-keyboard-shortcuts = اختصارات لوحة المفاتيح
@@ -32,7 +31,6 @@ settings-sign-in-with-google = تسجيل الدخول باستخدام Google
 settings-sign-in-finish = أكمل تسجيل الدخول في النافذة التي فُتحت.
 settings-no-channel = { $name } (بدون قناة)
 settings-another-channel = قناة أخرى
-settings-channel-not-during-transfer = غير متاح أثناء إجراء عملية نقل
 settings-switching = جارٍ التبديل…
 
 ## Playback
@@ -117,7 +115,6 @@ settings-playback-speed-desc = تشغيل الأغاني أسرع أو أبطأ�
 settings-speed = السرعة
 settings-keep-pitch = الحفاظ على طبقة الصوت
 settings-keep-pitch-desc = أسرع أو أبطأ دون أن يصبح الصوت أعلى أو أخفض طبقةً. عند إيقافه، تتغير الطبقة مع السرعة، مثل الأسطوانة.
-settings-playback-speed-jam-note = تعود إلى الوضع الطبيعي أثناء وجودك في جلسة مشتركة، حتى يسمع الجميع الأغنية نفسها.
 
 
 ## Music videos
@@ -125,22 +122,12 @@ settings-playback-speed-jam-note = تعود إلى الوضع الطبيعي أ�
 settings-music-videos = مقاطع الفيديو الموسيقية
 settings-songs-not-videos = تشغيل الأغاني بدلًا من مقاطع الفيديو الموسيقية
 settings-songs-not-videos-desc = يُشغَّل الفيديو الموسيقي الرسمي كأغنية (تسجيل الألبوم) عندما يتوفر لدى YouTube Music: دون مقدمات أو مشاهد تمثيلية أو تعديلات خاصة بالفيديو. وتظل القوائم تعرض ما تحتويه.
-settings-show-music-videos = عرض مقاطع الفيديو الموسيقية
-settings-show-music-videos-desc = تُشغَّل مقاطع الفيديو الموسيقية كفيديو متحرك بصوتها الخاص ودون كلمات. وعند إيقاف هذا الخيار وتشغيل الأغاني بدلًا منها، لا يظهر مفتاح التبديل بين أغنية وفيديو في شاشة قيد التشغيل الآن للأغاني، بينما تحتفظ به مقاطع الفيديو الموسيقية.
-settings-video-quality = جودة الفيديو
-settings-video-quality-desc = تُشغَّل مقاطع الفيديو الموسيقية بهذه الدقة، أو بأقرب دقة أقل متوفرة للفيديو. تتطلب دقة 1080p نحو ثلاثة أضعاف الجهد مقارنة بدقة 720p، وهو ما قد تعجز عنه الحواسيب البطيئة.
-settings-ambient-light = الإضاءة المحيطية
-settings-ambient-light-desc = تتوهّج شاشة قيد التشغيل الآن بألوان الفيديو من حولها.
-settings-animated-covers = الأغلفة المتحركة
-settings-animated-covers-desc = تتحرك أغلفة بعض الألبومات في شاشة قيد التشغيل الآن عندما يتوفر لها مقطع لدى Apple Music. ويتطلب العثور عليها إرسال عنوان كل أغنية واسم الفنان إلى Apple Music.
 settings-hide-videos-in-search = إخفاء مقاطع الفيديو في البحث
 settings-hide-videos-in-search-desc = إظهار الأغاني والألبومات والفنانين وقوائم التشغيل فقط في نتائج البحث.
 settings-skip-non-music-parts = تخطّي الأجزاء غير الموسيقية
 settings-skip-non-music-parts-desc = القفز فوق الحديث والمشاهد التمثيلية وفواصل الرعاة في مقاطع الفيديو الموسيقية، وفق ما حدّده مجتمع SponsorBlock. ولا تحتوي أغاني الألبومات على أيٍّ منها.
 ## Lyrics
 
-settings-romanization = الكتابة بالحروف اللاتينية
-settings-romanization-desc = اليابانية والكورية والصينية والسيريلية وغيرها من النصوص بالحروف اللاتينية. تكون متزامنة مع الكلمات عندما يوفر المصدر ذلك.
 settings-translation = الترجمة
 settings-translation-desc = تُترجم بواسطة Unison، أو Google عندما يتعذّر ذلك. وتُستخدم الترجمة المرفقة مع الكلمات إن وُجدت.
 settings-translate-into = الترجمة إلى
@@ -233,18 +220,6 @@ settings-app-icon-named = أيقونة التطبيق: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = السماح لإضافة Stream Deck على هذا الجهاز بالتحكم في التشغيل.
-settings-lastfm-connected = إرسال سجل ما تشغّله إلى ملف { $name } الشخصي.
-settings-lastfm-allow = اسمح لـ ytm-rs في صفحة Last.fm التي فُتحت في متصفحك.
-settings-lastfm-desc = إرسال سجل ما تشغّله إلى ملفك الشخصي على Last.fm.
-settings-disconnect = قطع الاتصال
-settings-connect = اتصال
-settings-listenbrainz-connected = إرسال ما تشغّله إلى ملف { $name } الشخصي.
-settings-listenbrainz-desc = إرسال ما تشغّله إلى ملفك الشخصي على ListenBrainz.
-settings-user-token = رمز المستخدم
-settings-listenbrainz-token-hint = الصق رمز المستخدم الخاص بك في ListenBrainz
-settings-listenbrainz-token-link = احصل على الرمز من listenbrainz.org
 
 ## Language
 
@@ -288,18 +263,8 @@ settings-renderer-restart-desc = سيستخدم التطبيق محرّك الع
 
 ## Downloads
 
-settings-downloads = التنزيلات
-settings-downloads-note = نزّل الأغاني من قائمتها، أو الألبومات وقوائم التشغيل بالكامل من صفحتها. تُحفظ بأعلى جودة يتيحها حسابك، وتُرفق بصورة الغلاف، وتعمل من الملف مباشرةً حتى دون اتصال بالإنترنت.
-settings-download-folder = مجلد التنزيلات
 settings-change = تغيير
 settings-open = فتح
-settings-folder-per-list = وضع الألبومات وقوائم التشغيل في مجلد خاص بها
-settings-folder-per-list-desc = تنزيل ألبوم أو قائمة تشغيل من صفحتها أو قائمتها يحفظ أغانيها في مجلد يحمل اسمها. تبقى الأغاني المُنزَّلة مسبقاً في مكانها الحالي.
-settings-file-lyrics = الكلمات في الملف
-settings-file-lyrics-desc = تحمل الأغاني المُنزَّلة الكلمات التي تراها لها، لمشغّلات الموسيقى الأخرى. تُحفَظ الكلمات المتزامنة بصيغة LRC.
-settings-file-lyrics-synced = متزامنة
-settings-file-lyrics-plain = النص فقط
-settings-file-lyrics-off = بلا كلمات
 
 ## Network
 

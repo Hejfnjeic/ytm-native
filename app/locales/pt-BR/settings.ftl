@@ -10,7 +10,6 @@
 settings-playback = Reprodução
 settings-lyrics = Letras
 settings-appearance = Aparência
-settings-connections = Conexões
 settings-account = Conta
 settings-general = Geral
 settings-keyboard-shortcuts = Atalhos de teclado
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Entrar com o Google
 settings-sign-in-finish = Conclua o login na janela que abriu.
 settings-no-channel = { $name } (Sem canal)
 settings-another-channel = Outro canal
-settings-channel-not-during-transfer = Não durante uma transferência
 settings-switching = Alternando…
 
 ## Playback
@@ -115,21 +113,12 @@ settings-playback-speed-desc = Toca as músicas mais rápido ou mais lento, tamb
 settings-speed = Velocidade
 settings-keep-pitch = Manter o tom
 settings-keep-pitch-desc = Mais rápido ou mais lento sem soar mais agudo ou mais grave. Desligado, o tom muda com a velocidade, como um disco.
-settings-playback-speed-jam-note = Volta ao normal enquanto você está em um jam, para todos ouvirem a mesma música.
 
 ## Music videos
 
 settings-music-videos = Videoclipes
 settings-songs-not-videos = Tocar músicas, não videoclipes
 settings-songs-not-videos-desc = Um videoclipe oficial toca como a música, a gravação do álbum, quando o YouTube Music tem uma: sem intros, esquetes ou edições só do vídeo. As listas ainda mostram o que têm.
-settings-show-music-videos = Mostrar videoclipes
-settings-show-music-videos-desc = Os videoclipes tocam como vídeo em movimento, com o próprio som e sem letras. Desligado enquanto as músicas tocam no lugar, as músicas não têm chave Música e Vídeo em Tocando agora; os videoclipes mantêm a sua.
-settings-video-quality = Qualidade do vídeo
-settings-video-quality-desc = Os videoclipes tocam nesta nitidez, ou o mais perto abaixo que o vídeo tiver. 1080p exige cerca de três vezes o trabalho de 720p, o que um PC mais lento pode não acompanhar.
-settings-ambient-light = Luz ambiente
-settings-ambient-light-desc = Tocando agora brilha com as cores do vídeo ao redor.
-settings-animated-covers = Capas animadas
-settings-animated-covers-desc = Algumas capas de álbum se movem em Tocando agora, quando o Apple Music tem um clipe para elas. Encontrá-las envia o título e o artista de cada música ao Apple Music.
 settings-hide-videos-in-search = Ocultar vídeos na busca
 settings-hide-videos-in-search-desc = Só músicas, álbuns, artistas e playlists nos resultados da busca.
 settings-skip-non-music-parts = Pular partes sem música
@@ -137,8 +126,6 @@ settings-skip-non-music-parts-desc = Pula falas, esquetes e intervalos de patroc
 
 ## Lyrics
 
-settings-romanization = Romanização
-settings-romanization-desc = Japonês, coreano, chinês, cirílico e outros alfabetos em letras latinas. Sincronizado com a letra quando a fonte tem.
 settings-translation = Tradução
 settings-translation-desc = Traduzido pelo Unison, ou pelo Google quando não consegue. Letras que já trazem tradução usam a própria.
 settings-translate-into = Traduzir para
@@ -231,18 +218,6 @@ settings-app-icon-named = Ícone do app: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Deixa um plugin do Stream Deck neste computador controlar a reprodução.
-settings-lastfm-connected = Scrobblando o que você toca no perfil de { $name }.
-settings-lastfm-allow = Autorize o ytm-rs na página do Last.fm que abriu no navegador.
-settings-lastfm-desc = Scrobble o que você toca no seu perfil do Last.fm.
-settings-disconnect = Desconectar
-settings-connect = Conectar
-settings-listenbrainz-connected = Enviando o que você toca ao perfil de { $name }.
-settings-listenbrainz-desc = Envia o que você toca ao seu perfil do ListenBrainz.
-settings-user-token = Token de usuário
-settings-listenbrainz-token-hint = Cole seu token de usuário do ListenBrainz
-settings-listenbrainz-token-link = Obtenha seu token em listenbrainz.org
 
 ## Language
 
@@ -277,9 +252,6 @@ settings-renderer-restart-desc = O app desenha com o novo renderizador no próxi
 
 ## Downloads
 
-settings-downloads = Downloads
-settings-downloads-note = Baixe músicas pelo menu delas, ou álbuns e playlists inteiros pela página. São salvos na melhor qualidade da sua conta, com a capa nas tags, e tocam do arquivo, mesmo offline.
-settings-download-folder = Pasta de downloads
 settings-change = Alterar
 settings-open = Abrir
 
@@ -390,13 +362,6 @@ settings-song-info-language = Idioma das informações das músicas
 settings-song-info-language-desc = Idioma dos títulos de músicas, nomes de artistas e álbuns e seções do YouTube Music, quando houver tradução disponível.
 settings-song-info-country = País das paradas e recomendações
 settings-song-info-country-desc = País usado nas paradas e recomendações.
-settings-folder-per-list = Salvar cada álbum e playlist em sua própria pasta
-settings-folder-per-list-desc = Ao baixar um álbum ou playlist pela página ou pelo menu, as músicas são salvas em uma pasta com o nome dele. As músicas já baixadas continuam no mesmo lugar.
-settings-file-lyrics = Letra no arquivo
-settings-file-lyrics-desc = As músicas baixadas levam a letra que você vê nelas, para outros players. A letra sincronizada é salva como LRC.
-settings-file-lyrics-synced = Sincronizada
-settings-file-lyrics-plain = Só o texto
-settings-file-lyrics-off = Nenhuma
 settings-backup-stream = Fluxo alternativo quando a música para
 settings-backup-stream-desc = Se você estiver conectado e o YouTube interromper uma música para verificar se você é um robô (pode acontecer com VPN), usa um fluxo que inclui o vídeo. Consome mais dados.
 settings-backup-stream-prompt-title = Reprodução interrompida

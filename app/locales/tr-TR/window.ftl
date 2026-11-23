@@ -43,7 +43,6 @@ window-keyboard-volume-up = Sesi artır
 window-keyboard-volume-down = Sesi kıs
 widget-pin-playlist = Oynatma listesini sabitle
 widget-unpin-playlist = Çalma listesinin sabitlemesini kaldır
-widget-show-in-folder = Klasörde göster
 palette-pages = Sayfalar
 palette-actions = Eylemler
 palette-title = Komut paleti

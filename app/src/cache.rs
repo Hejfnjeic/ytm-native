@@ -1,6 +1,5 @@
 //! What Settings › Storage clears: what the app fetched and keeps only to be quicker, all
-//! of which it fetches again when needed. Sign-in, settings, downloads (and their lyrics),
-//! the helpers playback runs on, and logs stay.
+//! of which it fetches again when needed. Sign-in, settings and logs stay.
 
 use std::path::Path;
 use std::sync::{Arc, Mutex};
@@ -9,14 +8,12 @@ use std::sync::{Arc, Mutex};
 const DIRS: &[&str] = &[
     // Covers and thumbnails, kept so the next launch shows them at once.
     "thumbs",
-    // Romanized and translated lyrics.
+    // What earlier builds kept of translated lyrics (now kept in memory only).
     "translations",
-    // The browser profile the lyrics check runs in (its token, `lyrics_jwt`, stays).
+    // The browser profile the lyrics check runs in (its token stays, in the vault).
     "webview-lyrics",
     // Downloaded updates: an installer, an unpacked build, the last install's log.
     "updates",
-    // Error reports from versions up to 0.2.11.
-    "rustypipe_reports",
 ];
 
 /// The folder of downloaded updates, left alone while one downloads or waits to install.
@@ -155,12 +152,12 @@ mod tests {
 
     #[test]
     fn clears_the_cache_and_keeps_the_rest() {
-        let dir = std::env::temp_dir().join("ytm-rs-cache-test");
+        let dir = std::env::temp_dir().join("ytm-native-cache-test");
         let _ = std::fs::remove_dir_all(&dir);
         for (path, len) in [
             ("thumbs/a", 100),
             ("webview-lyrics/EBWebView/Default/Cookies", 50),
-            ("updates/ytm-rs-setup.exe", 1000),
+            ("updates/ytm-native-setup.exe", 1000),
             ("lyrics/song.lrc", 7),
             ("webview/Cookies", 9),
             ("app.ron", 3),
@@ -172,7 +169,7 @@ mod tests {
         }
         assert_eq!(size(&dir), 1150);
         assert_eq!(clear(&dir, true), 150);
-        assert!(dir.join("updates/ytm-rs-setup.exe").exists());
+        assert!(dir.join("updates/ytm-native-setup.exe").exists());
         assert!(dir.join("thumbs").is_dir() && !dir.join("thumbs/a").exists());
         assert!(!dir.join("webview-lyrics/EBWebView").exists());
         assert_eq!(clear(&dir, false), 1000);

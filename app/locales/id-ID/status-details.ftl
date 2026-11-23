@@ -22,14 +22,6 @@ status-like-success = Suka ditambahkan: { $count }
 status-like-refused = YouTube Music nggak nerima perubahannya. Coba lagi nanti.
 status-refused-count = Ditolak YouTube Music: { $count }
 status-removed-liked = Dihapus dari lagu yang disukai
-status-download-batch = Mengunduh lagu: { $count }
-status-download-collection = Mengunduh dari “{ $title }”: { $count }
-status-download-stopped = Unduhan{ $name } dihentikan: { $songs } tersimpan
-status-download-already = Udah diunduh
-status-download-name-already = “{ $title }” udah diunduh
-status-download-done = Unduhan{ $name } selesai: { $songs }
-status-download-already-count = { $count } udah ada
-status-download-fail-count = { $count } gagal diunduh ({ $details })
 status-play-premium = “{ $title }” butuh YouTube Music Premium
 status-play-sign-in = Masuk dulu buat memutar “{ $title }”
 status-age-restricted = dibatasi usia
@@ -39,6 +31,3 @@ status-songs = { $count ->
 status-episodes = { $count ->
    *[other] { $count } episode
 }
-status-download-quoted-title = “{ $title }”
-discord-view-artist = Lihat artis
-discord-view-album = Lihat album

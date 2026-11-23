@@ -10,7 +10,7 @@
 //! - LRCLib directly, by the song's bare title, when the stream brought nothing from it.
 //!
 //! The API needs a JWT, obtained by exchanging a Cloudflare Turnstile token (see
-//! turnstile.rs). JWTs last 24 h and are cached on disk.
+//! turnstile.rs). JWTs last 24 h and are kept in the encrypted vault (vault.rs).
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -270,9 +270,12 @@ pub fn plain_words(l: &Lyrics) -> String {
 
 // ------------------------------------------------------------------- API client
 
+/// The vault entry holding the Better Lyrics API's access token.
+const JWT_SECRET: &str = "lyrics-jwt";
+
 pub struct Client {
     http: reqwest::Client,
-    jwt_file: PathBuf,
+    data_dir: PathBuf,
     webview_profile: PathBuf,
     jwt: tokio::sync::Mutex<Option<String>>,
     /// When the Turnstile challenge last failed; it isn't retried for a while, so
@@ -298,11 +301,12 @@ pub struct Query<'a> {
 
 impl Client {
     pub fn new(http: reqwest::Client, data_dir: &Path) -> Self {
-        let jwt_file = data_dir.join("lyrics_jwt");
-        let cached = std::fs::read_to_string(&jwt_file).ok().filter(|t| jwt_seconds_left(t) > 3600);
+        // A plain copy an earlier build left goes.
+        let _ = std::fs::remove_file(data_dir.join("lyrics_jwt"));
+        let cached = crate::vault::get(JWT_SECRET, data_dir).and_then(|b| String::from_utf8(b).ok()).filter(|t| jwt_seconds_left(t) > 3600);
         Self {
             http,
-            jwt_file,
+            data_dir: data_dir.to_owned(),
             webview_profile: data_dir.join("webview-lyrics"),
             jwt: tokio::sync::Mutex::new(cached),
             challenge_failed: Default::default(),
@@ -406,7 +410,7 @@ impl Client {
             .get(LRCLIB_SEARCH)
             .query(&[("track_name", q.bare_song), ("artist_name", q.main_artist)])
             // LRCLib asks clients to say who they are.
-            .header(reqwest::header::USER_AGENT, concat!("ytm-rs/", env!("CARGO_PKG_VERSION"), " (https://github.com/grapedjuice/ytm-rs)"))
+            .header(reqwest::header::USER_AGENT, concat!("ytm-native/", env!("CARGO_PKG_VERSION"), " (https://github.com/Hejfnjeic/ytm-native)"))
             .timeout(Duration::from_secs(10))
             .send()
             .await?
@@ -444,7 +448,10 @@ impl Client {
             .json()
             .await?;
         let jwt = resp["jwt"].as_str().ok_or_else(|| anyhow::anyhow!("no JWT in response"))?.to_owned();
-        let _ = std::fs::write(&self.jwt_file, &jwt);
+        let (dir, keep) = (self.data_dir.clone(), jwt.clone());
+        if let Ok(Err(e)) = tokio::task::spawn_blocking(move || crate::vault::set(JWT_SECRET, &dir, keep.as_bytes())).await {
+            log::warn!("lyrics: couldn't keep the access token: {e:#}");
+        }
         log::info!("lyrics: new access token ({}h)", jwt_seconds_left(&jwt) / 3600);
         *slot = Some(jwt.clone());
         Ok(jwt)

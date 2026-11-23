@@ -68,8 +68,6 @@ pub enum Media {
     Feed(String),
     /// An HLS playlist's segments, one block each.
     Segments(Vec<String>),
-    /// HLS segments carrying audio and video in MPEG-TS. Only the AAC is buffered.
-    TransportStream(Vec<String>),
 }
 
 /// Resolves fresh URLs for the same video and format.
@@ -399,7 +397,7 @@ impl UrlSlot {
         }
         match refresh().await {
             // The buffer is laid out for the stream it started with.
-            Ok(Media::Segments(urls) | Media::TransportStream(urls)) if Some(urls.len()) != self.segments => {
+            Ok(Media::Segments(urls)) if Some(urls.len()) != self.segments => {
                 log::warn!("stream URL refresh: {} segments for a buffer of {:?}", urls.len(), self.segments);
                 false
             }
@@ -433,11 +431,6 @@ pub async fn download(http: reqwest::Client, media: Media, ua: String, shared: A
 /// to come that a reader may need: the playing song gets the bandwidth first.
 pub async fn download_behind(http: reqwest::Client, media: Media, ua: String, shared: Arc<Shared>, refresh: Option<Refresh>, ahead: Option<Ahead>) {
     let segments = shared.segments.as_ref().map(|s| s.len());
-    let transport_stream = matches!(&media, Media::TransportStream(_));
-    // YouTube sometimes ends a Safari playlist with an empty segment shorter
-    // than one AAC frame (e.g. 2 ms).
-    let short_tail = transport_stream && shared.segments.as_ref().and_then(|starts| starts.last())
-        .is_some_and(|&start| (shared.duration_ms as f64 - start * 1000.0) < 10.0);
     let slot = Arc::new(UrlSlot { url: tokio::sync::Mutex::new((media, 0)), refresh, segments });
     let mut set = tokio::task::JoinSet::new();
     for _ in 0..WORKERS {
@@ -470,7 +463,7 @@ pub async fn download_behind(http: reqwest::Client, media: Media, ua: String, sh
                         match &slot.0 {
                             Media::File(url) => (format!("{url}&range={a}-{b}"), Range::Param(a, b), slot.1),
                             Media::Feed(url) => (url.clone(), Range::Header(a, b), slot.1),
-                            Media::Segments(urls) | Media::TransportStream(urls) => (urls[idx].clone(), Range::Whole, slot.1),
+                            Media::Segments(urls) => (urls[idx].clone(), Range::Whole, slot.1),
                         }
                     };
                     // A refreshed URL is tied to the address that resolved it, which is the
@@ -481,14 +474,7 @@ pub async fn download_behind(http: reqwest::Client, media: Media, ua: String, sh
                     } else if segments.is_none() && idx >= REFUSE_FROM.load(std::sync::atomic::Ordering::Relaxed) {
                         Err(anyhow::Error::new(SimulatedRefusal))
                     } else {
-                        fetch(&client, &url, &ua, range).await.and_then(|data| {
-                            let empty_tail = short_tail && Some(idx + 1) == segments && data.is_empty();
-                            if transport_stream && !empty_tail {
-                                crate::hls::unpack_audio(&data)
-                            } else {
-                                Ok(data)
-                            }
-                        })
+                        fetch(&client, &url, &ua, range).await
                     };
                     match res {
                         Ok(data) => {

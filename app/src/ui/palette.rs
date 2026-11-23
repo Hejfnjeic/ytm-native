@@ -492,7 +492,7 @@ mod tests {
     #[test]
     fn sections_are_in_settings() {
         // A renamed section would else turn into a plain search for its old name.
-        let code = [include_str!("pages.rs"), include_str!("hotkeys.rs"), include_str!("transfer.rs")]
+        let code = [include_str!("pages.rs"), include_str!("hotkeys.rs")]
             .concat()
             .replace("crate::", "");
         // A section's title, written out or by its message's id.

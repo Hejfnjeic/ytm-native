@@ -10,7 +10,6 @@
 settings-playback = Afspelen
 settings-lyrics = Songteksten
 settings-appearance = Weergave
-settings-connections = Verbindingen
 settings-account = Account
 settings-general = Algemeen
 settings-keyboard-shortcuts = Sneltoetsen
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Inloggen met Google
 settings-sign-in-finish = Rond het inloggen af in het geopende venster.
 settings-no-channel = { $name } (geen kanaal)
 settings-another-channel = Ander kanaal
-settings-channel-not-during-transfer = Niet beschikbaar tijdens een overdracht
 settings-switching = Wisselen…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 dB
 settings-playback-speed = Afspeelsnelheid
 settings-playback-speed-desc = Speel nummers sneller of trager af, ook via de spelerbalk. Net als bij een plaat klinkt sneller hoger en trager lager. Songteksten blijven gelijklopen. Bij het openen van ytm-rs wordt de snelheid 1×.
 settings-speed = Snelheid
-settings-playback-speed-jam-note = Bij Samen luisteren geldt de normale snelheid, zodat iedereen hetzelfde nummer hoort.
 
 ## Music videos
 
 settings-music-videos = Muziekvideo’s
 settings-songs-not-videos = Nummers boven muziekvideo’s verkiezen
 settings-songs-not-videos-desc = Als YouTube Music de albumopname heeft, speelt die in plaats van de officiële video, zonder intro’s, sketches of videomontage. De lijsten houden hun eigen inhoud.
-settings-show-music-videos = Muziekvideo’s tonen
-settings-show-music-videos-desc = Muziekvideo’s spelen als bewegend beeld met hun eigen geluid en zonder songtekst. Staat dit uit en geef je nummers voorrang, dan hebben alleen muziekvideo’s in Speelt nu nog een schakelaar Nummer / Video.
-settings-video-quality = Videokwaliteit
-settings-video-quality-desc = Video’s gebruiken deze resolutie of de hoogste daaronder die beschikbaar is. 1080p vraagt ongeveer drie keer zoveel rekenwerk als 720p. Een langzamere computer kan dat mogelijk niet bijhouden.
-settings-ambient-light = Sfeerverlichting
-settings-ambient-light-desc = Laat de omgeving van Speelt nu oplichten in de kleuren van de video.
-settings-animated-covers = Geanimeerde hoezen
-settings-animated-covers-desc = Animeert sommige albumhoezen in Speelt nu als Apple Music er een clip voor heeft. De zoekopdracht stuurt de titel en artiest van elk nummer naar Apple Music.
 settings-hide-videos-in-search = Video’s in zoekresultaten verbergen
 settings-hide-videos-in-search-desc = Toont alleen nummers, albums, artiesten en afspeellijsten in de resultaten.
 settings-skip-non-music-parts = Delen zonder muziek overslaan
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = Slaat gesprekken, sketches en sponsorstukke
 
 ## Lyrics
 
-settings-romanization = Romanisering
-settings-romanization-desc = Zet Japans, Koreaans, Chinees, Cyrillisch en andere schriften om in Latijnse letters. Loopt gelijk met de tekst als de bron timing biedt.
 settings-translation = Vertaling
 settings-translation-desc = Een vertaling van de bron krijgt voorrang. Anders vertaalt Unison, met Google als terugvaloptie.
 settings-translate-into = Vertalen naar
@@ -229,18 +216,6 @@ settings-app-icon-named = App-pictogram: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Laat een Stream Deck-plug-in op deze computer het afspelen bedienen.
-settings-lastfm-connected = Je afgespeelde nummers worden naar het profiel van { $name } gescrobbeld.
-settings-lastfm-allow = Geef ytm-rs toestemming op de Last.fm-pagina in je browser.
-settings-lastfm-desc = Scrobble wat je afspeelt naar je Last.fm-profiel.
-settings-disconnect = Verbinding verbreken
-settings-connect = Verbinden
-settings-listenbrainz-connected = Je afgespeelde nummers worden naar het profiel van { $name } gestuurd.
-settings-listenbrainz-desc = Stuur wat je afspeelt naar je ListenBrainz-profiel.
-settings-user-token = Gebruikerstoken
-settings-listenbrainz-token-hint = Plak je ListenBrainz-gebruikerstoken
-settings-listenbrainz-token-link = Haal je token op bij listenbrainz.org
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = De app gebruikt de nieuwe renderer bij de volge
 
 ## Downloads
 
-settings-downloads = Downloads
-settings-downloads-note = Download nummers via hun menu of hele albums en afspeellijsten via hun pagina. Ze worden met hoes opgeslagen in de beste kwaliteit voor je account en spelen ook offline af.
-settings-download-folder = Downloadmap
 settings-change = Wijzigen
 settings-open = Openen
 
@@ -388,8 +360,6 @@ settings-song-info-language = Taal van de nummerinformatie
 settings-song-info-language-desc = Taal voor titels van nummers, namen van artiesten en albums en secties van YouTube Music, voor zover vertalingen beschikbaar zijn.
 settings-song-info-country = Land voor hitlijsten en aanbevelingen
 settings-song-info-country-desc = Het land waarop de hitlijsten en aanbevelingen zijn gebaseerd.
-settings-folder-per-list = Elk album en elke afspeellijst in een eigen map opslaan
-settings-folder-per-list-desc = Als je een album of afspeellijst via de pagina of het menu downloadt, worden de nummers in een map met die naam opgeslagen. Eerder gedownloade nummers blijven op hun plek.
 settings-backup-stream = Reservestream als de muziek stopt
 settings-backup-stream-desc = Als je bent ingelogd en YouTube een nummer stopt voor een botcontrole (dit kan met een VPN gebeuren), wordt een stream met video gebruikt. Verbruikt meer data.
 settings-backup-stream-prompt-title = Afspelen gestopt

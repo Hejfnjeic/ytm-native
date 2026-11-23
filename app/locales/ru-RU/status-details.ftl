@@ -22,14 +22,6 @@ status-like-success = Поставлено лайков: { $count }
 status-like-refused = YouTube Music не принял изменение. Повторите попытку позже.
 status-refused-count = Отклонено YouTube Music: { $count }
 status-removed-liked = Убрано из понравившихся
-status-download-batch = Скачивание треков: { $count }
-status-download-collection = Скачивание из «{ $title }»: { $count }
-status-download-stopped = Скачивание{ $name } остановлено. Сохранено: { $songs }
-status-download-already = Уже скачано
-status-download-name-already = «{ $title }» уже скачано
-status-download-done = Скачано{ $name }: { $songs }
-status-download-already-count = Уже было: { $count }
-status-download-fail-count = Не удалось скачать: { $count } ({ $details })
 status-play-premium = Для «{ $title }» нужен YouTube Music Premium
 status-play-sign-in = Войдите, чтобы воспроизвести «{ $title }»
 status-age-restricted = действует ограничение по возрасту
@@ -45,6 +37,3 @@ status-episodes = { $count ->
     [many] { $count } выпусков
    *[other] { $count } выпуска
 }
-status-download-quoted-title = «{ $title }»
-discord-view-artist = К исполнителю
-discord-view-album = К альбому

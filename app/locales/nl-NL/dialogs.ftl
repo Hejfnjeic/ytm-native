@@ -33,7 +33,4 @@ dialog-collaborators = Medewerkers
 dialog-no-collaborators = Er doet nog niemand mee.
 dialog-delete-playlist-body = ‘{ $title }’ wordt uit je YouTube Music-bibliotheek verwijderd. Dit kan niet ongedaan worden gemaakt.
 dialog-delete-upload-body = ‘{ $title }’ wordt uit je YouTube Music-uploads verwijderd. Dit kan niet ongedaan worden gemaakt.
-dialog-download-count = Downloaden ({ $count })
 dialog-edit-playlist = Afspeellijst bewerken
-dialog-download-body = Nog te downloaden: { $count }. Downloads lopen op de achtergrond, te beginnen met het huidige nummer.
-dialog-download-collection-body = Nog te downloaden uit ‘{ $title }’: { $count }. Downloads lopen op de achtergrond, te beginnen met het huidige nummer.

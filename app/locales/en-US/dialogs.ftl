@@ -33,7 +33,4 @@ dialog-collaborators = Collaborators
 dialog-no-collaborators = No one has joined yet.
 dialog-delete-playlist-body = “{ $title }” will be removed from your YouTube Music library. This can't be undone.
 dialog-delete-upload-body = “{ $title }” is deleted from your YouTube Music uploads. This can't be undone.
-dialog-download-count = Download ({ $count })
 dialog-edit-playlist = Edit playlist
-dialog-download-body = Tracks left to download: { $count }. Downloads run in the background and start with the current track.
-dialog-download-collection-body = Tracks left to download from “{ $title }”: { $count }. Downloads run in the background and start with the current track.

@@ -10,7 +10,6 @@
 settings-playback = प्लेबैक
 settings-lyrics = गाने के बोल
 settings-appearance = दिखावट
-settings-connections = कनेक्शन
 settings-account = खाता
 settings-general = सामान्य
 settings-keyboard-shortcuts = कीबोर्ड शॉर्टकट
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Google के साथ साइन इन क�
 settings-sign-in-finish = खुलने वाली विंडो में साइन इन करना समाप्त करें।
 settings-no-channel = { $name } (कोई चैनल नहीं)
 settings-another-channel = एक और चैनल
-settings-channel-not-during-transfer = स्थानांतरण चलने के दौरान नहीं
 settings-switching = स्विचिंग…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 डीबी
 settings-playback-speed = प्लेबैक गति
 settings-playback-speed-desc = प्लेयर बार के एक बटन से भी गाने तेज या धीमी गति से चलाएं। तेज़ ध्वनि ऊँची और धीमी धीमी, एक रिकॉर्ड की तरह। गीत समय में रहते हैं. हर बार ytm-rs प्रारंभ होने पर 1× पर वापस जाएँ।
 settings-speed = गति
-settings-playback-speed-jam-note = जब आप जाम में हों तो वापस सामान्य हो जाएं, ताकि हर कोई एक ही गाना सुन सके।
 
 ## Music videos
 
 settings-music-videos = संगीत वीडियो
 settings-songs-not-videos = गाने चलाएं, संगीत वीडियो नहीं
 settings-songs-not-videos-desc = एक आधिकारिक संगीत वीडियो उसके गीत, एल्बम रिकॉर्डिंग के रूप में चलता है, जब YouTube Music में एक होता है: कोई परिचय, स्किट या केवल वीडियो संपादन नहीं। सूचियाँ अभी भी दिखाती हैं कि उनके पास क्या है।
-settings-show-music-videos = संगीत वीडियो दिखाएं
-settings-show-music-videos-desc = संगीत वीडियो गतिशील वीडियो के रूप में चलते हैं, उनकी अपनी ध्वनि होती है और कोई गीत नहीं होता। गाने अपनी जगह पर बजने के दौरान बंद हो जाते हैं, अब बज रहा है में गाने में कोई गाना और वीडियो स्विच नहीं है; संगीत वीडियो उनके पास रहते हैं।
-settings-video-quality = वीडियो गुणवत्ता
-settings-video-quality-desc = संगीत वीडियो इसे तेज गति से चलाते हैं, या वीडियो आते ही इसके करीब आते हैं। 1080p को 720p से लगभग तीन गुना अधिक काम करना पड़ता है, जिसे एक धीमा कंप्यूटर पूरा नहीं कर सकता।
-settings-ambient-light = परिवेशीय प्रकाश
-settings-ambient-light-desc = अब इसके चारों ओर वीडियो के रंगों के साथ चमक चल रही है।
-settings-animated-covers = एनिमेटेड कवर
-settings-animated-covers-desc = कुछ एल्बम के कवर अभी चल रहे हैं, जहां Apple Music के पास उनके लिए एक क्लिप है। उन्हें ढूँढने से प्रत्येक गीत का शीर्षक और कलाकार Apple Music को भेज दिया जाता है।
 settings-hide-videos-in-search = खोज में वीडियो छुपाएं
 settings-hide-videos-in-search-desc = खोज परिणामों में केवल गाने, एल्बम, कलाकार और प्लेलिस्ट।
 settings-skip-non-music-parts = गैर-संगीत भागों को छोड़ें
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = SponsorBlock समुदाय द्व�
 
 ## Lyrics
 
-settings-romanization = लैटिन लिपि में लिखावट
-settings-romanization-desc = जापानी, कोरियाई, चीनी, सिरिलिक और लैटिन अक्षरों में अन्य लिपियाँ। स्रोत के पास होने पर गीत के बोल के साथ समयबद्ध करें।
 settings-translation = अनुवाद
 settings-translation-desc = बोल के साथ मिला अनुवाद उपलब्ध होने पर वही दिखता है। बाकी मामलों में Unison से अनुवाद होता है, और ज़रूरत पड़ने पर Google से।
 settings-translate-into = अनुवाद की भाषा
@@ -229,18 +216,6 @@ settings-app-icon-named = ऐप आइकन: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = इस कंप्यूटर पर एक Stream Deck प्लगइन को प्लेबैक नियंत्रित करने दें।
-settings-lastfm-connected = आप जो भी खेलते हैं उसे { $name } की प्रोफ़ाइल पर स्क्रॉल करें।
-settings-lastfm-allow = अपने ब्राउज़र में खुले Last.fm पेज पर ytm-rs को अनुमति दें।
-settings-lastfm-desc = आप अपनी Last.fm प्रोफ़ाइल पर जो भी खेलते हैं उसे स्क्रोबल करें।
-settings-disconnect = डिस्कनेक्ट करें
-settings-connect = कनेक्ट करें
-settings-listenbrainz-connected = आप जो भी खेलते हैं उसे { $name } की प्रोफ़ाइल पर भेजा जा रहा है।
-settings-listenbrainz-desc = आप जो भी खेलते हैं उसे अपनी ListenBrainz प्रोफ़ाइल पर भेजें।
-settings-user-token = उपयोगकर्ता टोकन
-settings-listenbrainz-token-hint = अपना ListenBrainz उपयोगकर्ता टोकन चिपकाएँ
-settings-listenbrainz-token-link = listenbrainz.org पर अपना टोकन प्राप्त करें
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = ऐप अगली शुरुआत से �
 
 ## Downloads
 
-settings-downloads = डाउनलोड
-settings-downloads-note = उनके मेनू से गाने, या उनके पेज से संपूर्ण एल्बम और प्लेलिस्ट डाउनलोड करें। वे आपके खाते को मिलने वाली सर्वोत्तम गुणवत्ता में सहेजे जाते हैं, उनके कवर आर्ट के साथ टैग किए जाते हैं, और फ़ाइल से ऑफ़लाइन भी चलाए जाते हैं।
-settings-download-folder = फ़ोल्डर डाउनलोड करें
 settings-change = परिवर्तन
 settings-open = खुला
 
@@ -385,8 +357,6 @@ settings-song-info-language = गानों की जानकारी क�
 settings-song-info-language-desc = गानों के शीर्षक, कलाकारों और एल्बम के नाम और YouTube Music के सेक्शन की भाषा, जहाँ अनुवाद उपलब्ध हो।
 settings-song-info-country = चार्ट और सुझावों के लिए देश
 settings-song-info-country-desc = वह देश जिसके लिए चार्ट और सुझाव दिखाए जाते हैं।
-settings-folder-per-list = हर एल्बम और प्लेलिस्ट को अलग फ़ोल्डर में रखें
-settings-folder-per-list-desc = किसी एल्बम या प्लेलिस्ट को उसके पेज या मेन्यू से डाउनलोड करने पर गाने उसी नाम के फ़ोल्डर में सहेजे जाते हैं। पहले से डाउनलोड किए गए गाने अपनी जगह पर रहते हैं।
 settings-backup-stream = गाने रुकने पर वैकल्पिक स्ट्रीम
 settings-backup-stream-desc = साइन इन करने पर, अगर YouTube यह जाँचने के लिए गाना रोक दे कि आप बॉट तो नहीं हैं (VPN पर ऐसा हो सकता है), तो वीडियो वाली स्ट्रीम से गाना चलाएँ। इसमें अधिक डेटा लगता है।
 settings-backup-stream-prompt-title = गाना रुक गया

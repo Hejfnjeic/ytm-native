@@ -10,7 +10,6 @@
 settings-playback = 播放
 settings-lyrics = 歌詞
 settings-appearance = 外觀
-settings-connections = 連線
 settings-account = 帳戶
 settings-general = 一般
 settings-keyboard-shortcuts = 鍵盤快速鍵
@@ -32,7 +31,6 @@ settings-sign-in-with-google = 使用 Google 登入
 settings-sign-in-finish = 在開啟的視窗中完成登入。
 settings-no-channel = { $name }（無通道）
 settings-another-channel = 另一個頻道
-settings-channel-not-during-transfer = 傳輸運行時不會
 settings-switching = 切換…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 分貝
 settings-playback-speed = 播放速度
 settings-playback-speed-desc = 也可以透過播放器列中的按鈕更快或更慢地播放歌曲。更快的聲音更高，更慢的聲音更低，就像唱片一樣。歌詞停留在時間。每次ytm-rs啟動時返回1×。
 settings-speed = 速度
-settings-playback-speed-jam-note = 當你陷入困境時恢復正常，這樣每個人都會聽到同一首歌。
 
 ## Music videos
 
 settings-music-videos = 音樂視頻
 settings-songs-not-videos = 播放歌曲，而非音樂視頻
 settings-songs-not-videos-desc = 當 YouTube Music 有一個官方音樂錄影帶時，它會播放其歌曲（專輯錄音）：沒有前奏、小品或純影片編輯。清單仍然顯示它們所持有的內容。
-settings-show-music-videos = 顯示音樂視頻
-settings-show-music-videos-desc = 音樂影片作為行動影片播放，有自己的聲音，沒有歌詞。歌曲原位播放時關閉，歌曲在播放時沒有歌曲和視頻開關；音樂視頻保留他們的。
-settings-video-quality = 視訊質量
-settings-video-quality-desc = 音樂錄影帶播放得如此銳利，或影片播放時最接近它。 1080p 的工作量大約是 720p 的三倍，速度較慢的電腦可能無法跟上。
-settings-ambient-light = 環境光
-settings-ambient-light-desc = 現在播放帶有影片周圍顏色的發光效果。
-settings-animated-covers = 動畫封面
-settings-animated-covers-desc = 某些專輯的封面會移至“正在播放”，其中 Apple Music 提供了這些專輯的剪輯。找到它們會將每首歌曲的標題和藝術家發送到 Apple Music。
 settings-hide-videos-in-search = 隱藏搜尋中的視頻
 settings-hide-videos-in-search-desc = 搜尋結果中僅包含歌曲、專輯、藝人和播放清單。
 settings-skip-non-music-parts = 跳過非音樂部分
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = 跳過音樂影片中的談話、短劇和�
 
 ## Lyrics
 
-settings-romanization = 拉丁字母轉寫
-settings-romanization-desc = 日語、韓語、中文、西里爾字母和其他拉丁字母文字。當來源有歌詞時，與歌詞同步。
 settings-translation = 翻譯
 settings-translation-desc = 優先使用歌詞隨附的譯文。其餘歌詞由 Unison 翻譯，失敗時改用 Google。
 settings-translate-into = 翻譯語言
@@ -229,18 +216,6 @@ settings-app-icon-named = 應用程式圖示：{ $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = 讓這台電腦上的 Stream Deck 插件控製播放。
-settings-lastfm-connected = 將您所玩的內容記錄到 { $name } 的個人資料中。
-settings-lastfm-allow = 允許在瀏覽器中開啟的 Last.fm 頁面上使用 ytm-rs。
-settings-lastfm-desc = 將您播放的內容記錄到您的 Last.fm 個人資料中。
-settings-disconnect = 斷開連接
-settings-connect = 連接
-settings-listenbrainz-connected = 正在將您播放的內容傳送到 { $name } 的個人資料。
-settings-listenbrainz-desc = 將您玩的內容傳送到您的 ListenBrainz 個人資料。
-settings-user-token = 使用者令牌
-settings-listenbrainz-token-hint = 貼上您的 ListenBrainz 使用者令牌
-settings-listenbrainz-token-link = 在 Listenbrainz.org 上取得您的令牌
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = 應用程式從下次開始時使用新的渲�
 
 ## Downloads
 
-settings-downloads = 下載
-settings-downloads-note = 從他們的選單下載歌曲，或從他們的頁面下載整張專輯和播放清單。它們以您帳戶獲得的最佳品質保存，並標有封面藝術，並可以從文件中播放，甚至可以離線播放。
-settings-download-folder = 下載資料夾
 settings-change = 改變
 settings-open = 打開
 
@@ -385,8 +357,6 @@ settings-song-info-language = 歌曲資訊語言
 settings-song-info-language-desc = 歌曲標題、藝人和專輯名稱以及 YouTube Music 內容區塊的語言，取決於是否有相應翻譯。
 settings-song-info-country = 排行榜和推薦內容的國家/地區
 settings-song-info-country-desc = 排行榜和推薦內容所針對的國家/地區。
-settings-folder-per-list = 為每張專輯和播放清單各自建立資料夾
-settings-folder-per-list-desc = 從專輯或播放清單的頁面或選單下載時，會將歌曲儲存在以其命名的資料夾中。已下載的歌曲保留在原位置。
 settings-backup-stream = 歌曲停止時使用備用串流
 settings-backup-stream-desc = 登入後，如果 YouTube 為驗證你是否為機器人而停止播放歌曲（使用 VPN 時可能發生），則使用包含影片的串流播放。會消耗更多流量。
 settings-backup-stream-prompt-title = 播放已停止

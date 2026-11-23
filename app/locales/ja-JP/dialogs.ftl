@@ -33,7 +33,4 @@ dialog-collaborators = 共同編集者
 dialog-no-collaborators = まだ誰も参加していません。
 dialog-delete-playlist-body = 「{ $title }」を YouTube Music のライブラリから削除します。この操作は元に戻せません。
 dialog-delete-upload-body = 「{ $title }」を YouTube Music のアップロードから削除します。この操作は元に戻せません。
-dialog-download-count = ダウンロード（{ $count } 件）
 dialog-edit-playlist = プレイリストを編集
-dialog-download-body = 残り { $count } 曲です。再生中の曲からバックグラウンドでダウンロードします。
-dialog-download-collection-body = 「{ $title }」の残りは { $count } 曲です。再生中の曲からバックグラウンドでダウンロードします。

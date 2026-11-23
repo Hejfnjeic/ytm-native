@@ -33,7 +33,4 @@ dialog-collaborators = Collaborateurs
 dialog-no-collaborators = Personne n’a encore rejoint la playlist.
 dialog-delete-playlist-body = « { $title } » sera retirée de votre bibliothèque YouTube Music. Cette action est irréversible.
 dialog-delete-upload-body = « { $title } » sera supprimé de vos titres importés dans YouTube Music. Cette action est irréversible.
-dialog-download-count = Télécharger ({ $count })
 dialog-edit-playlist = Modifier la playlist
-dialog-download-body = Titres restant à télécharger : { $count }. Le téléchargement se fait en arrière-plan, en commençant par le titre en cours.
-dialog-download-collection-body = Titres de « { $title } » restant à télécharger : { $count }. Le téléchargement se fait en arrière-plan, en commençant par le titre en cours.

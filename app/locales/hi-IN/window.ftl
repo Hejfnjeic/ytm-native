@@ -43,7 +43,6 @@ window-keyboard-volume-up = वॉल्यूम बढ़ाएँ
 window-keyboard-volume-down = आवाज़ कम
 widget-pin-playlist = प्लेलिस्ट पिन करें
 widget-unpin-playlist = प्लेलिस्ट को अनपिन करें
-widget-show-in-folder = फ़ोल्डर में दिखाएँ
 palette-pages = पेज
 palette-actions = क्रियाएँ
 palette-title = कमांड पैलेट

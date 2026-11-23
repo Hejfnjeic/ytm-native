@@ -22,14 +22,6 @@ status-like-success = «Mi piace» aggiunti: { $count }
 status-like-refused = YouTube Music non ha accettato la modifica. Riprova più tardi.
 status-refused-count = Rifiutati da YouTube Music: { $count }
 status-removed-liked = Rimosso dai brani che ti piacciono
-status-download-batch = Download di brani: { $count }
-status-download-collection = Download da «{ $title }»: { $count }
-status-download-stopped = Download interrotto{ $name }. Salvati: { $songs }
-status-download-already = Già scaricato
-status-download-name-already = «{ $title }» è già stato scaricato
-status-download-done = Scaricato{ $name }: { $songs }
-status-download-already-count = { $count } già presenti
-status-download-fail-count = Impossibile scaricarne { $count } ({ $details })
 status-play-premium = «{ $title }» richiede YouTube Music Premium
 status-play-sign-in = Accedi per riprodurre «{ $title }»
 status-age-restricted = ha limiti di età
@@ -41,6 +33,3 @@ status-episodes = { $count ->
     [one] { $count } episodio
    *[other] { $count } episodi
 }
-status-download-quoted-title = «{ $title }»
-discord-view-artist = Vai all’artista
-discord-view-album = Vai all’album

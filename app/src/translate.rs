@@ -1,13 +1,13 @@
-//! Romanization and translation of lyric lines, the way the better-lyrics extension gets
-//! them (translation.ts): Unison's translate endpoint first, which answers both at once,
-//! then Google Translate's keyless `gtx` endpoint for whatever is still missing. Lyrics
-//! that ship their own (Apple-style TTML) use those instead; see the renderer.
-//! Results are cached on disk per song, source and target language.
+//! Translation of lyric lines, the way the better-lyrics extension gets it
+//! (translation.ts): Unison's translate endpoint first, then Google Translate's keyless
+//! `gtx` endpoint for whatever is still missing. Lyrics that ship their own (Apple-style
+//! TTML) use those instead; see the renderer. No romanization: ytm-native leaves it out.
+//! Results are kept in memory for this run only (no lyrics on disk, by request).
 
-use std::path::{Path, PathBuf};
+use std::collections::HashMap;
+use std::sync::Mutex;
 use std::time::Duration;
 
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 const UNISON_TRANSLATE: &str = "https://unison.betterlyrics.org/translate";
@@ -20,31 +20,32 @@ const ENDPOINTS: [(&str, &str); 2] = [
 ];
 const BATCH_SEPARATOR: &str = "\n\n;\n\n";
 
-/// Per-line extras, index-aligned with the lines they were asked for.
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+/// Per-line translations, index-aligned with the lines they were asked for.
+#[derive(Clone, Debug, Default)]
 pub struct Extras {
-    pub roman: Vec<Option<String>>,
     pub trans: Vec<Option<String>>,
 }
 
+/// Songs translated this run, at most this many kept.
+const KEPT: usize = 200;
+
 pub struct Client {
     http: reqwest::Client,
-    dir: PathBuf,
+    /// This run's translations, by song, source and target language.
+    kept: Mutex<HashMap<String, Extras>>,
 }
 
 impl Client {
-    pub fn new(http: reqwest::Client, data_dir: &Path) -> Self {
-        Self { http, dir: data_dir.join("translations") }
+    pub fn new(http: reqwest::Client) -> Self {
+        Self { http, kept: Mutex::default() }
     }
 
-    /// Romanization (non-Latin lines only) and translation into `target` for `lines`.
-    /// `cache_key` names the song and source; `lang` is the language the lyrics say they're in.
+    /// Translation into `target` for `lines`. `cache_key` names the song and source;
+    /// `lang` is the language the lyrics say they're in.
     pub async fn extras(&self, cache_key: &str, lines: &[String], lang: Option<&str>, target: &str) -> Option<Extras> {
-        let file = self.dir.join(format!("{}.json", safe_name(&format!("{cache_key}_{target}"))));
-        if let Some(e) = std::fs::read(&file).ok().and_then(|b| serde_json::from_slice::<Extras>(&b).ok())
-            && e.roman.len() == lines.len()
-        {
-            return Some(e);
+        let key = format!("{cache_key}_{target}");
+        if let Some(e) = self.kept.lock().unwrap().get(&key).filter(|e| e.trans.len() == lines.len()) {
+            return Some(e.clone());
         }
         // Distinct non-empty lines only; choruses repeat.
         let mut uniq: Vec<&str> = Vec::new();
@@ -56,18 +57,14 @@ impl Client {
         if uniq.is_empty() {
             return None;
         }
-        let mut roman: Vec<Option<String>> = vec![None; uniq.len()];
         let mut trans: Vec<Option<String>> = vec![None; uniq.len()];
         let mut complete = true;
 
         match self.unison(&uniq, lang, target).await {
             Ok(rows) => {
-                for (i, (t, r)) in rows.into_iter().enumerate() {
+                for (i, t) in rows.into_iter().enumerate() {
                     if let Some(t) = t.filter(|t| !t.eq_ignore_ascii_case(uniq[i])) {
                         trans[i] = Some(t);
-                    }
-                    if let Some(r) = r.filter(|r| non_latin(uniq[i]) && !r.eq_ignore_ascii_case(uniq[i])) {
-                        roman[i] = Some(r);
                     }
                 }
             }
@@ -75,22 +72,6 @@ impl Client {
         }
 
         // Google for the rest.
-        let need_roman: Vec<usize> = (0..uniq.len()).filter(|&i| roman[i].is_none() && non_latin(uniq[i])).collect();
-        if !need_roman.is_empty() {
-            let texts: Vec<&str> = need_roman.iter().map(|&i| uniq[i]).collect();
-            let rl = romanization_language(lang, &texts);
-            match self.romanize(&texts, &rl).await {
-                Ok(out) => {
-                    for (k, &i) in need_roman.iter().enumerate() {
-                        roman[i] = out.get(k).cloned().flatten().filter(|r| !r.eq_ignore_ascii_case(uniq[i]));
-                    }
-                }
-                Err(e) => {
-                    complete = false;
-                    log::warn!("romanization failed: {e:#}");
-                }
-            }
-        }
         let need_trans: Vec<usize> = (0..uniq.len()).filter(|&i| trans[i].is_none()).collect();
         if !need_trans.is_empty() && lang.is_none_or(|l| !same_lang(l, target) || need_trans.iter().any(|&i| non_latin(uniq[i]))) {
             // Non-Latin lines first, like the extension, so one language leads detection.
@@ -111,16 +92,19 @@ impl Client {
         }
 
         let pick = |table: &[Option<String>], l: &str| uniq.iter().position(|u| *u == l.trim()).and_then(|i| table[i].clone());
-        let e = Extras { roman: lines.iter().map(|l| pick(&roman, l)).collect(), trans: lines.iter().map(|l| pick(&trans, l)).collect() };
+        let e = Extras { trans: lines.iter().map(|l| pick(&trans, l)).collect() };
         if complete {
-            let _ = std::fs::create_dir_all(&self.dir);
-            let _ = std::fs::write(&file, serde_json::to_vec(&e).unwrap_or_default());
+            let mut kept = self.kept.lock().unwrap();
+            if kept.len() >= KEPT {
+                kept.clear();
+            }
+            kept.insert(key, e.clone());
         }
         Some(e)
     }
 
-    /// Unison answers translation and romanization for every line in one request.
-    async fn unison(&self, lines: &[&str], lang: Option<&str>, target: &str) -> anyhow::Result<Vec<(Option<String>, Option<String>)>> {
+    /// Unison answers a translation for every line in one request.
+    async fn unison(&self, lines: &[&str], lang: Option<&str>, target: &str) -> anyhow::Result<Vec<Option<String>>> {
         let mut body = serde_json::json!({ "lines": lines, "to": target });
         if let Some(l) = lang {
             body["from"] = l.into();
@@ -130,11 +114,7 @@ impl Client {
         anyhow::ensure!(rows.len() == lines.len(), "unison answered {} lines for {}", rows.len(), lines.len());
         Ok(rows
             .iter()
-            .map(|r| {
-                let t = r["translation"].as_str().filter(|_| r["needsTranslation"].as_bool().unwrap_or(true)).map(|s| s.trim().to_owned()).filter(|s| !s.is_empty());
-                let ro = r["romanization"].as_str().map(|s| s.trim().to_owned()).filter(|s| !s.is_empty());
-                (t, ro)
-            })
+            .map(|r| r["translation"].as_str().filter(|_| r["needsTranslation"].as_bool().unwrap_or(true)).map(|s| s.trim().to_owned()).filter(|s| !s.is_empty()))
             .collect())
     }
 
@@ -150,26 +130,6 @@ impl Client {
             }
         }
         Err(last.expect("at least one endpoint").into())
-    }
-
-    /// Romanization comes back as one run-on string, so lines are joined with a numeric
-    /// separator that survives (`romanizeBatch`).
-    async fn romanize(&self, lines: &[&str], lang: &str) -> anyhow::Result<Vec<Option<String>>> {
-        let mut sep = "0000".to_owned();
-        while lines.iter().any(|l| l.contains(&sep)) {
-            sep.push('0');
-        }
-        let latn = format!("{lang}-Latn");
-        let v = self.call(&[("sl", lang), ("tl", &latn), ("dt", "t"), ("dt", "rm")], &lines.join(&format!(" {sep} "))).await?;
-        let mut full = String::new();
-        for part in v[0].as_array().into_iter().flatten() {
-            if let Some(r) = part[3].as_str().or_else(|| part[2].as_str()) {
-                full.push_str(r);
-            }
-        }
-        let out: Vec<Option<String>> = full.split(sep.as_str()).map(|s| Some(s.trim().to_owned()).filter(|s| !s.is_empty())).collect();
-        anyhow::ensure!(out.len() == lines.len(), "romanization split into {} parts, expected {}", out.len(), lines.len());
-        Ok(out)
     }
 
     /// `translateBatch`'s Google pass: lines joined with a separator Google keeps.
@@ -192,34 +152,9 @@ impl Client {
     }
 }
 
-fn safe_name(s: &str) -> String {
-    s.chars().map(|c| if c.is_ascii_alphanumeric() || matches!(c, '-' | '_') { c } else { '_' }).collect()
-}
-
 fn same_lang(a: &str, b: &str) -> bool {
     let base = |s: &str| s.split(['-', '_']).next().unwrap_or_default().to_ascii_lowercase();
     base(a) == base(b)
-}
-
-/// Languages Google romanizes (`ROMANIZATION_LANGUAGES`).
-const ROMANIZATION_LANGUAGES: &[&str] = &["ja", "ko", "zh", "ru", "hi", "ar", "th", "el", "he", "bn", "ta", "te", "ml", "kn", "gu", "pa", "si", "my", "ka", "km", "lo", "uk", "bg", "sr", "fa", "ur"];
-
-/// `resolveRomanizationLanguage`: the lyrics' language if Google romanizes it, else
-/// the script most lines are written in.
-fn romanization_language(lang: Option<&str>, lines: &[&str]) -> String {
-    if let Some(l) = lang.filter(|l| ROMANIZATION_LANGUAGES.iter().any(|r| same_lang(l, r))) {
-        return l.to_owned();
-    }
-    let mut tally: Vec<(&str, usize)> = Vec::new();
-    for l in lines {
-        if let Some(d) = script_language(l) {
-            match tally.iter_mut().find(|(k, _)| *k == d) {
-                Some((_, n)) => *n += 1,
-                None => tally.push((d, 1)),
-            }
-        }
-    }
-    tally.into_iter().max_by_key(|(_, n)| *n).map_or("auto".to_owned(), |(k, _)| k.to_owned())
 }
 
 /// `detectNonLatinLanguage`: the language a script points to, in the same order.

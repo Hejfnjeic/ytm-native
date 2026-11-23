@@ -641,7 +641,6 @@ pub struct App {
     lyrics_extras: Option<(String, String, String, crate::translate::Extras)>,
     /// The extras last asked for, so each is requested once.
     extras_asked: Option<(String, String, String)>,
-    show_roman: bool,
     show_trans: bool,
     /// Lines move on quickly, the extension's way, whatever the theme's timing.
     quick_lyric_scroll: bool,
@@ -1014,7 +1013,6 @@ impl App {
             lyrics: None,
             lyrics_extras: None,
             extras_asked: None,
-            show_roman: get("show_roman").is_none_or(|v| v == "1"),
             show_trans: get("show_trans").is_none_or(|v| v == "1"),
             quick_lyric_scroll: get("quick_lyric_scroll").is_some_and(|v| v == "1"),
             lyrics_full_rate: get("lyrics_full_rate").is_some_and(|v| v == "1"),
@@ -2007,7 +2005,6 @@ impl eframe::App for App {
         storage.set_string("balance", self.stereo.balance.to_string());
         storage.set_string("tempo", b(self.tempo_on));
         storage.set_string("keep_pitch", b(self.keep_pitch));
-        storage.set_string("show_roman", b(self.show_roman));
         storage.set_string("show_trans", b(self.show_trans));
         storage.set_string("quick_lyric_scroll", b(self.quick_lyric_scroll));
         storage.set_string("lyrics_full_rate", b(self.lyrics_full_rate));
@@ -2363,7 +2360,6 @@ mod start_page_tests {
         let lib = |t| Page::Library(t);
         assert_eq!(start_page(&lib(LibTab::Playlists), true, false), lib(LibTab::Playlists));
         assert_eq!(start_page(&lib(LibTab::Playlists), false, false), Page::Home);
-        assert_eq!(start_page(&lib(LibTab::Downloads), false, false), lib(LibTab::Downloads));
         assert_eq!(start_page(&Page::Explore, false, false), Page::Explore);
         assert_eq!(start_page(&lib(LibTab::Podcasts), true, false), Page::Home);
         assert_eq!(start_page(&lib(LibTab::Podcasts), true, true), lib(LibTab::Podcasts));

@@ -44,7 +44,6 @@ window-keyboard-volume-up = Volume naik
 window-keyboard-volume-down = Volume turun
 widget-pin-playlist = Sematkan playlist
 widget-unpin-playlist = Lepas sematan playlist
-widget-show-in-folder = Tampilkan di folder
 palette-pages = Halaman
 palette-actions = Aksi
 palette-title = Command palette

@@ -43,7 +43,6 @@ window-keyboard-volume-up = Tăng âm lượng
 window-keyboard-volume-down = Giảm âm lượng
 widget-pin-playlist = Ghim danh sách phát
 widget-unpin-playlist = Bỏ ghim danh sách phát
-widget-show-in-folder = Hiển thị trong thư mục
 palette-pages = Trang
 palette-actions = Hành động
 palette-title = Bảng lệnh

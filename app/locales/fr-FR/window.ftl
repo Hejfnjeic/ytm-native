@@ -43,7 +43,6 @@ window-keyboard-volume-up = Augmenter le volume
 window-keyboard-volume-down = Baisser le volume
 widget-pin-playlist = Épingler la playlist
 widget-unpin-playlist = Désépingler la playlist
-widget-show-in-folder = Afficher dans le dossier
 palette-pages = Pages
 palette-actions = Actions
 palette-title = Palette de commandes

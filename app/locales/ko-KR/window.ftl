@@ -43,7 +43,6 @@ window-keyboard-volume-up = 볼륨 업
 window-keyboard-volume-down = 볼륨 낮추기
 widget-pin-playlist = 재생목록 고정
 widget-unpin-playlist = 재생목록 고정 해제
-widget-show-in-folder = 폴더에 표시
 palette-pages = 페이지
 palette-actions = 액션
 palette-title = 명령 팔레트

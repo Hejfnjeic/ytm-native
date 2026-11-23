@@ -387,14 +387,13 @@ pub fn sidebar(app: &mut App, ui: &mut Ui) {
         menu_button(app, ui);
         ui.add_space(8.0);
         ui.multiply_opacity(a);
+        // The app's own icon and name, not YouTube Music's logo.
         let (r, _) = ui.allocate_exact_size(vec2(32.0, 32.0), Sense::hover());
-        ui.painter().circle_filled(r.center(), 16.0, theme::RED);
-        ui.painter().circle_stroke(r.center(), 9.5, egui::Stroke::new(1.6, Color32::WHITE));
-        widgets::play_triangle(ui, r.center() + vec2(0.8, 0.0), 4.6, Color32::WHITE);
+        super::pages::icon_at(ui, crate::appicon::get(app.app_icon), r);
         ui.add_space(8.0);
         let logo = app.look().app.top_bar.clone();
         let text_r = if logo.logo_text.is_empty() {
-            ui.label(egui::RichText::new("Music").font(theme::bold(22.0)).color(theme::text())).rect
+            ui.label(egui::RichText::new("ytm-native").font(theme::bold(20.0)).color(theme::text())).rect
         } else {
             logo_name(ui, &logo, app.accent_color())
         };

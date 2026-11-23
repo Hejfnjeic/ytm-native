@@ -1,321 +1,281 @@
-//! Secrets (the Google and Spotify sign-ins) in the OS credential store: Windows
-//! Credential Manager, encrypted to the signed-in Windows user, on macOS the login
-//! Keychain, or on Linux the Secret Service (GNOME Keyring, KWallet).
+//! Secrets (the YouTube sign-in, a proxy's password) kept encrypted in the data folder.
 //!
-//! A credential holds at most 2,560 bytes and a Google cookie is close to that, so a
-//! secret is split over numbered entries: `name`, `name #2`, `name #3`, …
-//! Linux without a Secret Service running, a Keychain that refuses, and other
-//! systems keep the secret in a file only this user can read, in the data folder.
+//! Each secret is a file, `<name>.enc`: `YTMN1` | 24-byte nonce | XChaCha20-Poly1305
+//! ciphertext, under one random 256-bit key. Where the key lives:
+//! - Linux: the desktop's secret store (Secret Service: KWallet on Plasma, GNOME Keyring
+//!   elsewhere), never on disk next to the data. Without one running, a file only this
+//!   user can read, in the data folder.
+//! - Windows: a file in the data folder, itself encrypted with DPAPI (bound to the Windows
+//!   user account; not the Credential Manager). Copied elsewhere, it can't be decrypted.
+//! - Elsewhere: a file only this user can read, in the data folder.
+//!
+//! The key is the one ytm-native kept its login under before this design moved here
+//! (`session.enc`), so that login carries over: see [`legacy_cookie`].
+//! These calls block (D-Bus, disk): keep them off the UI thread where it matters.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-const SERVICE: &str = "ytm-rs";
+use anyhow::{Context, anyhow, bail};
+use chacha20poly1305::{
+    XChaCha20Poly1305, XNonce,
+    aead::{Aead, Generate, Key, KeyInit},
+};
 
-/// The credential names for `name`, scoped to the data folder when it isn't the
-/// default one (`YTM_DATA_DIR` dev profiles, tests), so those never share or touch
-/// the real sign-ins.
-fn key(name: &str, data_dir: &Path) -> String {
-    let default = directories::ProjectDirs::from("", "", "ytm-rs").map(|d| d.data_dir().to_path_buf());
-    if default.as_deref() == Some(data_dir) {
-        name.to_owned()
-    } else {
-        format!("{name} ({})", data_dir.display())
+const MAGIC: &[u8] = b"YTMN1";
+const NONCE: usize = 24;
+/// The keyring entry's service and user, as the Slint version of ytm-native named them.
+const SERVICE: &str = "ytm-native";
+const KEY_USER: &str = "session-encryption-key";
+
+/// One key operation at a time: two first saves at once would each make a key.
+static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+fn file(name: &str, dir: &Path) -> PathBuf {
+    let safe: String = name.chars().map(|c| if c.is_ascii_alphanumeric() || c == '-' { c } else { '_' }).collect();
+    dir.join(format!("{safe}.enc"))
+}
+
+/// Whether `dir` is the usual data folder: a `YTM_DATA_DIR` dev profile (or a test's
+/// folder) gets a key of its own, so it never shares or touches the real sign-in's.
+fn default_dir(dir: &Path) -> bool {
+    crate::default_data_dir().as_deref() == Some(dir)
+}
+
+#[cfg(target_os = "linux")]
+mod keystore {
+    use std::path::Path;
+
+    /// Tests leave the desktop's keyring alone: a locked one doesn't refuse, it waits on
+    /// its unlock prompt, and the test run with it.
+    fn use_keyring(dir: &Path) -> bool {
+        !cfg!(test) && super::default_dir(dir)
+    }
+
+    fn entry() -> anyhow::Result<keyring::Entry> {
+        keyring::Entry::new(super::SERVICE, super::KEY_USER).map_err(|e| anyhow::anyhow!("system keyring unavailable: {e}"))
+    }
+
+    pub fn get(dir: &Path) -> anyhow::Result<Option<Vec<u8>>> {
+        if use_keyring(dir) {
+            match entry().and_then(|e| e.get_secret().map_err(Into::into)) {
+                Ok(b) => return Ok(Some(b)),
+                Err(e) if e.downcast_ref::<keyring::Error>().is_some_and(|k| matches!(k, keyring::Error::NoEntry)) => {}
+                Err(e) => log::info!("system keyring unavailable, looking for the key file: {e:#}"),
+            }
+        }
+        super::plain::get(dir)
+    }
+
+    pub fn set(dir: &Path, key: &[u8]) -> anyhow::Result<()> {
+        if use_keyring(dir) {
+            match entry().and_then(|e| e.set_secret(key).map_err(Into::into)) {
+                Ok(()) => return Ok(()),
+                Err(e) => log::info!("no system keyring, keeping the key in a file: {e:#}"),
+            }
+        }
+        super::plain::set(dir, key)
     }
 }
 
-#[cfg(any(windows, target_os = "linux", target_os = "macos"))]
-mod store {
-    /// Credential Manager's limit on one secret. Secrets written in parts are read back
-    /// by this size everywhere, so those saved in parts by earlier versions still load.
-    const CHUNK: usize = 2560;
-    /// How much of a secret one entry holds when written. The Keychain and the Secret
-    /// Service have no such limit, and on macOS every entry asks for access on its own
-    /// (after each update, since the app is signed ad hoc), so there the whole secret
-    /// goes in one entry: one prompt instead of one per part.
-    #[cfg(windows)]
-    const WRITE_CHUNK: usize = CHUNK;
-    #[cfg(not(windows))]
-    const WRITE_CHUNK: usize = usize::MAX;
-    /// One store operation at a time: writes and deletes from several threads at once
-    /// can be lost (stale parts were left behind in testing).
-    static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+#[cfg(windows)]
+mod keystore {
+    //! DPAPI (CryptProtectData) for the current Windows user; the protected key is a file.
+    use std::path::{Path, PathBuf};
+    use std::ptr;
 
-    #[cfg(test)]
-    pub fn tests_entry(key: &str, part: usize) -> keyring::Entry {
-        entry(key, part).unwrap()
+    use windows_sys::Win32::Foundation::LocalFree;
+    use windows_sys::Win32::Security::Cryptography::{CRYPT_INTEGER_BLOB, CRYPTPROTECT_UI_FORBIDDEN, CryptProtectData, CryptUnprotectData};
+
+    fn path(dir: &Path) -> PathBuf {
+        dir.join("session.key")
     }
 
-    fn entry(key: &str, part: usize) -> keyring::Result<keyring::Entry> {
-        let user = if part == 0 { key.to_owned() } else { format!("{key} #{}", part + 1) };
-        keyring::Entry::new(super::SERVICE, &user)
-    }
-
-    pub fn get(key: &str) -> anyhow::Result<Option<Vec<u8>>> {
-        let _one = LOCK.lock().unwrap_or_else(|e| e.into_inner());
-        let mut out = Vec::new();
-        for part in 0.. {
-            match entry(key, part)?.get_secret() {
-                Ok(bytes) => {
-                    let full = bytes.len() == CHUNK;
-                    out.extend(bytes);
-                    if !full {
-                        break;
-                    }
-                }
-                Err(keyring::Error::NoEntry) if part == 0 => return Ok(None),
-                Err(keyring::Error::NoEntry) => break,
-                Err(e) => return Err(e.into()),
+    fn run(input: &[u8], protect: bool) -> anyhow::Result<Vec<u8>> {
+        let inp = CRYPT_INTEGER_BLOB { cbData: input.len() as u32, pbData: input.as_ptr() as *mut u8 };
+        let mut out = CRYPT_INTEGER_BLOB { cbData: 0, pbData: ptr::null_mut() };
+        // SAFETY: a valid input blob; Windows allocates the output, freed below.
+        let ok = unsafe {
+            if protect {
+                CryptProtectData(&inp, ptr::null(), ptr::null(), ptr::null(), ptr::null(), CRYPTPROTECT_UI_FORBIDDEN, &mut out)
+            } else {
+                CryptUnprotectData(&inp, ptr::null_mut(), ptr::null(), ptr::null(), ptr::null(), CRYPTPROTECT_UI_FORBIDDEN, &mut out)
             }
+        };
+        if ok == 0 || out.pbData.is_null() {
+            anyhow::bail!("Windows couldn't {} the login key (different user or PC?)", if protect { "protect" } else { "unlock" });
         }
-        Ok(Some(out))
+        // SAFETY: Windows returned `cbData` bytes at `pbData`; copied out, then freed once.
+        let data = unsafe { std::slice::from_raw_parts(out.pbData, out.cbData as usize).to_vec() };
+        unsafe { LocalFree(out.pbData as _) };
+        Ok(data)
     }
 
-    pub fn set(key: &str, secret: &[u8]) -> anyhow::Result<()> {
-        let _one = LOCK.lock().unwrap_or_else(|e| e.into_inner());
-        // A secret of an exact multiple of CHUNK ends with an empty part, so reading knows
-        // where it stops. Written whole (WRITE_CHUNK), one of exactly CHUNK bytes makes the
-        // reader look for a second part, which isn't there: `delete_from` below removes
-        // any an earlier version left.
-        let mut parts: Vec<&[u8]> = secret.chunks(WRITE_CHUNK).collect();
-        if (WRITE_CHUNK == CHUNK && secret.len().is_multiple_of(CHUNK)) || secret.is_empty() {
-            parts.push(&[]);
+    pub fn get(dir: &Path) -> anyhow::Result<Option<Vec<u8>>> {
+        match std::fs::read(path(dir)) {
+            Ok(blob) => Ok(Some(run(&blob, false)?)),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(e.into()),
         }
-        for (i, part) in parts.iter().enumerate() {
-            entry(key, i)?.set_secret(part)?;
-        }
-        delete_from(key, parts.len())
     }
 
-    pub fn delete(key: &str) -> anyhow::Result<()> {
-        let _one = LOCK.lock().unwrap_or_else(|e| e.into_inner());
-        delete_from(key, 0)
-    }
-
-    /// Delete parts `first..` (left over from a longer secret).
-    fn delete_from(key: &str, first: usize) -> anyhow::Result<()> {
-        for part in first.. {
-            match entry(key, part)?.delete_credential() {
-                Ok(()) => {}
-                Err(keyring::Error::NoEntry) => break,
-                Err(e) => return Err(e.into()),
-            }
-        }
+    pub fn set(dir: &Path, key: &[u8]) -> anyhow::Result<()> {
+        let blob = run(key, true)?;
+        std::fs::create_dir_all(dir)?;
+        std::fs::write(path(dir), blob)?;
         Ok(())
     }
 }
 
-#[cfg(not(windows))]
-mod file {
+#[cfg(not(any(target_os = "linux", windows)))]
+mod keystore {
+    pub use super::plain::{get, set};
+}
+
+/// The key in a file only this user can read, in the data folder: where there's no
+/// keyring, and for tests and dev profiles.
+#[cfg_attr(windows, allow(dead_code))]
+mod plain {
     use std::path::{Path, PathBuf};
 
-    /// No store here: the secret is a file named after its key, in the data folder.
-    fn path(key: &str, dir: &Path) -> PathBuf {
-        let safe: String = key.chars().map(|c| if c.is_ascii_alphanumeric() { c } else { '_' }).collect();
-        dir.join(format!("{safe}.secret"))
+    fn path(dir: &Path) -> PathBuf {
+        dir.join("vault.key")
     }
 
-    pub fn get(key: &str, dir: &Path) -> anyhow::Result<Option<Vec<u8>>> {
-        match std::fs::read(path(key, dir)) {
+    pub fn get(dir: &Path) -> anyhow::Result<Option<Vec<u8>>> {
+        match std::fs::read(path(dir)) {
             Ok(b) => Ok(Some(b)),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
             Err(e) => Err(e.into()),
         }
     }
 
-    pub fn set(key: &str, dir: &Path, secret: &[u8]) -> anyhow::Result<()> {
-        use std::io::Write;
-        use std::os::unix::fs::OpenOptionsExt;
-        let mut f = std::fs::OpenOptions::new().write(true).create(true).truncate(true).mode(0o600).open(path(key, dir))?;
-        Ok(f.write_all(secret)?)
-    }
-
-    pub fn delete(key: &str, dir: &Path) -> anyhow::Result<()> {
-        match std::fs::remove_file(path(key, dir)) {
-            Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e.into()),
-            _ => Ok(()),
-        }
+    pub fn set(dir: &Path, key: &[u8]) -> anyhow::Result<()> {
+        std::fs::create_dir_all(dir)?;
+        super::write_private(&path(dir), key)
     }
 }
 
-/// The store everywhere but Windows: the Keychain on macOS or the Secret Service on
-/// Linux when one answers, otherwise the file in `dir`.
-#[cfg(not(windows))]
-mod either {
-    use std::path::Path;
-
-    /// Tests leave the desktop's keyring alone unless asked (`YTM_TEST_KEYRING=1`): a
-    /// locked one doesn't refuse, it waits on its unlock prompt, and the test run with it.
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    pub fn use_store() -> bool {
-        !cfg!(test) || std::env::var_os("YTM_TEST_KEYRING").is_some()
-    }
-
-    pub fn get(key: &str, dir: &Path) -> anyhow::Result<Option<Vec<u8>>> {
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        if use_store() {
-            match super::store::get(key) {
-                Ok(Some(s)) => return Ok(Some(s)),
-                Ok(None) => {}
-                Err(e) => log::debug!("credential store unavailable: {e:#}"),
-            }
-        }
-        super::file::get(key, dir)
-    }
-
-    pub fn set(key: &str, dir: &Path, secret: &[u8]) -> anyhow::Result<()> {
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        if use_store() {
-            match super::store::set(key, secret) {
-                // Saved in the keyring: drop any copy an earlier run left in a file.
-                Ok(()) => return super::file::delete(key, dir),
-                Err(e) => log::info!("no credential store, keeping {key:?} in a file: {e:#}"),
-            }
-        }
-        super::file::set(key, dir, secret)
-    }
-
-    pub fn delete(key: &str, dir: &Path) -> anyhow::Result<()> {
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        if use_store()
-            && let Err(e) = super::store::delete(key)
+/// Write a file only this user can read, replacing what was there in one step.
+fn write_private(path: &Path, bytes: &[u8]) -> anyhow::Result<()> {
+    use std::io::Write;
+    let tmp = path.with_extension("tmp");
+    {
+        let mut opts = std::fs::OpenOptions::new();
+        opts.write(true).create(true).truncate(true);
+        #[cfg(unix)]
         {
-            log::debug!("credential store unavailable: {e:#}");
+            use std::os::unix::fs::OpenOptionsExt;
+            opts.mode(0o600);
         }
-        super::file::delete(key, dir)
+        let mut f = opts.open(&tmp)?;
+        f.write_all(bytes)?;
+        f.sync_all()?;
+    }
+    std::fs::rename(&tmp, path)?;
+    Ok(())
+}
+
+fn existing_key(dir: &Path) -> anyhow::Result<Option<Key<XChaCha20Poly1305>>> {
+    match keystore::get(dir)? {
+        Some(bytes) => {
+            let key: [u8; 32] = bytes.try_into().map_err(|_| anyhow!("the stored key has the wrong length"))?;
+            Ok(Some(key.into()))
+        }
+        None => Ok(None),
     }
 }
 
-#[cfg(not(windows))]
-use either as backend;
-
-/// Windows has only the Credential Manager; the data folder is just part of the key.
-#[cfg(windows)]
-mod backend {
-    use std::path::Path;
-
-    pub fn get(key: &str, _dir: &Path) -> anyhow::Result<Option<Vec<u8>>> {
-        super::store::get(key)
+fn key_or_create(dir: &Path) -> anyhow::Result<Key<XChaCha20Poly1305>> {
+    if let Some(k) = existing_key(dir)? {
+        return Ok(k);
     }
-    pub fn set(key: &str, _dir: &Path, secret: &[u8]) -> anyhow::Result<()> {
-        super::store::set(key, secret)
+    let key = Key::<XChaCha20Poly1305>::generate();
+    keystore::set(dir, key.as_slice())?;
+    Ok(key)
+}
+
+fn seal(dir: &Path, plain: &[u8]) -> anyhow::Result<Vec<u8>> {
+    let _one = LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    let key = key_or_create(dir)?;
+    let nonce = XNonce::generate();
+    let sealed = XChaCha20Poly1305::new(&key).encrypt(&nonce, plain).map_err(|_| anyhow!("encryption failed"))?;
+    Ok([MAGIC, nonce.as_slice(), &sealed].concat())
+}
+
+fn open(dir: &Path, data: &[u8]) -> anyhow::Result<Vec<u8>> {
+    if data.len() < MAGIC.len() + NONCE || !data.starts_with(MAGIC) {
+        bail!("the stored file is damaged");
     }
-    pub fn delete(key: &str, _dir: &Path) -> anyhow::Result<()> {
-        super::store::delete(key)
+    let _one = LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    let key = existing_key(dir)?.ok_or_else(|| anyhow!("its key is missing from the system keyring"))?;
+    let nonce = XNonce::try_from(&data[MAGIC.len()..MAGIC.len() + NONCE]).map_err(|_| anyhow!("bad nonce"))?;
+    XChaCha20Poly1305::new(&key).decrypt(&nonce, &data[MAGIC.len() + NONCE..]).map_err(|_| anyhow!("it can't be decrypted (wrong key or damaged file)"))
+}
+
+fn read(path: &Path, dir: &Path) -> anyhow::Result<Option<Vec<u8>>> {
+    match std::fs::read(path) {
+        Ok(data) => open(dir, &data).map(Some),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(e).context("reading a stored secret"),
     }
 }
 
 /// The secret saved under `name`, if any.
 pub fn get(name: &str, data_dir: &Path) -> Option<Vec<u8>> {
-    backend::get(&key(name, data_dir), data_dir).unwrap_or_else(|e| {
-        log::warn!("couldn't read {name} from the credential store: {e:#}");
+    read(&file(name, data_dir), data_dir).unwrap_or_else(|e| {
+        log::warn!("couldn't read {name}: {e:#}");
         None
     })
 }
 
 pub fn set(name: &str, data_dir: &Path, secret: &[u8]) -> anyhow::Result<()> {
-    backend::set(&key(name, data_dir), data_dir, secret)
+    std::fs::create_dir_all(data_dir)?;
+    write_private(&file(name, data_dir), &seal(data_dir, secret)?)
 }
 
+/// Forget the secret. The key stays: others may be sealed under it.
 pub fn delete(name: &str, data_dir: &Path) {
-    if let Err(e) = backend::delete(&key(name, data_dir), data_dir) {
-        log::warn!("couldn't delete {name} from the credential store: {e:#}");
+    match std::fs::remove_file(file(name, data_dir)) {
+        Err(e) if e.kind() != std::io::ErrorKind::NotFound => log::warn!("couldn't delete {name}: {e:#}"),
+        _ => {}
     }
 }
 
-#[cfg(all(test, windows))]
+/// The login the Slint version of ytm-native kept (`session.enc`, the youtube.com
+/// cookies as a JSON map), as a `Cookie` header, for signing in once with it.
+pub fn legacy_cookie(data_dir: &Path) -> Option<String> {
+    let plain = read(&data_dir.join("session.enc"), data_dir)
+        .inspect_err(|e| log::warn!("the earlier version's login: {e:#}"))
+        .ok()
+        .flatten()?;
+    let cookies: std::collections::BTreeMap<String, String> = serde_json::from_slice(&plain).ok()?;
+    cookies.contains_key("SAPISID").then(|| cookies.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<_>>().join("; "))
+}
+
+#[cfg(test)]
 mod tests {
     #[test]
-    fn round_trip_across_chunks() {
-        let key = &format!("ytm-rs vault test {}", std::process::id());
-        for len in [0, 10, 2560, 2561, 6000, 100] {
-            let secret: Vec<u8> = (0..len).map(|i| (i % 251) as u8).collect();
-            super::store::set(key, &secret).unwrap();
-            assert_eq!(super::store::get(key).unwrap().unwrap(), secret, "{len} bytes");
-        }
-        super::store::delete(key).unwrap();
-        assert!(super::store::get(key).unwrap().is_none());
-    }
-}
-
-#[cfg(all(test, windows))]
-mod stress {
-    #[test]
-    #[ignore]
-    fn parallel_stress() {
-        let pid = std::process::id();
-        let handles: Vec<_> = (0..4)
-            .map(|t| {
-                std::thread::spawn(move || {
-                    for round in 0..15 {
-                        let key = format!("ytm-rs stress {pid} {t}");
-                        super::store::set(&key, &vec![7u8; 6000]).unwrap();
-                        super::store::set(&key, &[7u8; 100]).unwrap();
-                        assert_eq!(super::store::get(&key).unwrap().unwrap().len(), 100, "round {round}");
-                        super::store::delete(&key).unwrap();
-                        for part in 0..3 {
-                            assert!(matches!(super::store::tests_entry(&key, part).get_secret(), Err(keyring::Error::NoEntry)), "thread {t} round {round} part {part} left");
-                        }
-                    }
-                })
-            })
-            .collect();
-        for h in handles {
-            h.join().unwrap();
-        }
-    }
-}
-
-#[cfg(all(test, any(target_os = "linux", target_os = "macos")))]
-mod unix_tests {
-    #[test]
-    fn round_trip_in_keyring_or_file() {
-        let dir = std::env::temp_dir().join(format!("ytm-rs-vault-test-{}", std::process::id()));
-        std::fs::create_dir_all(&dir).unwrap();
-        for len in [0, 10, 2560, 2561, 6000, 100] {
-            let secret: Vec<u8> = (0..len).map(|i| (i % 251) as u8).collect();
-            super::set("test", &dir, &secret).unwrap();
-            assert_eq!(super::get("test", &dir).unwrap(), secret, "{len} bytes");
-        }
-        let in_keyring = super::either::use_store() && super::store::get(&super::key("test", &dir)).ok().flatten().is_some();
-        let files: Vec<_> = std::fs::read_dir(&dir).unwrap().filter_map(|e| e.ok()).collect();
-        // Exactly one copy: in the keyring, or in an owner-only file.
-        if in_keyring {
-            assert!(files.is_empty(), "keyring secret also left in a file");
-        } else {
-            use std::os::unix::fs::PermissionsExt;
-            assert_eq!(files.len(), 1);
-            assert_eq!(files[0].metadata().unwrap().permissions().mode() & 0o777, 0o600);
-        }
-        eprintln!("stored in {}", if in_keyring { "the credential store" } else { "a file" });
-        super::delete("test", &dir);
-        assert!(super::get("test", &dir).is_none());
+    fn round_trip_without_plain_text_on_disk() {
+        let dir = std::env::temp_dir().join(format!("ytm-native-vault-test-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        assert!(super::get("account", &dir).is_none());
+        super::set("account", &dir, b"cookie=dummy-value").unwrap();
+        let raw = std::fs::read(super::file("account", &dir)).unwrap();
+        assert!(!raw.windows(11).any(|w| w == b"dummy-value"), "plain text on disk");
+        assert_eq!(super::get("account", &dir).as_deref(), Some(&b"cookie=dummy-value"[..]));
+        super::delete("account", &dir);
+        assert!(super::get("account", &dir).is_none());
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    /// A secret an earlier version saved in parts still loads, and the next save puts it
-    /// in one entry and removes the old parts. In the desktop's keyring, so only when asked:
-    /// `YTM_TEST_KEYRING=1 cargo test vault`
     #[test]
-    fn parts_from_earlier_versions() {
-        if !super::either::use_store() {
-            eprintln!("YTM_TEST_KEYRING not set: skipped");
-            return;
-        }
-        let key = &format!("ytm-rs vault parts test {}", std::process::id());
-        let old: Vec<u8> = (0..2660).map(|i| (i % 251) as u8).collect();
-        let (first, second) = old.split_at(2560);
-        let part = |i| super::store::tests_entry(key, i);
-        if part(0).set_secret(first).is_err() {
-            eprintln!("no credential store here, skipped");
-            return;
-        }
-        part(1).set_secret(second).unwrap();
-        assert_eq!(super::store::get(key).unwrap().unwrap(), old);
-        let new = vec![7u8; 3000];
-        super::store::set(key, &new).unwrap();
-        assert_eq!(super::store::get(key).unwrap().unwrap(), new);
-        assert!(matches!(part(1).get_secret(), Err(keyring::Error::NoEntry)), "old second part left");
-        super::store::delete(key).unwrap();
-        assert!(super::store::get(key).unwrap().is_none());
+    fn the_earlier_versions_login_becomes_a_cookie_header() {
+        let dir = std::env::temp_dir().join(format!("ytm-native-vault-legacy-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let sealed = super::seal(&dir, br#"{"SID":"b","SAPISID":"a"}"#).unwrap();
+        std::fs::write(dir.join("session.enc"), sealed).unwrap();
+        assert_eq!(super::legacy_cookie(&dir).as_deref(), Some("SAPISID=a; SID=b"));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

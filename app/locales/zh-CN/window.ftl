@@ -43,7 +43,6 @@ window-keyboard-volume-up = 音量调高
 window-keyboard-volume-down = 音量调低
 widget-pin-playlist = 固定播放列表
 widget-unpin-playlist = 取消固定播放列表
-widget-show-in-folder = 在文件夹中显示
 palette-pages = 页数
 palette-actions = 行动
 palette-title = 命令面板

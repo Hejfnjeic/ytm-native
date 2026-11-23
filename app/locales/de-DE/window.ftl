@@ -44,7 +44,6 @@ window-keyboard-volume-up = Lauter
 window-keyboard-volume-down = Leiser
 widget-pin-playlist = Playlist anheften
 widget-unpin-playlist = Playlist lösen
-widget-show-in-folder = Im Ordner anzeigen
 palette-pages = Seiten
 palette-actions = Aktionen
 palette-title = Befehlspalette

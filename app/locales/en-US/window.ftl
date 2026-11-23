@@ -44,7 +44,6 @@ window-keyboard-volume-up = Volume up
 window-keyboard-volume-down = Volume down
 widget-pin-playlist = Pin playlist
 widget-unpin-playlist = Unpin playlist
-widget-show-in-folder = Show in folder
 palette-pages = Pages
 palette-actions = Actions
 palette-title = Command palette

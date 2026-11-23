@@ -43,7 +43,6 @@ window-keyboard-volume-up = Збільшити гучність
 window-keyboard-volume-down = Зменшити гучність
 widget-pin-playlist = Закріпити список відтворення
 widget-unpin-playlist = Відкріпити список відтворення
-widget-show-in-folder = Показати в папці
 palette-pages = Сторінки
 palette-actions = Дії
 palette-title = Палітра команд

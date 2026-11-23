@@ -10,7 +10,6 @@
 settings-playback = Воспроизведение
 settings-lyrics = Тексты песен
 settings-appearance = Внешний вид
-settings-connections = Подключения
 settings-account = Аккаунт
 settings-general = Общие
 settings-keyboard-shortcuts = Сочетания клавиш
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Войти через Google
 settings-sign-in-finish = Завершите вход в открывшемся окне.
 settings-no-channel = { $name } (без канала)
 settings-another-channel = Другой канал
-settings-channel-not-during-transfer = Недоступно во время переноса
 settings-switching = Переключение…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 дБ
 settings-playback-speed = Скорость воспроизведения
 settings-playback-speed-desc = Ускоряет или замедляет треки. Настройка доступна и на панели плеера. Как на пластинке, при ускорении тон повышается, при замедлении понижается. Текст остаётся синхронным. При запуске ytm-rs скорость возвращается к 1×.
 settings-speed = Скорость
-settings-playback-speed-jam-note = При совместном прослушивании скорость возвращается к обычной, чтобы все слышали одну и ту же песню.
 
 ## Music videos
 
 settings-music-videos = Музыкальные клипы
 settings-songs-not-videos = Предпочитать аудиоверсии клипам
 settings-songs-not-videos-desc = Если в YouTube Music есть альбомная версия, она играет вместо официального клипа без его заставок, диалогов и специальных монтажных вставок. Содержимое списков сохраняется.
-settings-show-music-videos = Показывать музыкальные клипы
-settings-show-music-videos-desc = Клипы показываются в движении со своим звуком и без текста песни. Если выключить показ и выбрать приоритет аудиоверсий, переключатель «Трек / Видео» останется на экране воспроизведения только у клипов.
-settings-video-quality = Качество видео
-settings-video-quality-desc = Клипы воспроизводятся в этом или ближайшем доступном разрешении ниже него. 1080p требует примерно втрое больше ресурсов, чем 720p, и может перегружать медленные компьютеры.
-settings-ambient-light = Фоновая подсветка
-settings-ambient-light-desc = Подсвечивает экран воспроизведения цветами видео.
-settings-animated-covers = Анимированные обложки
-settings-animated-covers-desc = Анимирует некоторые обложки на экране воспроизведения, если для них есть ролик в Apple Music. Для поиска в Apple Music отправляются название и исполнитель каждого трека.
 settings-hide-videos-in-search = Скрывать видео в поиске
 settings-hide-videos-in-search-desc = Оставляет в результатах поиска только треки, альбомы, исполнителей и плейлисты.
 settings-skip-non-music-parts = Пропускать фрагменты без музыки
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = Пропускает разговоры, с
 
 ## Lyrics
 
-settings-romanization = Транслитерация латиницей
-settings-romanization-desc = Отображает японский, корейский, китайский, кириллицу и другие письменности латинскими буквами. Синхронизируется с текстом при наличии таймингов у источника.
 settings-translation = Перевод
 settings-translation-desc = Сначала используется перевод из источника. Если его нет, текст переводит Unison, а при недоступности — Google.
 settings-translate-into = Язык перевода
@@ -229,18 +216,6 @@ settings-app-icon-named = Значок приложения: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Разрешает плагину Stream Deck на этом компьютере управлять воспроизведением.
-settings-lastfm-connected = Прослушивания записываются в профиль { $name }.
-settings-lastfm-allow = Разрешите доступ для ytm-rs на странице Last.fm, открывшейся в браузере.
-settings-lastfm-desc = Записывает прослушивания в ваш профиль Last.fm.
-settings-disconnect = Отключить
-settings-connect = Подключить
-settings-listenbrainz-connected = Прослушивания отправляются в профиль { $name }.
-settings-listenbrainz-desc = Отправляет прослушивания в ваш профиль ListenBrainz.
-settings-user-token = Токен пользователя
-settings-listenbrainz-token-hint = Вставьте токен пользователя ListenBrainz
-settings-listenbrainz-token-link = Получить токен на listenbrainz.org
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = Приложение переключится �
 
 ## Downloads
 
-settings-downloads = Загрузки
-settings-downloads-note = Загружайте треки через их меню, а целые альбомы и плейлисты — с их страниц. Файлы сохраняются с обложкой в лучшем качестве для вашего аккаунта и воспроизводятся даже без подключения к сети.
-settings-download-folder = Папка загрузок
 settings-change = Изменить
 settings-open = Открыть
 
@@ -390,8 +362,6 @@ settings-song-info-language = Язык данных о песнях
 settings-song-info-language-desc = Язык названий песен, исполнителей, альбомов и разделов YouTube Music, если для них доступен перевод.
 settings-song-info-country = Страна для чартов и рекомендаций
 settings-song-info-country-desc = Страна, для которой YouTube Music подбирает чарты и рекомендации.
-settings-folder-per-list = Отдельная папка для каждого альбома и плейлиста
-settings-folder-per-list-desc = При скачивании альбома или плейлиста с его страницы или из меню песни сохраняются в папку с его названием. Ранее скачанные песни остаются на своих местах.
 settings-backup-stream = Резервный поток при остановке песни
 settings-backup-stream-desc = Если вы вошли в аккаунт, а YouTube остановил песню для проверки на бота (такое бывает при использовании VPN), воспроизвести её из потока с видео. Расходует больше трафика.
 settings-backup-stream-prompt-title = Воспроизведение остановлено

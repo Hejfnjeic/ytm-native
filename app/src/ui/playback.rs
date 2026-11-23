@@ -29,10 +29,10 @@ impl App {
         self.lyrics.is_some() && self.lyric_choice().is_none()
     }
 
-    /// Ask for romanization/translation of the shown source once, when they're switched on
-    /// and some line needs one the lyrics don't ship.
+    /// Ask for a translation of the shown source once, when translations are switched on
+    /// and some line needs one the lyrics don't ship. Never romanization (not wanted).
     pub(super) fn request_lyric_extras(&mut self) {
-        if !(self.show_roman || self.show_trans) {
+        if !self.show_trans {
             return;
         }
         let Some(l) = self.lyric_choice() else { return };
@@ -45,8 +45,7 @@ impl App {
         let needs = l.lines.iter().any(|x| {
             !x.instrumental
                 && !x.text.trim().is_empty()
-                && ((self.show_roman && x.romanization.is_none() && crate::translate::non_latin(&x.text))
-                    || (self.show_trans && lyric_prefs::shipped_translation(x, &target).is_none()))
+                && lyric_prefs::shipped_translation(x, &target).is_none()
         });
         let req = needs.then(|| Req::LyricsExtras {
             video_id: id.clone(),

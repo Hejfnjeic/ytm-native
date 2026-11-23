@@ -707,7 +707,7 @@ impl Backend {
         let data_dir = storage;
         let http = crate::proxy::http();
         let lyrics = Arc::new(lyrics::Client::new(http.clone(), &data_dir));
-        let translate = Arc::new(crate::translate::Client::new(http, &data_dir));
+        let translate = Arc::new(crate::translate::Client::new(http));
         let jsc = Arc::new(jsc::Solver::new(&data_dir));
         let api = Arc::new(ytmapi::Api::new(&data_dir));
         if crate::proxy::needs_relay()
@@ -717,7 +717,35 @@ impl Backend {
         }
         let backend = Self { rt: Arc::new(rt), api, tx, audio, wake, prefetched: Default::default(), staged: Default::default(), current: Default::default(), data_dir, lyrics, translate, jsc, premium: Arc::new(tokio::sync::Mutex::new(Err(None))), hq: Default::default(), backup_stream: Default::default(), clean: Default::default(), visionos_hls: Default::default(), songs: Default::default() };
         backend.keep_signed_in();
+        backend.carry_over_login();
         Ok(backend)
+    }
+
+    /// Sign in once with the login the Slint version of ytm-native kept, when there's no
+    /// sign-in of this version's yet. Its file stays, for that version.
+    fn carry_over_login(&self) {
+        if self.api.account().is_some() {
+            return;
+        }
+        let Some(cookie) = crate::vault::legacy_cookie(&self.data_dir) else { return };
+        let this = self.clone();
+        self.rt.spawn(async move {
+            let signed_in = match this.set_cookie(&cookie).await {
+                Ok(()) => {
+                    log::info!("signed in with the earlier version's login");
+                    this.warm_signed_in();
+                    true
+                }
+                Err(e) => {
+                    log::warn!("the earlier version's login didn't work: {e:#}");
+                    false
+                }
+            };
+            if signed_in {
+                let _ = this.tx.send(Resp::LoggedIn(true));
+                this.wake();
+            }
+        });
     }
 
     /// Refresh the session's cookies every few minutes, as an open YouTube tab does:

@@ -10,7 +10,6 @@
 settings-playback = Lecture
 settings-lyrics = Paroles
 settings-appearance = Apparence
-settings-connections = Connexions
 settings-account = Compte
 settings-general = Général
 settings-keyboard-shortcuts = Raccourcis clavier
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Se connecter avec Google
 settings-sign-in-finish = Terminez la connexion dans la fenêtre qui s’est ouverte.
 settings-no-channel = { $name } (aucune chaîne)
 settings-another-channel = Autre chaîne
-settings-channel-not-during-transfer = Indisponible pendant un transfert
 settings-switching = Changement en cours…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 dB
 settings-playback-speed = Vitesse de lecture
 settings-playback-speed-desc = Accélère ou ralentit les titres, aussi depuis la barre du lecteur. Comme sur un disque, le son devient plus aigu en accélérant et plus grave en ralentissant. Les paroles restent synchronisées. Revient à 1× au démarrage de ytm-rs.
 settings-speed = Vitesse
-settings-playback-speed-jam-note = En écoute collective, la vitesse redevient normale pour que tout le monde entende le même titre.
 
 ## Music videos
 
 settings-music-videos = Clips musicaux
 settings-songs-not-videos = Privilégier les titres audio
 settings-songs-not-videos-desc = Si YouTube Music dispose de l’enregistrement d’album, il remplace le clip officiel, sans ses intros, interludes ni montages exclusifs. Les entrées des listes restent les mêmes.
-settings-show-music-videos = Afficher les clips musicaux
-settings-show-music-videos-desc = Les clips sont lus avec leur image, leur propre son et sans paroles. Si l’option est désactivée et que les titres audio sont privilégiés, seuls les clips conservent le bouton Titre / Vidéo dans la lecture en cours.
-settings-video-quality = Qualité vidéo
-settings-video-quality-desc = Les clips utilisent cette résolution ou la plus proche disponible en dessous. Le 1080p demande environ trois fois plus de ressources que le 720p, ce qui peut ralentir les ordinateurs modestes.
-settings-ambient-light = Éclairage ambiant
-settings-ambient-light-desc = Éclaire le pourtour de la lecture en cours aux couleurs du clip.
-settings-animated-covers = Pochettes animées
-settings-animated-covers-desc = Anime certaines pochettes dans la lecture en cours si Apple Music fournit un clip. La recherche envoie le titre et l’artiste de chaque morceau à Apple Music.
 settings-hide-videos-in-search = Masquer les vidéos dans la recherche
 settings-hide-videos-in-search-desc = Affiche uniquement les titres, albums, artistes et playlists dans les résultats.
 settings-skip-non-music-parts = Ignorer les passages sans musique
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = Saute les dialogues, interludes et passages
 
 ## Lyrics
 
-settings-romanization = Romanisation
-settings-romanization-desc = Transcrit en caractères latins le japonais, le coréen, le chinois, le cyrillique et d’autres écritures. La transcription suit les paroles si la source fournit la synchronisation.
 settings-translation = Traduction
 settings-translation-desc = La traduction fournie avec les paroles est prioritaire. À défaut, Unison traduit le texte, ou Google si Unison ne le peut pas.
 settings-translate-into = Traduire en
@@ -229,18 +216,6 @@ settings-app-icon-named = Icône de l’application : { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Autorise un module Stream Deck de cet ordinateur à contrôler la lecture.
-settings-lastfm-connected = Les écoutes sont scrobblées sur le profil de { $name }.
-settings-lastfm-allow = Autorisez ytm-rs sur la page Last.fm ouverte dans votre navigateur.
-settings-lastfm-desc = Scrobblez vos écoutes sur votre profil Last.fm.
-settings-disconnect = Déconnecter
-settings-connect = Connecter
-settings-listenbrainz-connected = Les écoutes sont envoyées au profil de { $name }.
-settings-listenbrainz-desc = Envoyez vos écoutes à votre profil ListenBrainz.
-settings-user-token = Jeton utilisateur
-settings-listenbrainz-token-hint = Collez votre jeton ListenBrainz
-settings-listenbrainz-token-link = Obtenez votre jeton sur listenbrainz.org
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = L’application utilisera le nouveau moteur de 
 
 ## Downloads
 
-settings-downloads = Téléchargements
-settings-downloads-note = Téléchargez des titres depuis leur menu ou des albums et playlists entiers depuis leur page. Les fichiers incluent la pochette, utilisent la meilleure qualité disponible pour votre compte et se lisent hors connexion.
-settings-download-folder = Dossier de téléchargement
 settings-change = Modifier
 settings-open = Ouvrir
 
@@ -388,8 +360,6 @@ settings-song-info-language = Langue des informations sur les titres
 settings-song-info-language-desc = Langue des titres de chansons, noms d'artistes et d'albums et rubriques de YouTube Music, lorsqu'une traduction est disponible.
 settings-song-info-country = Pays des classements et recommandations
 settings-song-info-country-desc = Pays auquel correspondent les classements et les recommandations.
-settings-folder-per-list = Enregistrer chaque album et playlist dans son dossier
-settings-folder-per-list-desc = Le téléchargement d'un album ou d'une playlist depuis sa page ou son menu enregistre les titres dans un dossier portant son nom. Les titres déjà téléchargés conservent leur emplacement.
 settings-backup-stream = Flux de secours en cas d'interruption
 settings-backup-stream-desc = Avec une session ouverte, si YouTube interrompt un titre pour vérifier que vous n'êtes pas un robot (cela peut arriver avec un VPN), utilise un flux incluant la vidéo. Consomme plus de données.
 settings-backup-stream-prompt-title = Lecture interrompue

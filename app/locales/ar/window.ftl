@@ -43,7 +43,6 @@ window-keyboard-volume-up = رفع مستوى الصوت
 window-keyboard-volume-down = خفض مستوى الصوت
 widget-pin-playlist = تثبيت قائمة التشغيل
 widget-unpin-playlist = إلغاء تثبيت قائمة التشغيل
-widget-show-in-folder = إظهار في المجلد
 palette-pages = الصفحات
 palette-actions = الإجراءات
 palette-title = لوحة الأوامر

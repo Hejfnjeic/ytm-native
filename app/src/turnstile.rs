@@ -5,7 +5,7 @@
 //! an interaction, the window is shown so the user can complete it. Nothing here
 //! solves or forges the challenge.
 //!
-//! Like the sign-in window, this runs in a child process (`ytm-rs --turnstile <dir>`)
+//! This runs in a child process (`ytm-native --turnstile <dir>`)
 //! because tao and winit can't share a process.
 
 use std::path::PathBuf;

@@ -43,7 +43,6 @@ window-keyboard-volume-up = Volume verhogen
 window-keyboard-volume-down = Volume verlagen
 widget-pin-playlist = Afspeellijst vastmaken
 widget-unpin-playlist = Afspeellijst losmaken
-widget-show-in-folder = Tonen in map
 palette-pages = Pagina’s
 palette-actions = Acties
 palette-title = Opdrachtenpalet

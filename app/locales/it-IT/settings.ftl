@@ -10,7 +10,6 @@
 settings-playback = Riproduzione
 settings-lyrics = Testi
 settings-appearance = Aspetto
-settings-connections = Collegamenti
 settings-account = Account
 settings-general = Generali
 settings-keyboard-shortcuts = Scorciatoie da tastiera
@@ -32,7 +31,6 @@ settings-sign-in-with-google = Accedi con Google
 settings-sign-in-finish = Completa l’accesso nella finestra che si è aperta.
 settings-no-channel = { $name } (nessun canale)
 settings-another-channel = Altro canale
-settings-channel-not-during-transfer = Non disponibile durante il trasferimento
 settings-switching = Cambio in corso…
 
 ## Playback
@@ -113,21 +111,12 @@ settings-0-db = 0 dB
 settings-playback-speed = Velocità di riproduzione
 settings-playback-speed-desc = Riproduci i brani più velocemente o più lentamente, anche dalla barra del lettore. Come con un disco, accelerando il suono è più acuto, rallentando più grave. I testi restano sincronizzati. All’avvio di ytm-rs torna a 1×.
 settings-speed = Velocità
-settings-playback-speed-jam-note = Nelle sessioni di gruppo si torna alla velocità normale, così tutti ascoltano lo stesso brano.
 
 ## Music videos
 
 settings-music-videos = Video musicali
 settings-songs-not-videos = Preferisci i brani ai video musicali
 settings-songs-not-videos-desc = Se YouTube Music ha la versione dell’album, viene riprodotta al posto del video ufficiale, senza introduzioni, scenette o montaggi esclusivi. Gli elenchi mantengono le proprie voci.
-settings-show-music-videos = Mostra i video musicali
-settings-show-music-videos-desc = I video musicali si vedono in movimento con audio proprio e senza testi. Se l’opzione è disattivata e si preferiscono i brani, il selettore Brano / Video in In riproduzione resta disponibile solo per i video.
-settings-video-quality = Qualità video
-settings-video-quality-desc = I video usano questa risoluzione o la più vicina disponibile fra quelle inferiori. Il 1080p richiede circa il triplo delle risorse del 720p e può mettere in difficoltà i computer più lenti.
-settings-ambient-light = Illuminazione ambientale
-settings-ambient-light-desc = Illumina i bordi di In riproduzione con i colori del video.
-settings-animated-covers = Copertine animate
-settings-animated-covers-desc = Anima alcune copertine in In riproduzione quando Apple Music dispone di un video. La ricerca invia il titolo e l’artista di ogni brano ad Apple Music.
 settings-hide-videos-in-search = Nascondi i video nella ricerca
 settings-hide-videos-in-search-desc = Mostra solo brani, album, artisti e playlist nei risultati.
 settings-skip-non-music-parts = Salta le parti senza musica
@@ -135,8 +124,6 @@ settings-skip-non-music-parts-desc = Salta dialoghi, scenette e sponsorizzazioni
 
 ## Lyrics
 
-settings-romanization = Romanizzazione
-settings-romanization-desc = Trascrive in caratteri latini il giapponese, il coreano, il cinese, il cirillico e altre scritture. Segue i tempi del testo se la fonte li fornisce.
 settings-translation = Traduzione
 settings-translation-desc = Ha la precedenza la traduzione fornita con il testo. In sua assenza traduce Unison o, se non disponibile, Google.
 settings-translate-into = Traduci in
@@ -229,18 +216,6 @@ settings-app-icon-named = Icona dell’app: { $name }
 
 ## Connections
 
-settings-stream-deck = Stream Deck
-settings-stream-deck-desc = Consente a un plugin Stream Deck su questo computer di controllare la riproduzione.
-settings-lastfm-connected = Le riproduzioni vengono registrate nel profilo di { $name }.
-settings-lastfm-allow = Autorizza ytm-rs nella pagina Last.fm che si è aperta nel browser.
-settings-lastfm-desc = Registra i tuoi ascolti nel profilo Last.fm tramite scrobbling.
-settings-disconnect = Disconnetti
-settings-connect = Connetti
-settings-listenbrainz-connected = Gli ascolti vengono inviati al profilo di { $name }.
-settings-listenbrainz-desc = Invia i tuoi ascolti al profilo ListenBrainz.
-settings-user-token = Token utente
-settings-listenbrainz-token-hint = Incolla il tuo token utente ListenBrainz
-settings-listenbrainz-token-link = Ottieni il tuo token su listenbrainz.org
 
 ## Language
 
@@ -275,9 +250,6 @@ settings-renderer-restart-desc = L’app userà il nuovo motore grafico al pross
 
 ## Downloads
 
-settings-downloads = Download
-settings-downloads-note = Scarica i brani dal relativo menu o interi album e playlist dalla loro pagina. I file sono salvati con la copertina, alla migliore qualità disponibile per il tuo account, e si riproducono anche offline.
-settings-download-folder = Cartella dei download
 settings-change = Cambia
 settings-open = Apri
 
@@ -384,8 +356,6 @@ settings-song-info-language = Lingua delle informazioni sui brani
 settings-song-info-language-desc = Lingua dei titoli dei brani, nomi degli artisti e degli album e sezioni di YouTube Music, quando è disponibile una traduzione.
 settings-song-info-country = Paese per classifiche e consigli
 settings-song-info-country-desc = Il paese a cui si riferiscono classifiche e consigli.
-settings-folder-per-list = Salva ogni album e playlist nella propria cartella
-settings-folder-per-list-desc = Scaricando un album o una playlist dalla relativa pagina o dal menu, i brani vengono salvati in una cartella con lo stesso nome. I brani già scaricati rimangono dove sono.
 settings-backup-stream = Flusso alternativo se la musica si interrompe
 settings-backup-stream-desc = Se hai effettuato l'accesso e YouTube interrompe un brano per verificare che tu non sia un bot (può succedere con una VPN), usa un flusso che include il video. Consuma più dati.
 settings-backup-stream-prompt-title = Riproduzione interrotta

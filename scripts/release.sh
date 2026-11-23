@@ -40,6 +40,9 @@ echo "== 2. builds"
 export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$HOME=/build"
 # Same for the bundled C code (QuickJS; libopus on Windows): __FILE__ in its assertions.
 export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$HOME=/build"
+# rquickjs-sys sets CFLAGS itself for Windows targets (dropping ours); the target-specific
+# variable wins over it in the cc crate, so it repeats rquickjs' flags.
+export CFLAGS_x86_64_pc_windows_gnu="-DWIN32_LEAN_AND_MEAN -std=c11 -ffile-prefix-map=$HOME=/build"
 no_home() {
     if grep -qaF -e "$HOME" -e "/$(id -un)/" "$1"; then
         echo "$1 still contains paths from $HOME: not publishing" >&2

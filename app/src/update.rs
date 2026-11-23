@@ -1,425 +1,1094 @@
-//! Updates from the project's GitHub releases.
+//! Automatic updates from GitHub releases.
 //!
-//! Each release carries `update-manifest.json`: per platform, the full executable and binary
-//! patches (bsdiff, `BSDIFF40` format) from earlier versions, all with SHA-256 sums. An update
-//! downloads only the patch from the running version, applies it to the running executable and
-//! checks the result's hash; if anything doesn't match, it downloads the full executable instead
-//! (also hash-checked). The new executable takes the old one's place and runs from the next
-//! start. Release builds are made by `scripts/release.sh`, which also writes the patches.
+//! The installed app (Inno Setup, per-user) checks the latest release at startup and
+//! every few hours, downloads a newer installer in the background, and runs it
+//! silently when the app closes, or right away when the user picks "Restart to
+//! update". The portable build (a `portable.txt` beside the exe) downloads the new
+//! portable zip instead and swaps the exe in place as it closes. On Linux, a copy
+//! put in place by `install.sh` (an `install.txt` beside the binary) downloads the new
+//! tarball and renames the new binary over itself as it closes. On macOS, the copy
+//! installed from the disk image downloads the new one and puts the app from it in
+//! place of its own as it closes. A copy from the Linux .deb (a `deb.txt` beside the
+//! binary, in /usr/lib/ytm-rs) can't replace itself: it only says a new version is out
+//! ([`State::Available`]), and the new .deb installs over it. The Arch package (a
+//! `pacman.txt` there instead) does the same with the new package. A Flatpak (which
+//! always has `/.flatpak-info`) only says so too, and is updated through Flatpak. Every platform has a portable build too (a
+//! `portable.txt` marker; inside the app bundle on macOS), which updates from the
+//! portable download. Dev builds never update themselves.
 //!
-//! Only official release builds replace themselves (`YTM_RELEASE_BUILD` set at compile time).
-//! Builds from source and distro packages (`YTM_PACKAGED`, e.g. the Arch package) only say that
-//! a new version exists: replacing them would overwrite the user's own build or files a
-//! package manager owns.
+//! Nothing waits a fixed time for the app to exit. The installer is run by a copy of
+//! this exe staged in the updates folder ([`apply_main`]), which waits for this process
+//! to exit, runs the installer, and starts the app again. A relaunch is passed this
+//! process's id ([`start_after_exit`]) and waits for it to exit before going on.
+//!
+//! A download is checked against the SHA-256 GitHub's API gives for it before it's
+//! unpacked or run, as is one kept from an earlier check.
+//!
+//! Release notes (the release's Markdown body) are kept per version: the one a check
+//! finds, and any other on request ([`Updater::notes`]), for the update dialog, the
+//! card shown after updating and Settings.
+//!
+//! Two channels: stable follows the latest published release; nightly also takes the
+//! prereleases built from main every night there are new changes (tagged
+//! `v<version>-nightly.<date>`, see the release workflow), whichever is newer. A nightly
+//! build knows it is one from `YTM_NIGHTLY`, set when it was built. Switching back to
+//! stable from a nightly installs the latest stable release, though its version is lower.
+//!
+//! Dev hooks: `YTM_UPDATE_FORCE=1` treats any build as installed; `YTM_UPDATE_AS=<ver>`
+//! pretends to be that version; `YTM_UPDATE_FLATPAK=1` (Linux) acts as a Flatpak;
+//! `YTM_UPDATE_DRYRUN=1` logs the install command
+//! instead of running it; `YTM_UPDATE_FEED=<url>` reads the release (or the list of
+//! releases) from there.
+//!
+//! GitHub's API allows 60 requests an hour without a token, shared by everyone on the
+//! same IP address (a VPN, a proxy, a carrier's NAT). `YTM_GITHUB_TOKEN` sends a token
+//! with them for 5,000 an hour ([`github_api`]); a check turned down for the limit
+//! tries again when it ends ([`State::RateLimited`]).
 
-use std::{
-    collections::HashMap,
-    io::Read,
-    path::{Path, PathBuf},
-    time::Duration,
-};
+use std::cmp::Ordering;
+use std::ffi::OsString;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use anyhow::{Context, Result, anyhow, bail};
-use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-/// `owner/repo` on GitHub.
-pub const REPO: &str = "Hejfnjeic/ytm-native";
-pub const MANIFEST: &str = "update-manifest.json";
+const LATEST: &str = "https://api.github.com/repos/grapedjuice/ytm-rs/releases/latest";
+const ALL_RELEASES: &str = "https://api.github.com/repos/grapedjuice/ytm-rs/releases";
+const BY_TAG: &str = "https://api.github.com/repos/grapedjuice/ytm-rs/releases/tags/v";
+pub const RELEASES: &str = "https://github.com/grapedjuice/ytm-rs/releases";
 
-/// How this build gets updated.
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-pub enum Mode {
-    /// Official release build: downloads and installs updates itself.
-    SelfUpdate,
-    /// Installed by a package manager (pacman): tell the user, don't touch the files.
-    Packaged(&'static str),
-    /// Built from source: tell the user, don't overwrite their build.
-    FromSource,
+/// The first argument of the staged helper (see [`apply_main`]).
+const APPLY_FLAG: &str = "--apply-update";
+/// `--after=<pid>`: wait for that process to exit first (see [`wait_for_predecessor`]).
+const AFTER_FLAG: &str = "--after=";
+/// The staged helper, and the note it leaves when an install fails, in the updates folder.
+#[cfg_attr(not(windows), allow(dead_code))]
+const HELPER: &str = "update.exe";
+const FAILED: &str = "install-failed.txt";
+
+/// Release notes by version: `None` while fetching or when there are none.
+type Notes = Arc<Mutex<std::collections::HashMap<String, Option<String>>>>;
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum State {
+    Idle,
+    Checking,
+    UpToDate,
+    Downloading { version: String, percent: u8 },
+    /// `installer` is the setup exe, or for the portable build the new ytm-rs.exe.
+    Ready { version: String, installer: PathBuf },
+    /// A newer version is out, for a copy that can't install it itself (the .deb, the
+    /// Arch package, a Flatpak): `url` is its package (for a Flatpak, the release's page,
+    /// unused).
+    Available { version: String, url: String },
+    /// GitHub's API turned the check down for its rate limit, until then.
+    RateLimited { until: Instant },
+    Failed(String),
 }
 
-pub fn mode() -> Mode {
-    if let Some(p) = option_env!("YTM_PACKAGED") {
-        Mode::Packaged(p)
-    } else if option_env!("YTM_RELEASE_BUILD").is_some() {
-        Mode::SelfUpdate
-    } else {
-        Mode::FromSource
-    }
-}
-
-/// Release asset platform key ("linux-x86_64", "windows-x86_64").
-pub fn platform() -> String {
-    let os = if cfg!(windows) { "windows" } else if cfg!(target_os = "macos") { "macos" } else { "linux" };
-    format!("{os}-{}", std::env::consts::ARCH)
-}
-
-/// The executable's path, as it was at startup. Asked again after an update, Linux would
-/// answer "<path> (deleted)": the running process still points at the replaced file.
-pub fn exe_path() -> Option<PathBuf> {
-    static EXE: std::sync::OnceLock<Option<PathBuf>> = std::sync::OnceLock::new();
-    EXE.get_or_init(|| std::env::current_exe().ok()).clone()
-}
-
-pub fn current_version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct Asset {
-    pub name: String,
-    pub size: u64,
-    pub sha256: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct Patch {
-    /// Version the patch applies to.
-    pub from: String,
-    /// SHA-256 of that version's executable (the patch only fits that exact file).
-    pub from_sha256: String,
-    #[serde(flatten)]
-    pub asset: Asset,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct PlatformFiles {
-    /// The new executable; its sha256 is also what a patched executable must hash to.
-    pub full: Asset,
-    #[serde(default)]
-    pub patches: Vec<Patch>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct Manifest {
-    pub version: String,
-    pub platforms: HashMap<String, PlatformFiles>,
-}
-
-/// A newer release than the running one.
-#[derive(Clone, Debug)]
-pub struct Release {
-    pub version: String,
-    /// The release's web page (notes, manual downloads).
-    pub page: String,
-    /// The release notes (GitHub Markdown).
-    pub notes: String,
-    manifest: Manifest,
-    /// Asset name -> download URL.
-    urls: HashMap<String, String>,
-}
-
-impl Release {
-    /// Download size for this platform: the patch if one fits, otherwise the full file.
-    pub fn download_size(&self, exe_sha256: Option<&str>) -> Option<u64> {
-        let files = self.manifest.platforms.get(&platform())?;
-        Some(pick_patch(files, exe_sha256).map_or(files.full.size, |p| p.asset.size))
-    }
-}
-
-fn pick_patch<'a>(files: &'a PlatformFiles, exe_sha256: Option<&str>) -> Option<&'a Patch> {
-    files.patches.iter().find(|p| p.from == current_version() && exe_sha256.is_none_or(|h| h == p.from_sha256))
-}
-
-/// "1.2.3" -> (1, 2, 3); anything after a '-' is ignored.
-fn parse_version(v: &str) -> Option<(u64, u64, u64)> {
-    let v = v.trim().trim_start_matches('v');
-    let core = v.split('-').next()?;
-    let mut it = core.split('.').map(|n| n.parse::<u64>().ok());
-    Some((it.next()??, it.next().flatten().unwrap_or(0), it.next().flatten().unwrap_or(0)))
-}
-
-pub fn is_newer(candidate: &str, current: &str) -> bool {
-    matches!((parse_version(candidate), parse_version(current)), (Some(a), Some(b)) if a > b)
-}
-
+#[derive(Clone)]
 pub struct Updater {
-    http: reqwest::Client,
-    /// GitHub API base; `YTM_UPDATE_API` overrides it (tests serve a fake release locally).
-    api: String,
+    state: Arc<Mutex<State>>,
+    dir: PathBuf,
+    wake: Arc<dyn Fn() + Send + Sync>,
+    notes: Notes,
+    /// Total downloads of every release asset: None until asked, Some(None) while fetching.
+    downloads: Arc<Mutex<Option<Option<u64>>>>,
+    /// The nightly channel, rather than stable.
+    nightly: Arc<AtomicBool>,
+}
+
+/// What a nightly's version has between the base version and its build number.
+const NIGHTLY: &str = "-nightly.";
+
+/// The version this was built as: a nightly build adds its build number.
+pub fn build_version() -> String {
+    match option_env!("YTM_NIGHTLY").filter(|n| !n.is_empty()) {
+        Some(n) => format!("{}{NIGHTLY}{n}", env!("CARGO_PKG_VERSION")),
+        None => env!("CARGO_PKG_VERSION").to_owned(),
+    }
+}
+
+pub fn current_version() -> String {
+    std::env::var("YTM_UPDATE_AS").unwrap_or_else(|_| build_version())
+}
+
+/// Whether `version` is a nightly build's.
+pub fn is_nightly(version: &str) -> bool {
+    version.contains(NIGHTLY)
+}
+
+/// Whether this copy was installed by the installer (which leaves its uninstaller
+/// beside the exe, or on Linux `install.sh` its `install.txt`), or on macOS runs from
+/// an app bundle that isn't the portable one, so it's safe to update in place.
+pub fn installed() -> bool {
+    if std::env::var_os("YTM_UPDATE_FORCE").is_some() {
+        return true;
+    }
+    let Ok(exe) = std::env::current_exe() else { return false };
+    if cfg!(target_os = "macos") {
+        return bundle_of(&exe).is_some() && portable_dir().is_none();
+    }
+    let marker = if cfg!(windows) { "unins000.exe" } else { "install.txt" };
+    exe.parent().is_some_and(|d| d.join(marker).exists())
+}
+
+/// Whether this copy was installed from the .deb, which marks it with `deb.txt` beside
+/// the binary. Apt owns it, so it never replaces itself.
+pub fn deb() -> bool {
+    static DEB: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *DEB.get_or_init(|| cfg!(target_os = "linux") && std::env::current_exe().ok().and_then(|e| Some(e.parent()?.join("deb.txt").exists())).unwrap_or(false))
+}
+
+/// Whether this copy was installed from the Arch package, which marks it with
+/// `pacman.txt` beside the binary. Pacman owns it, so like the .deb it never replaces
+/// itself.
+pub fn pacman() -> bool {
+    static PACMAN: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *PACMAN.get_or_init(|| cfg!(target_os = "linux") && std::env::current_exe().ok().and_then(|e| Some(e.parent()?.join("pacman.txt").exists())).unwrap_or(false))
+}
+
+/// Whether this copy runs as a Flatpak. Flatpak owns it, so like the .deb it never
+/// replaces itself, and there's no package to download either: Flatpak updates it.
+pub fn flatpak() -> bool {
+    static FLATPAK: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *FLATPAK.get_or_init(|| cfg!(target_os = "linux") && in_flatpak(Path::new("/.flatpak-info"), std::env::var_os("YTM_UPDATE_FLATPAK").is_some()))
+}
+
+/// Every Flatpak sandbox has `/.flatpak-info` (`info`), outside one nothing does.
+/// `FLATPAK_ID` isn't asked: it's set in the sandbox too, but can be passed on to
+/// programs started outside it. `pretend` is the dev hook.
+fn in_flatpak(info: &Path, pretend: bool) -> bool {
+    pretend || info.is_file()
+}
+
+/// Whether a package manager owns this copy (the .deb, the Arch package or a Flatpak):
+/// it only says a new version is out.
+pub fn packaged() -> bool {
+    flatpak() || deb() || pacman()
+}
+
+/// What to do with the new version, for a copy a package manager owns. A Flatpak
+/// comes first: one made from the .deb or the Arch package keeps its marker.
+pub fn package_step() -> &'static str {
+    if flatpak() {
+        crate::tr!("window-package-flatpak")
+    } else if pacman() {
+        crate::tr!("window-package-instructions")
+    } else {
+        crate::tr!("window-package-download")
+    }
+}
+
+/// On Linux, another copy installed the other way (one from install.sh beside the
+/// .deb's or the Arch package's, or the other way round), which would otherwise be left
+/// behind: the menu and the `ytm-rs` command open the install.sh one. What it's from,
+/// and the command that removes it.
+pub fn other_copy() -> Option<(&'static str, &'static str)> {
+    if !cfg!(target_os = "linux") {
+        return None;
+    }
+    let home = std::env::var_os("HOME").map(PathBuf::from)?;
+    if packaged() {
+        home.join(".local/lib/ytm-rs/install.txt").exists().then_some(("install.sh", "~/.local/lib/ytm-rs/install.sh --uninstall"))
+    } else if !installed() {
+        None
+    } else if Path::new("/usr/lib/ytm-rs/deb.txt").exists() {
+        Some(("the .deb", "sudo apt remove ytm-rs"))
+    } else {
+        Path::new("/usr/lib/ytm-rs/pacman.txt").exists().then_some(("the Arch package", "sudo pacman -R ytm-rs"))
+    }
+}
+
+/// A version as the .deb has it: a nightly (`0.3.0-nightly.20261111`) comes after its
+/// version there too (`0.3.0+nightly.20261111`).
+pub fn deb_version(version: &str) -> String {
+    version.replacen(NIGHTLY, "+nightly.", 1)
+}
+
+/// The Arch package's file, as linux/arch.sh builds it: pkgver can't have a hyphen, so
+/// a nightly (`0.3.0-nightly.20261111`) is `0.3.0.nightly.20261111`, which pacman puts
+/// after its version too.
+fn pacman_package(version: &str, arch: &str) -> String {
+    format!("ytm-rs-{}-1-{arch}.pkg.tar.zst", version.replace('-', "."))
+}
+
+/// The `.app` bundle a binary is in (`X.app/Contents/MacOS/ytm-rs`).
+fn bundle_of(exe: &Path) -> Option<&Path> {
+    exe.ancestors().nth(3).filter(|a| a.extension().is_some_and(|x| x == "app"))
+}
+
+/// The release asset this copy updates from.
+fn asset_name(version: &str) -> String {
+    let portable = portable_dir().is_some();
+    let arch = std::env::consts::ARCH;
+    if cfg!(target_os = "linux") && pacman() {
+        return pacman_package(version, arch);
+    }
+    if cfg!(target_os = "linux") && deb() {
+        let arch = if arch == "x86_64" { "amd64" } else if arch == "aarch64" { "arm64" } else { arch };
+        return format!("ytm-rs_{}_{arch}.deb", deb_version(version));
+    }
+    if cfg!(target_os = "linux") {
+        let kind = if portable { "portable-" } else { "" };
+        return format!("ytm-rs-{kind}{version}-linux-{arch}.tar.gz");
+    }
+    // ARM64 Windows builds have their own assets; x64 keeps the original names.
+    let (suffix, setup) = if cfg!(target_os = "macos") {
+        (format!("-macos-{arch}"), "dmg")
+    } else {
+        (if cfg!(target_arch = "aarch64") { "-arm64" } else { "" }.to_owned(), "exe")
+    };
+    if portable { format!("ytm-rs-portable-{version}{suffix}.zip") } else { format!("ytm-rs-setup-{version}{suffix}.{setup}") }
+}
+
+/// The portable build's folder: the download ships a `portable.txt` beside the exe
+/// (on macOS inside the app bundle, where code signing allows it), which keeps
+/// settings in `data` next to it (next to the bundle) and has updates replace it in place.
+pub fn portable_dir() -> Option<PathBuf> {
+    let exe = std::env::current_exe().ok()?;
+    if let Some(app) = bundle_of(&exe) {
+        // Opened without being moved out of quarantine, macOS runs the app from a
+        // random read-only copy; there's no folder beside it to keep data in.
+        if app.to_string_lossy().contains("/AppTranslocation/") {
+            return None;
+        }
+        if !app.join("Contents/Resources/portable.txt").exists() {
+            return None;
+        }
+        return app.parent().map(Path::to_path_buf);
+    }
+    let dir = exe.parent()?.to_path_buf();
+    dir.join("portable.txt").exists().then_some(dir)
+}
+
+/// Remove the exe a portable update replaced (it was still running then), and any
+/// new one a failed swap left beside it.
+pub fn clean_portable() {
+    if portable_dir().is_some()
+        && let Ok(exe) = std::env::current_exe()
+    {
+        let _ = std::fs::remove_file(exe.with_extension("exe.old"));
+        let _ = std::fs::remove_file(exe.with_extension("exe.new"));
+    }
+}
+
+/// A relaunch (`--after=<pid>`) waits for the copy that started it to exit, so the two
+/// never run at once. Before anything else, even the single-instance handoff.
+pub fn wait_for_predecessor() {
+    let pid = std::env::args_os().skip(1).find_map(|a| a.to_str()?.strip_prefix(AFTER_FLAG)?.parse().ok());
+    if let Some(pid) = pid {
+        wait_for_exit(pid);
+    }
+}
+
+/// Start `exe` once this process has exited: it waits for this one
+/// ([`wait_for_predecessor`]), so this process can take as long as it needs to close.
+pub fn start_after_exit(exe: &Path) -> bool {
+    let after = format!("{AFTER_FLAG}{}", std::process::id());
+    #[cfg(target_os = "macos")]
+    if let Some(app) = bundle_of(exe) {
+        // Through Launch Services; `-n` starts a new copy while this one is still up.
+        return spawn(Command::new("open").arg("-n").arg(app).arg("--args").arg(&after));
+    }
+    spawn(Command::new(exe).arg(after))
+}
+
+/// Wait for process `pid` to exit, however long it takes: going ahead early would run
+/// two copies at once (or hand off to one that's closing).
+#[cfg(windows)]
+fn wait_for_exit(pid: u32) {
+    use windows::Win32::Foundation::{CloseHandle, FILETIME, HANDLE};
+    use windows::Win32::System::Threading::{
+        GetCurrentProcess, GetProcessTimes, INFINITE, OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION, PROCESS_SYNCHRONIZE, WaitForSingleObject,
+    };
+    // SAFETY: out-params of the right types, and a handle opened, waited on and closed
+    // here. One that can't be opened belongs to a process that has already exited.
+    unsafe {
+        let started = |h: HANDLE| {
+            let [mut created, mut exited, mut kernel, mut user] = [FILETIME::default(); 4];
+            let _ = GetProcessTimes(h, &mut created, &mut exited, &mut kernel, &mut user);
+            (u64::from(created.dwHighDateTime) << 32) | u64::from(created.dwLowDateTime)
+        };
+        if let Ok(h) = OpenProcess(PROCESS_SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, false, pid) {
+            // One started after this process has the id only because ours has exited.
+            if started(h) <= started(GetCurrentProcess()) {
+                let _ = WaitForSingleObject(h, INFINITE);
+            }
+            let _ = CloseHandle(h);
+        }
+    }
+}
+
+#[cfg(unix)]
+fn wait_for_exit(pid: u32) {
+    // Started straight from it (always, but for `open` on macOS), this process is its
+    // child until it exits: as a zombie it would still answer `kill`. Through `open`,
+    // it's gone once `kill` can't find it.
+    let child = cfg!(not(target_os = "macos")) || std::os::unix::process::parent_id() == pid;
+    // SAFETY: signal 0 only checks that the process exists.
+    let alive = || if child { std::os::unix::process::parent_id() == pid } else { unsafe { libc::kill(pid as libc::pid_t, 0) == 0 } };
+    while alive() {
+        std::thread::sleep(std::time::Duration::from_millis(50));
+    }
+}
+
+/// The staged helper: when this process was started as one, apply the update and
+/// return true (the caller exits). Arguments: the old process's id, the installer, the
+/// folder to install to, `/ALLUSERS` or `/CURRENTUSER`, and `1` to start the app after.
+pub fn apply_main() -> bool {
+    let args: Vec<OsString> = std::env::args_os().skip(1).collect();
+    if args.first().is_none_or(|a| a != APPLY_FLAG) {
+        return false;
+    }
+    #[cfg(windows)]
+    if let [pid, installer, dir, scope, relaunch] = &args[1..] {
+        wait_for_exit(pid.to_str().and_then(|p| p.parse().ok()).unwrap_or(0));
+        let installer = Path::new(installer);
+        let updates = installer.parent().unwrap_or(Path::new("."));
+        let arg = |name: &str, value: &std::ffi::OsStr| {
+            let mut a = OsString::from(name);
+            a.push(value);
+            a
+        };
+        let status = Command::new(installer)
+            .args(["/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"])
+            .arg(scope)
+            .arg(arg("/DIR=", dir.as_os_str()))
+            .arg(arg("/LOG=", updates.join("install.log").as_os_str()))
+            .status();
+        // The next launch logs it (this process has no log of its own).
+        let failed = match status {
+            Ok(s) if s.success() => None,
+            Ok(s) => Some(format!("the installer exited with {s}")),
+            Err(e) => Some(format!("couldn't run the installer: {e}")),
+        };
+        if let Some(why) = failed {
+            let _ = std::fs::write(updates.join(FAILED), why);
+        }
+        // Even after a failure: the installer rolls back, so the old version is still there.
+        // After this helper exits, so the next launch can delete it.
+        let exe = Path::new(dir).join("ytm-rs.exe");
+        if relaunch == "1" && exe.exists() {
+            start_after_exit(&exe);
+        }
+    }
+    true
+}
+
+/// Start a program that outlives this process; false if it couldn't be.
+fn spawn(cmd: &mut Command) -> bool {
+    cmd.stdin(std::process::Stdio::null());
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        // Its own process group, so it isn't taken down with this one.
+        cmd.process_group(0);
+    }
+    cmd.spawn().inspect_err(|e| log::warn!("update: couldn't start {}: {e}", cmd.get_program().display())).is_ok()
+}
+
+/// `a` is newer than `b` (dotted numeric versions, a leading "v" ignored). A nightly
+/// (`0.2.34-nightly.20261110`) is built from main after that version's release, so it's
+/// newer than the release and older than the next one.
+pub fn newer(a: &str, b: &str) -> bool {
+    let nums = |s: &str| s.split('.').map(|p| p.parse::<u64>().unwrap_or(0)).collect::<Vec<_>>();
+    let parse = |v: &str| {
+        let v = v.trim_start_matches('v');
+        match v.split_once(NIGHTLY) {
+            Some((base, build)) => (nums(base), Some(nums(build))),
+            None => (nums(v), None),
+        }
+    };
+    let cmp = |a: &[u64], b: &[u64]| {
+        (0..a.len().max(b.len())).map(|i| a.get(i).copied().unwrap_or(0).cmp(&b.get(i).copied().unwrap_or(0))).find(|o| o.is_ne()).unwrap_or(Ordering::Equal)
+    };
+    let (a, b) = (parse(a), parse(b));
+    match cmp(&a.0, &b.0) {
+        Ordering::Equal => match (a.1, b.1) {
+            (Some(x), Some(y)) => cmp(&x, &y).is_gt(),
+            (Some(_), None) => true,
+            _ => false,
+        },
+        o => o.is_gt(),
+    }
+}
+
+/// The release to update to from what the feed returned: a single release, or the
+/// list of them, from which the newest stable one, or on the nightly channel the newest
+/// stable or nightly one. Other prereleases (test builds) are never picked.
+fn pick_release(feed: serde_json::Value, nightly: bool) -> Option<serde_json::Value> {
+    let serde_json::Value::Array(list) = feed else { return Some(feed) };
+    let tag = |r: &serde_json::Value| r["tag_name"].as_str().unwrap_or_default().to_owned();
+    list.into_iter()
+        .filter(|r| !r["draft"].as_bool().unwrap_or(false))
+        .filter(|r| if r["prerelease"].as_bool().unwrap_or(false) { nightly && is_nightly(&tag(r)) } else { true })
+        .reduce(|best, r| if newer(&tag(&r), &tag(&best)) { r } else { best })
+}
+
+/// Whether `tag` is the one to install over `current`: newer, or on the stable channel,
+/// the stable release in place of a nightly build.
+fn wanted(tag: &str, current: &str, nightly: bool) -> bool {
+    newer(tag, current) || (!nightly && is_nightly(current) && !is_nightly(tag) && !tag.is_empty() && tag.trim_start_matches('v') != current)
 }
 
 impl Updater {
-    pub fn new() -> Result<Self> {
-        // Its own client: nothing from the YouTube session goes to GitHub.
-        let http = reqwest::Client::builder()
-            .user_agent(concat!("ytm-native/", env!("CARGO_PKG_VERSION")))
-            .connect_timeout(Duration::from_secs(10))
-            .timeout(Duration::from_secs(600))
-            .build()?;
-        let api = std::env::var("YTM_UPDATE_API").unwrap_or_else(|_| "https://api.github.com".into());
-        Ok(Self { http, api })
+    pub fn new(data_dir: &Path, nightly: bool, wake: impl Fn() + Send + Sync + 'static) -> Self {
+        let dir = data_dir.join("updates");
+        // What the last install's helper left behind.
+        #[cfg(windows)]
+        let _ = std::fs::remove_file(dir.join(HELPER));
+        if let Ok(why) = std::fs::read_to_string(dir.join(FAILED)) {
+            log::warn!("update: the last update didn't install: {why} (see {})", dir.join("install.log").display());
+            let _ = std::fs::remove_file(dir.join(FAILED));
+        }
+        Self {
+            state: Arc::new(Mutex::new(State::Idle)),
+            dir,
+            wake: Arc::new(wake),
+            notes: Default::default(),
+            downloads: Default::default(),
+            nightly: Arc::new(AtomicBool::new(nightly)),
+        }
     }
 
-    /// The latest release, if it's newer than this build.
-    /// (Its notes are shown with `note_lines`.)
-    pub async fn check(&self) -> Result<Option<Release>> {
-        let url = format!("{}/repos/{REPO}/releases/latest", self.api);
-        let resp = self.http.get(&url).header("Accept", "application/vnd.github+json").send().await?;
-        if resp.status() == reqwest::StatusCode::NOT_FOUND {
-            return Ok(None); // no releases yet
+    /// Switch channel. What was found or downloaded for the other one is dropped; a
+    /// check under way starts over on the new channel when it ends.
+    pub fn set_nightly(&self, nightly: bool) {
+        if self.nightly.swap(nightly, Relaxed) == nightly {
+            return;
         }
-        let v: serde_json::Value = resp.error_for_status()?.json().await?;
-        let tag = v["tag_name"].as_str().ok_or_else(|| anyhow!("release without a tag"))?;
-        if !is_newer(tag, current_version()) {
-            return Ok(None);
+        let mut state = self.state.lock().unwrap();
+        if !matches!(*state, State::Checking | State::Downloading { .. }) {
+            *state = State::Idle;
         }
-        let urls: HashMap<String, String> = v["assets"].as_array().into_iter().flatten()
-            .filter_map(|a| Some((a["name"].as_str()?.to_string(), a["browser_download_url"].as_str()?.to_string())))
-            .collect();
-        let page = v["html_url"].as_str().unwrap_or_default().to_string();
-        let murl = urls.get(MANIFEST).ok_or_else(|| anyhow!("release {tag} has no {MANIFEST}"))?;
-        let manifest: Manifest = self.http.get(murl).send().await?.error_for_status()?.json().await?;
-        let notes = v["body"].as_str().unwrap_or_default().to_string();
-        Ok(Some(Release { version: manifest.version.clone(), page, notes, manifest, urls }))
+        drop(state);
+        (self.wake)();
     }
 
-    async fn download(&self, asset: &Asset, urls: &HashMap<String, String>) -> Result<Vec<u8>> {
-        let url = urls.get(&asset.name).ok_or_else(|| anyhow!("release is missing {}", asset.name))?;
-        let bytes = self.http.get(url).send().await?.error_for_status()?.bytes().await?.to_vec();
-        if bytes.len() as u64 != asset.size || sha256_hex(&bytes) != asset.sha256 {
-            bail!("{} didn't match its checksum", asset.name);
-        }
-        Ok(bytes)
+    pub fn state(&self) -> State {
+        self.state.lock().unwrap().clone()
     }
 
-    /// Download and install `release` over the running executable. Returns a short summary
-    /// ("patch, 3.1 MB"). The new version runs from the next start.
-    pub async fn install(&self, release: &Release) -> Result<String> {
-        if mode() != Mode::SelfUpdate {
-            bail!("this build doesn't update itself");
-        }
-        let files = release.manifest.platforms.get(&platform())
-            .ok_or_else(|| anyhow!("release {} has nothing for {}", release.version, platform()))?;
-        let exe = exe_path().ok_or_else(|| anyhow!("can't tell where the app is installed"))?;
-        let old = std::fs::read(&exe).with_context(|| format!("reading {}", exe.display()))?;
-        let old_sha = sha256_hex(&old);
+    fn set(&self, s: State) {
+        *self.state.lock().unwrap() = s;
+        (self.wake)();
+    }
 
-        let mut how = String::new();
-        let mut new = None;
-        if let Some(p) = pick_patch(files, Some(&old_sha)) {
-            match self.download(&p.asset, &release.urls).await {
-                Ok(patch) => {
-                    let built = tokio::task::spawn_blocking(move || bspatch(&old, &patch)).await?;
-                    match built {
-                        Ok(b) if sha256_hex(&b) == files.full.sha256 => {
-                            how = format!("patch, {:.1} MB", p.asset.size as f64 / 1e6);
-                            new = Some(b);
-                        }
-                        Ok(_) => eprintln!("[update] patched file didn't match; downloading the full version"),
-                        Err(e) => eprintln!("[update] patch failed ({e}); downloading the full version"),
+    /// Release notes (Markdown) for `version`, fetched in the background the first time
+    /// they're asked for; `None` until they arrive, or if the release has none.
+    pub fn notes(&self, version: &str) -> Option<String> {
+        let version = version.trim_start_matches('v').to_owned();
+        {
+            let mut notes = self.notes.lock().unwrap();
+            if let Some(n) = notes.get(&version) {
+                return n.clone();
+            }
+            notes.insert(version.clone(), None);
+        }
+        let this = self.clone();
+        std::thread::spawn(move || {
+            let fetch = async {
+                let http = client()?;
+                let release: serde_json::Value = github_api(&http, &format!("{BY_TAG}{version}")).await?.json().await?;
+                anyhow::Ok(release["body"].as_str().map(str::to_owned))
+            };
+            let body = match tokio::runtime::Builder::new_current_thread().enable_all().build() {
+                Ok(rt) => rt.block_on(fetch).unwrap_or_else(|e| {
+                    log::warn!("update: notes for {version}: {e:#}");
+                    None
+                }),
+                Err(_) => None,
+            };
+            if body.is_some() {
+                this.notes.lock().unwrap().insert(version.clone(), body);
+                (this.wake)();
+            }
+        });
+        None
+    }
+
+    /// How many times ytm-rs has been downloaded: every release asset's GitHub download
+    /// count added up (installers, plus the copies the updater fetched). Fetched in the
+    /// background the first time it's asked for; `None` until it arrives.
+    pub fn downloads(&self) -> Option<u64> {
+        {
+            let mut d = self.downloads.lock().unwrap();
+            if let Some(n) = *d {
+                return n;
+            }
+            *d = Some(None);
+        }
+        let this = self.clone();
+        std::thread::spawn(move || {
+            let fetch = async {
+                let http = client()?;
+                let mut total = 0;
+                for page in 1.. {
+                    let releases: Vec<serde_json::Value> = github_api(&http, &format!("{ALL_RELEASES}?per_page=100&page={page}")).await?.json().await?;
+                    total += releases.iter().flat_map(|r| r["assets"].as_array().into_iter().flatten()).filter_map(|a| a["download_count"].as_u64()).sum::<u64>();
+                    if releases.len() < 100 {
+                        break;
                     }
                 }
-                Err(e) => eprintln!("[update] {e}; downloading the full version"),
+                anyhow::Ok(total)
+            };
+            let total = tokio::runtime::Builder::new_current_thread().enable_all().build().map_err(anyhow::Error::from).and_then(|rt| rt.block_on(fetch));
+            match total {
+                Ok(n) => {
+                    *this.downloads.lock().unwrap() = Some(Some(n));
+                    (this.wake)();
+                }
+                Err(e) => log::warn!("update: download count: {e:#}"),
             }
+        });
+        None
+    }
+
+    /// Check for a newer release and download it, in the background.
+    pub fn check(&self) {
+        if matches!(self.state(), State::Checking | State::Downloading { .. } | State::Ready { .. }) {
+            return;
         }
-        let new = match new {
-            Some(n) => n,
-            None => {
-                how = format!("full download, {:.1} MB", files.full.size as f64 / 1e6);
-                self.download(&files.full, &release.urls).await?
-            }
-        };
-        replace_exe(&exe, &new)?;
-        Ok(how)
-    }
-}
-
-pub fn sha256_hex(data: &[u8]) -> String {
-    hex::encode(Sha256::digest(data))
-}
-
-/// Put `new` in place of the running executable. Linux: write next to it, then rename over it
-/// (the running process keeps the old file). Windows can't replace a running .exe, but can
-/// rename it: the old one moves to `<name>.old` (removed at the next start).
-fn replace_exe(exe: &Path, new: &[u8]) -> Result<()> {
-    let tmp = exe.with_extension("update-new");
-    std::fs::write(&tmp, new).with_context(|| format!("writing {}", tmp.display()))?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&tmp, std::fs::Permissions::from_mode(0o755))?;
-    }
-    #[cfg(windows)]
-    {
-        let old = old_path(exe);
-        let _ = std::fs::remove_file(&old);
-        std::fs::rename(exe, &old).context("moving the running version aside")?;
-        if let Err(e) = std::fs::rename(&tmp, exe) {
-            let _ = std::fs::rename(&old, exe);
-            return Err(e).context("putting the new version in place");
-        }
-    }
-    #[cfg(not(windows))]
-    std::fs::rename(&tmp, exe).with_context(|| format!("replacing {}", exe.display()))?;
-    Ok(())
-}
-
-fn old_path(exe: &Path) -> PathBuf {
-    exe.with_extension("old")
-}
-
-/// Remove what an earlier update left behind (Windows keeps the replaced .exe until then).
-pub fn clean_up() {
-    if let Some(exe) = exe_path() {
-        let _ = std::fs::remove_file(old_path(&exe));
-        let _ = std::fs::remove_file(exe.with_extension("update-new"));
-    }
-}
-
-/// Start the (updated) executable again; called after the app has shut down.
-pub fn relaunch() {
-    let Some(exe) = exe_path() else { return };
-    match std::process::Command::new(&exe).spawn() {
-        Ok(_) => eprintln!("[update] started the new version"),
-        Err(e) => eprintln!("[update] couldn't start {}: {e}", exe.display()),
-    }
-}
-
-/// Apply a bsdiff patch (`BSDIFF40`: header, then bzip2-compressed control, diff and extra
-/// streams). Written here so the app needs no native code for it (bzip2 is pure Rust).
-pub fn bspatch(old: &[u8], patch: &[u8]) -> Result<Vec<u8>> {
-    fn int(b: &[u8]) -> i64 {
-        let x = u64::from_le_bytes(b[..8].try_into().unwrap());
-        let mag = (x & !(1 << 63)) as i64;
-        if x >> 63 == 1 { -mag } else { mag }
-    }
-    if patch.len() < 32 || &patch[..8] != b"BSDIFF40" {
-        bail!("not a bsdiff patch");
-    }
-    let (clen, dlen, new_len) = (int(&patch[8..16]), int(&patch[16..24]), int(&patch[24..32]));
-    if clen < 0 || dlen < 0 || !(0..=1 << 31).contains(&new_len) || 32 + clen as u64 + dlen as u64 > patch.len() as u64 {
-        bail!("corrupt patch header");
-    }
-    let body = &patch[32..];
-    let (ctrl, rest) = body.split_at(clen as usize);
-    let (diff, extra) = rest.split_at(dlen as usize);
-    let mut ctrl = bzip2::read::BzDecoder::new(ctrl);
-    let mut diff = bzip2::read::BzDecoder::new(diff);
-    let mut extra = bzip2::read::BzDecoder::new(extra);
-
-    let new_len = new_len as usize;
-    let mut new = Vec::with_capacity(new_len);
-    let mut old_pos: i64 = 0;
-    let mut buf = [0u8; 24];
-    while new.len() < new_len {
-        ctrl.read_exact(&mut buf).context("patch ended early")?;
-        let (add, copy, seek) = (int(&buf[0..8]), int(&buf[8..16]), int(&buf[16..24]));
-        if add < 0 || copy < 0 || new.len() as i64 + add + copy > new_len as i64 {
-            bail!("corrupt patch");
-        }
-        // Diff bytes are added to the old file's bytes (out-of-range old bytes count as 0).
-        let start = new.len();
-        new.resize(start + add as usize, 0);
-        diff.read_exact(&mut new[start..]).context("patch diff data ended early")?;
-        for (i, b) in new[start..].iter_mut().enumerate() {
-            let at = old_pos + i as i64;
-            if at >= 0 && (at as usize) < old.len() {
-                *b = b.wrapping_add(old[at as usize]);
-            }
-        }
-        old_pos += add;
-        let start = new.len();
-        new.resize(start + copy as usize, 0);
-        extra.read_exact(&mut new[start..]).context("patch extra data ended early")?;
-        old_pos += seek;
-    }
-    Ok(new)
-}
-
-/// Kind of a line in the release notes, as shown in the "What's new" window.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum NoteKind {
-    Heading,
-    Bullet,
-    Text,
-}
-
-/// Release notes (GitHub Markdown) as plain lines for the "What's new" window: headings,
-/// bullets (wrapped lines joined) and text, without the "Install" section (it's about the
-/// downloads) or Markdown marks. Links keep their text.
-pub fn note_lines(md: &str) -> Vec<(NoteKind, String)> {
-    let link = regex::Regex::new(r"\[([^\]]*)\]\([^)]*\)").unwrap();
-    let clean = |t: &str| link.replace_all(t, "$1").replace('*', "").replace('`', "").replace("__", "").trim().to_string();
-    let mut out: Vec<(NoteKind, String)> = Vec::new();
-    let mut joinable = false;
-    for raw in md.lines() {
-        let line = raw.trim_end();
-        let t = line.trim_start();
-        if let Some(h) = t.strip_prefix('#') {
-            let h = clean(h.trim_start_matches('#'));
-            if h.eq_ignore_ascii_case("install") || h.eq_ignore_ascii_case("installation") {
+        self.set(State::Checking);
+        let this = self.clone();
+        std::thread::spawn(move || {
+            let rt = match tokio::runtime::Builder::new_current_thread().enable_all().build() {
+                Ok(rt) => rt,
+                Err(e) => return this.set(State::Failed(e.to_string())),
+            };
+            loop {
+                let nightly = this.nightly.load(Relaxed);
+                let result = rt.block_on(this.run(nightly));
+                // The channel changed while this ran: check again on the new one.
+                if this.nightly.load(Relaxed) != nightly {
+                    continue;
+                }
+                match result {
+                    Ok(s) => this.set(s),
+                    Err(e) => match e.downcast_ref::<RateLimited>() {
+                        Some(&RateLimited(until)) => {
+                            log::warn!("update check: GitHub's rate limit, trying again in {}s", until.saturating_duration_since(Instant::now()).as_secs());
+                            this.set(State::RateLimited { until });
+                        }
+                        None => {
+                            log::warn!("update check failed: {e:#}");
+                            this.set(State::Failed(format!("{e:#}")));
+                        }
+                    },
+                }
                 break;
             }
-            out.push((NoteKind::Heading, h));
-            joinable = false;
-        } else if let Some(b) = t.strip_prefix("- ").or_else(|| t.strip_prefix("* ")) {
-            out.push((NoteKind::Bullet, clean(b)));
-            joinable = true;
-        } else if t.is_empty() {
-            joinable = false;
-        } else if joinable || (line.starts_with(' ') && matches!(out.last(), Some((NoteKind::Bullet, _)))) {
-            // A wrapped line of the previous bullet/paragraph.
-            if let Some((_, prev)) = out.last_mut() {
-                prev.push(' ');
-                prev.push_str(&clean(t));
+        });
+    }
+
+    async fn run(&self, nightly: bool) -> anyhow::Result<State> {
+        let http = client()?;
+        // Nightlies are prereleases, which the latest release never is: they're in the list.
+        let feed = std::env::var("YTM_UPDATE_FEED").unwrap_or_else(|_| if nightly { format!("{ALL_RELEASES}?per_page=30") } else { LATEST.to_owned() });
+        let feed: serde_json::Value = github_api(&http, &feed).await?.json().await?;
+        let release = pick_release(feed, nightly).ok_or_else(|| anyhow::anyhow!("no releases found"))?;
+        let tag = release["tag_name"].as_str().unwrap_or_default();
+        if let Some(body) = release["body"].as_str() {
+            self.notes.lock().unwrap().insert(tag.trim_start_matches('v').to_owned(), Some(body.to_owned()));
+        }
+        let current = current_version();
+        if !wanted(tag, &current, nightly) {
+            log::info!("update: {current} is current (latest {tag}, {} channel)", if nightly { "nightly" } else { "stable" });
+            return Ok(State::UpToDate);
+        }
+        let version = tag.trim_start_matches('v').to_owned();
+        // A Flatpak downloads nothing, so it doesn't wait for an asset (and there's none
+        // for every architecture it may run on): the link is to the release's page.
+        if flatpak() {
+            log::info!("update: {version} is out");
+            return Ok(State::Available { url: format!("{RELEASES}/tag/{tag}"), version });
+        }
+        let portable = portable_dir().is_some();
+        let want = asset_name(&version);
+        // A release published before its installer was built: nothing to install
+        // yet, so this isn't an error. The next check picks it up.
+        let Some(asset) = release["assets"].as_array().and_then(|a| a.iter().find(|x| x["name"] == want.as_str())) else {
+            log::info!("update: release {tag} has no {want} yet");
+            return Ok(State::UpToDate);
+        };
+        let url = asset["browser_download_url"].as_str().ok_or_else(|| anyhow::anyhow!("asset has no URL"))?;
+        if packaged() {
+            log::info!("update: {version} is out");
+            return Ok(State::Available { version, url: url.to_owned() });
+        }
+        let size = asset["size"].as_u64().unwrap_or(0);
+        std::fs::create_dir_all(&self.dir)?;
+        let path = self.dir.join(&want);
+        if std::fs::metadata(&path).map(|m| m.len()).ok() != Some(size) || size == 0 {
+            log::info!("update: downloading {version} ({size} bytes)");
+            self.set(State::Downloading { version: version.clone(), percent: 0 });
+            let mut resp = http.get(url).send().await?.error_for_status()?;
+            // Stream to a file beside, then rename, so a half-written file is never taken as ready.
+            let part = path.with_extension("part");
+            let mut file = std::io::BufWriter::new(std::fs::File::create(&part)?);
+            let (mut got, mut shown) = (0u64, 0u8);
+            while let Some(chunk) = resp.chunk().await? {
+                std::io::Write::write_all(&mut file, &chunk)?;
+                got += chunk.len() as u64;
+                let percent = (got * 100).checked_div(size).map_or(0, |p| p.min(100) as u8);
+                if percent != shown {
+                    shown = percent;
+                    self.set(State::Downloading { version: version.clone(), percent });
+                }
             }
+            std::io::Write::flush(&mut file)?;
+            drop(file);
+            if size > 0 && got != size {
+                let _ = std::fs::remove_file(&part);
+                anyhow::bail!("download incomplete ({got} of {size} bytes)");
+            }
+            std::fs::rename(&part, &path)?;
+        }
+        // Against the hash GitHub's API gives for the asset, a download kept from an
+        // earlier check too: the right size doesn't say the file is the release's.
+        match asset_sha256(asset) {
+            Some(sum) => {
+                let got = file_sha256(&path)?;
+                if got != sum {
+                    let _ = std::fs::remove_file(&path);
+                    anyhow::bail!("{want}'s SHA-256 is {got}, not {sum}");
+                }
+            }
+            None => log::warn!("update: release {tag} gives no SHA-256 for {want}, so it isn't checked"),
+        }
+        // Old downloads are no longer needed.
+        if let Ok(rd) = std::fs::read_dir(&self.dir) {
+            for e in rd.flatten() {
+                let p = e.path();
+                if p != path {
+                    let _ = if p.is_dir() { std::fs::remove_dir_all(&p) } else { std::fs::remove_file(&p) };
+                }
+            }
+        }
+        let unpacked = self.dir.join(format!("ytm-rs-{version}"));
+        let ready = if cfg!(target_os = "macos") && !portable {
+            open_dmg(&path, &unpacked)?
+        } else if portable || cfg!(unix) {
+            unzip_exe(&path, &unpacked)?
         } else {
-            out.push((NoteKind::Text, clean(t)));
-            joinable = true;
+            path
+        };
+        log::info!("update: {version} ready at {}", ready.display());
+        Ok(State::Ready { version, installer: ready })
+    }
+
+    /// Run the downloaded installer silently once this process has exited, then
+    /// (if `relaunch`) start the updated app.
+    pub fn install(&self, relaunch: bool) {
+        let State::Ready { installer, .. } = self.state() else { return };
+        let exe = std::env::current_exe().unwrap_or_default();
+        if !self.apply(&installer, &exe, relaunch) && relaunch {
+            // Nothing changed: start this version again.
+            start_after_exit(&exe);
         }
     }
-    out.retain(|(_, t)| !t.is_empty());
-    out
+
+    /// Replace the app (and start it after, if `relaunch`); false if it couldn't be.
+    #[cfg(unix)]
+    fn apply(&self, installer: &Path, exe: &Path, relaunch: bool) -> bool {
+        #[cfg(target_os = "macos")]
+        if let (Some(new), Some(app)) = (bundle_of(installer), bundle_of(exe)) {
+            return replace_bundle(new, app, relaunch);
+        }
+        replace_binary(installer, exe, relaunch)
+    }
+
+    #[cfg(windows)]
+    fn apply(&self, installer: &Path, exe: &Path, relaunch: bool) -> bool {
+        if portable_dir().is_some() {
+            return swap_exe(installer, exe, relaunch);
+        }
+        // Update the copy that's running, where it is (an all-users install asks for
+        // admin rights).
+        let Some(dir) = exe.parent() else { return false };
+        let scope = if all_users(dir) { "/ALLUSERS" } else { "/CURRENTUSER" };
+        // A copy of this exe runs it, as this one can't be replaced while it runs.
+        let helper = self.dir.join(HELPER);
+        let mut cmd = Command::new(&helper);
+        cmd.arg(APPLY_FLAG).arg(std::process::id().to_string()).arg(installer).arg(dir).arg(scope).arg(if relaunch { "1" } else { "0" });
+        if std::env::var_os("YTM_UPDATE_DRYRUN").is_some() {
+            log::info!("update (dry run): {cmd:?}");
+            return true;
+        }
+        let _ = std::fs::remove_file(&helper);
+        if let Err(e) = std::fs::copy(exe, &helper) {
+            log::warn!("update: couldn't stage the updater: {e}");
+            return false;
+        }
+        log::info!("update: installing {}", installer.display());
+        spawn(&mut cmd)
+    }
+}
+
+/// Whether the copy in `dir` is the all-users install: the installer records where it
+/// put that one under HKLM (else it's under Program Files, where per-user ones aren't).
+#[cfg(windows)]
+fn all_users(dir: &Path) -> bool {
+    use windows::Win32::System::Registry::{HKEY_LOCAL_MACHINE, RRF_RT_REG_SZ, RegGetValueW};
+    use windows::core::w;
+    let mut buf = [0u16; 1024];
+    let mut size = std::mem::size_of_val(&buf) as u32;
+    // SAFETY: an out-buffer of the size passed; the strings are static. The key is the
+    // installer's AppId.
+    let read = unsafe {
+        RegGetValueW(
+            HKEY_LOCAL_MACHINE,
+            w!(r"Software\Microsoft\Windows\CurrentVersion\Uninstall\{6E0B7C4A-2D1F-4C8E-9B3A-7F5D1E2A9C40}_is1"),
+            w!("InstallLocation"),
+            RRF_RT_REG_SZ,
+            None,
+            Some(buf.as_mut_ptr() as *mut _),
+            Some(&mut size),
+        )
+    };
+    let len = buf.iter().position(|&c| c == 0).unwrap_or(buf.len());
+    let recorded = String::from_utf16_lossy(&buf[..len]);
+    let here = dir.to_string_lossy();
+    let program_files = std::env::var_os("ProgramFiles").map(PathBuf::from);
+    (read.is_ok() && recorded.trim_end_matches('\\').eq_ignore_ascii_case(here.trim_end_matches('\\'))) || program_files.is_some_and(|p| dir.starts_with(p))
+}
+
+/// The portable update: Windows lets a running exe be renamed, so move this one aside
+/// and put the new one in its place (the next launch deletes the old one). The new one
+/// is copied beside it first, so the exe is only ever renamed: never missing or half
+/// written.
+#[cfg(windows)]
+fn swap_exe(new: &Path, exe: &Path, relaunch: bool) -> bool {
+    let (old, next) = (exe.with_extension("exe.old"), exe.with_extension("exe.new"));
+    if std::env::var_os("YTM_UPDATE_DRYRUN").is_some() {
+        log::info!("update (dry run): {} aside to {}, {} in its place", exe.display(), old.display(), new.display());
+        return true;
+    }
+    let _ = std::fs::remove_file(&old);
+    if let Err(e) = std::fs::copy(new, &next) {
+        let _ = std::fs::remove_file(&next);
+        log::warn!("update: couldn't copy the new version: {e}");
+        return false;
+    }
+    if let Err(e) = std::fs::rename(exe, &old) {
+        let _ = std::fs::remove_file(&next);
+        log::warn!("update: couldn't move {} aside: {e}", exe.display());
+        return false;
+    }
+    if let Err(e) = std::fs::rename(&next, exe) {
+        let _ = std::fs::rename(&old, exe);
+        let _ = std::fs::remove_file(&next);
+        log::warn!("update: couldn't put the new version in place: {e}");
+        return false;
+    }
+    log::info!("update: replaced {}", exe.display());
+    if relaunch {
+        start_after_exit(exe);
+    }
+    true
+}
+
+/// Linux: rename the new binary over this one. The running process keeps its copy
+/// open until it exits; the next launch runs the new one.
+#[cfg(unix)]
+fn replace_binary(new: &Path, exe: &Path, relaunch: bool) -> bool {
+    use std::os::unix::fs::PermissionsExt;
+    let tmp = exe.with_file_name(".ytm-rs.new");
+    if std::env::var_os("YTM_UPDATE_DRYRUN").is_some() {
+        log::info!("update (dry run): {} over {}", new.display(), exe.display());
+        return true;
+    }
+    let done = std::fs::copy(new, &tmp)
+        .and_then(|_| std::fs::set_permissions(&tmp, std::fs::Permissions::from_mode(0o755)))
+        .and_then(|_| std::fs::rename(&tmp, exe));
+    if let Err(e) = done {
+        let _ = std::fs::remove_file(&tmp);
+        log::warn!("update: couldn't replace {}: {e}", exe.display());
+        return false;
+    }
+    log::info!("update: replaced {}", exe.display());
+    if relaunch {
+        start_after_exit(exe);
+    }
+    true
+}
+
+/// macOS: put the new app bundle where this one is, so its Info.plist and icon update
+/// too. A running app's bundle can be moved; this process keeps running from the old
+/// one until it exits.
+#[cfg(target_os = "macos")]
+fn replace_bundle(new: &Path, app: &Path, relaunch: bool) -> bool {
+    let parent = app.parent().unwrap_or(Path::new("/"));
+    let (tmp, old) = (parent.join(".ytm-rs.app.new"), parent.join(".ytm-rs.app.old"));
+    if std::env::var_os("YTM_UPDATE_DRYRUN").is_some() {
+        log::info!("update (dry run): {} in place of {}", new.display(), app.display());
+        return true;
+    }
+    let _ = std::fs::remove_dir_all(&tmp);
+    let _ = std::fs::remove_dir_all(&old);
+    // ditto copies a bundle whole: symlinks, permissions, signature.
+    let copied = std::process::Command::new("ditto").arg(new).arg(&tmp).status().is_ok_and(|s| s.success());
+    if !copied {
+        let _ = std::fs::remove_dir_all(&tmp);
+        log::warn!("update: couldn't copy {} beside {}", new.display(), app.display());
+        return false;
+    }
+    if let Err(e) = std::fs::rename(app, &old) {
+        let _ = std::fs::remove_dir_all(&tmp);
+        log::warn!("update: couldn't move {} aside: {e}", app.display());
+        return false;
+    }
+    if let Err(e) = std::fs::rename(&tmp, app) {
+        let _ = std::fs::rename(&old, app);
+        let _ = std::fs::remove_dir_all(&tmp);
+        log::warn!("update: couldn't put the new version in place: {e}");
+        return false;
+    }
+    let _ = std::fs::remove_dir_all(&old);
+    log::info!("update: replaced {}", app.display());
+    if relaunch {
+        start_after_exit(&app.join("Contents/MacOS/ytm-rs"));
+    }
+    true
+}
+
+/// macOS: the app from a downloaded installer disk image, copied out into `dir`.
+fn open_dmg(dmg: &Path, dir: &Path) -> anyhow::Result<PathBuf> {
+    let _ = std::fs::remove_dir_all(dir);
+    let mnt = dir.join("mnt");
+    std::fs::create_dir_all(&mnt)?;
+    let attached = std::process::Command::new("hdiutil").args(["attach", "-nobrowse", "-readonly", "-noautoopen", "-quiet", "-mountpoint"]).arg(&mnt).arg(dmg).status()?;
+    anyhow::ensure!(attached.success(), "couldn't open {}", dmg.display());
+    let copied = std::process::Command::new("ditto").arg(mnt.join("ytm-rs.app")).arg(dir.join("ytm-rs.app")).status();
+    let _ = std::process::Command::new("hdiutil").args(["detach", "-quiet"]).arg(&mnt).status();
+    let exe = dir.join("ytm-rs.app/Contents/MacOS/ytm-rs");
+    anyhow::ensure!(copied.is_ok_and(|s| s.success()) && exe.exists(), "couldn't copy the app out of {}", dmg.display());
+    Ok(exe)
+}
+
+/// The new binary from a downloaded update (the portable zip, or on Linux the
+/// tarball), unpacked into `dir` with tar (on Windows, its own; macOS's reads zips).
+fn unzip_exe(zip: &Path, dir: &Path) -> anyhow::Result<PathBuf> {
+    let _ = std::fs::remove_dir_all(dir);
+    std::fs::create_dir_all(dir)?;
+    #[cfg(windows)]
+    let mut cmd = {
+        let system = std::env::var_os("SystemRoot").map_or_else(|| PathBuf::from(r"C:\Windows"), PathBuf::from);
+        std::process::Command::new(system.join(r"System32\tar.exe"))
+    };
+    #[cfg(not(windows))]
+    let mut cmd = std::process::Command::new("tar");
+    cmd.arg("-xf").arg(zip).arg("-C").arg(dir);
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    let status = cmd.status()?;
+    #[cfg(windows)]
+    let exe = dir.join("ytm-rs.exe");
+    // Everything is in one top-level folder: the binary, or on macOS the app bundle.
+    #[cfg(not(windows))]
+    let exe = std::fs::read_dir(dir)?
+        .flatten()
+        .flat_map(|e| [e.path().join("ytm-rs"), e.path().join("ytm-rs.app/Contents/MacOS/ytm-rs")])
+        .find(|p| p.is_file())
+        .unwrap_or_else(|| dir.join("ytm-rs"));
+    anyhow::ensure!(status.success() && exe.exists(), "couldn't unpack {}", zip.display());
+    Ok(exe)
+}
+
+/// A release asset's SHA-256 as GitHub's API gives it (`"digest": "sha256:<hex>"`), in
+/// lowercase hex.
+pub(crate) fn asset_sha256(asset: &serde_json::Value) -> Option<String> {
+    asset["digest"].as_str()?.strip_prefix("sha256:").map(str::to_ascii_lowercase)
+}
+
+fn file_sha256(path: &Path) -> std::io::Result<String> {
+    let mut hash = Sha256::new();
+    std::io::copy(&mut std::fs::File::open(path)?, &mut hash)?;
+    Ok(format!("{:x}", hash.finalize()))
+}
+
+/// GitHub's API turned a request down for its rate limit, until then.
+#[derive(Debug)]
+pub(crate) struct RateLimited(pub Instant);
+
+impl std::fmt::Display for RateLimited {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.write_str("GitHub's rate limit")
+    }
+}
+
+impl std::error::Error for RateLimited {}
+
+/// A GitHub token for a higher API rate limit. Not `GITHUB_TOKEN`: plenty of people have
+/// one of those set for other tools, with more access than this needs.
+const TOKEN_VAR: &str = "YTM_GITHUB_TOKEN";
+
+/// GET `url`, with the token in `YTM_GITHUB_TOKEN` if it's for GitHub's API (never for a
+/// download or another feed). A refusal for the rate limit is a [`RateLimited`] error.
+pub(crate) async fn github_api(http: &reqwest::Client, url: &str) -> anyhow::Result<reqwest::Response> {
+    let token = std::env::var(TOKEN_VAR).ok().map(|t| t.trim().to_owned()).filter(|t| !t.is_empty() && url.starts_with("https://api.github.com/"));
+    let mut req = http.get(url).timeout(Duration::from_secs(60));
+    if let Some(t) = &token {
+        req = req.bearer_auth(t);
+    }
+    let resp = req.send().await?;
+    let status = resp.status();
+    if let Some(wait) = rate_limit_wait(status, resp.headers(), SystemTime::now()) {
+        return Err(RateLimited(Instant::now() + wait).into());
+    }
+    if status == reqwest::StatusCode::UNAUTHORIZED && token.is_some() {
+        anyhow::bail!("GitHub didn't accept the token in {TOKEN_VAR}");
+    }
+    // A secondary limit can come without its headers: the body says so.
+    if status == reqwest::StatusCode::FORBIDDEN {
+        if resp.text().await.unwrap_or_default().contains("rate limit") {
+            return Err(RateLimited(Instant::now() + Duration::from_secs(60)).into());
+        }
+        anyhow::bail!("{status} from {url}");
+    }
+    Ok(resp.error_for_status()?)
+}
+
+/// How long until a refusal for GitHub's rate limit ends, if this is one: `retry-after`
+/// for a secondary limit, else `x-ratelimit-reset` once `x-ratelimit-remaining` is 0,
+/// else a minute for a 429. Between a minute and an hour, whatever the clocks say.
+fn rate_limit_wait(status: reqwest::StatusCode, headers: &reqwest::header::HeaderMap, now: SystemTime) -> Option<Duration> {
+    if !matches!(status.as_u16(), 403 | 429) {
+        return None;
+    }
+    let num = |name: &str| headers.get(name)?.to_str().ok()?.trim().parse::<u64>().ok();
+    let wait = match num("retry-after") {
+        Some(secs) => secs,
+        None if num("x-ratelimit-remaining") == Some(0) => {
+            num("x-ratelimit-reset").map_or(3600, |reset| reset.saturating_sub(now.duration_since(UNIX_EPOCH).unwrap_or_default().as_secs()))
+        }
+        None if status == reqwest::StatusCode::TOO_MANY_REQUESTS => 60,
+        None => return None,
+    };
+    Some(Duration::from_secs(wait.clamp(60, 3600)))
+}
+
+fn client() -> anyhow::Result<reqwest::Client> {
+    Ok(crate::proxy::apply(reqwest::Client::builder()).user_agent(concat!("ytm-rs/", env!("CARGO_PKG_VERSION"))).connect_timeout(std::time::Duration::from_secs(10)).read_timeout(std::time::Duration::from_secs(30)).build()?)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{asset_sha256, deb_version, file_sha256, in_flatpak, newer, pacman_package, pick_release, rate_limit_wait, wanted};
+    use reqwest::{StatusCode, header::HeaderMap};
+    use serde_json::json;
+    use std::time::{Duration, UNIX_EPOCH};
 
     #[test]
-    fn release_notes() {
-        let md = "## What's new\n\n- **Library page**: *saved* things,\n  in one place.\n- See [the page](https://example.com) and `code`.\n\nSome text.\n\n## Install\n- download it\n";
-        let lines = note_lines(md);
-        assert_eq!(lines, vec![
-            (NoteKind::Heading, "What's new".to_string()),
-            (NoteKind::Bullet, "Library page: saved things, in one place.".to_string()),
-            (NoteKind::Bullet, "See the page and code.".to_string()),
-            (NoteKind::Text, "Some text.".to_string()),
-        ]);
-    }
-
-    fn sample(seed: u64, len: usize) -> Vec<u8> {
-        let mut x = seed;
-        (0..len).map(|_| { x = x.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407); (x >> 33) as u8 }).collect()
-    }
-
-    #[test]
-    fn applies_qbsdiff_patches() {
-        // An "old build" and a "new build" that shares most of it, shifted and edited.
-        let old = sample(1, 300_000);
-        let mut new = old[1000..200_000].to_vec();
-        new.extend(sample(2, 5_000));
-        new.extend_from_slice(&old[150_000..290_000]);
-        for i in (0..new.len()).step_by(997) {
-            new[i] = new[i].wrapping_add(3);
-        }
-        let mut patch = Vec::new();
-        qbsdiff::Bsdiff::new(&old, &new).compare(std::io::Cursor::new(&mut patch)).unwrap();
-        assert!(patch.len() < new.len() / 4, "patch is {} bytes", patch.len());
-        assert_eq!(bspatch(&old, &patch).unwrap(), new);
-        // A wrong base file gives a different result (caught by the hash check), not a panic.
-        let other = sample(9, 300_000);
-        assert_ne!(bspatch(&other, &patch).ok(), Some(new));
-        assert!(bspatch(&old, b"BSDIFF40 too short").is_err());
+    fn a_rate_limit_ends_when_github_says() {
+        let now = UNIX_EPOCH + Duration::from_secs(1_000_000);
+        let headers = |pairs: &[(&'static str, &str)]| pairs.iter().map(|(k, v)| (reqwest::header::HeaderName::from_static(k), v.parse().unwrap())).collect::<HeaderMap>();
+        let end = |status, pairs: &[(&'static str, &str)]| rate_limit_wait(status, &headers(pairs), now).map(|d| d.as_secs());
+        let spent = [("x-ratelimit-remaining", "0"), ("x-ratelimit-reset", "1000600")];
+        assert_eq!(end(StatusCode::FORBIDDEN, &spent), Some(600));
+        assert_eq!(end(StatusCode::TOO_MANY_REQUESTS, &[("retry-after", "120")]), Some(120));
+        assert_eq!(end(StatusCode::TOO_MANY_REQUESTS, &[]), Some(60));
+        // A reset already past (a clock off), or far off, stays between a minute and an hour.
+        assert_eq!(end(StatusCode::FORBIDDEN, &[("x-ratelimit-remaining", "0"), ("x-ratelimit-reset", "999000")]), Some(60));
+        assert_eq!(end(StatusCode::FORBIDDEN, &[("retry-after", "90000")]), Some(3600));
+        // Another 403, or requests left: not by the headers (the body may still say so).
+        assert_eq!(end(StatusCode::FORBIDDEN, &[]), None);
+        assert_eq!(end(StatusCode::FORBIDDEN, &[("x-ratelimit-remaining", "12")]), None);
+        assert_eq!(end(StatusCode::NOT_FOUND, &spent), None);
     }
 
     #[test]
-    fn versions() {
-        assert!(is_newer("v0.2.0", "0.1.9"));
-        assert!(is_newer("1.0.0", "0.99.99"));
-        assert!(!is_newer("0.2.0", "0.2.0"));
-        assert!(!is_newer("0.1.0", "0.2.0"));
-        assert!(!is_newer("garbage", "0.1.0"));
+    fn a_download_is_checked_against_the_assets_hash() {
+        let abc = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
+        assert_eq!(asset_sha256(&json!({ "digest": format!("sha256:{}", abc.to_uppercase()) })).as_deref(), Some(abc));
+        // Releases from before GitHub hashed assets, and another kind of hash.
+        assert_eq!(asset_sha256(&json!({ "digest": null })), None);
+        assert_eq!(asset_sha256(&json!({ "digest": "sha512:00" })), None);
+        let file = std::env::temp_dir().join(format!("ytm-update-sum-{}", std::process::id()));
+        std::fs::write(&file, "abc").unwrap();
+        assert_eq!(file_sha256(&file).unwrap(), abc);
+        let _ = std::fs::remove_file(&file);
+    }
+
+    #[test]
+    fn a_flatpak_is_known_by_its_info_file() {
+        let dir = std::env::temp_dir().join(format!("ytm-flatpak-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let info = dir.join(".flatpak-info");
+        assert!(!in_flatpak(&info, false));
+        assert!(in_flatpak(&info, true));
+        std::fs::write(&info, "[Application]
+name=io.github.grapedjuice.ytm-rs
+").unwrap();
+        assert!(in_flatpak(&info, false));
+        // A folder by that name isn't the file.
+        std::fs::remove_file(&info).unwrap();
+        std::fs::create_dir(&info).unwrap();
+        assert!(!in_flatpak(&info, false));
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn deb_versions() {
+        assert_eq!(deb_version("0.3.0"), "0.3.0");
+        assert_eq!(deb_version("0.3.0-nightly.20261111"), "0.3.0+nightly.20261111");
+        assert_eq!(deb_version("0.3.0-nightly.20261111.2"), "0.3.0+nightly.20261111.2");
+    }
+
+    /// The names makepkg gives linux/arch.sh's package, which the Arch copy looks for.
+    #[test]
+    fn pacman_packages() {
+        assert_eq!(pacman_package("0.3.0", "x86_64"), "ytm-rs-0.3.0-1-x86_64.pkg.tar.zst");
+        assert_eq!(pacman_package("0.3.0-nightly.20261111", "x86_64"), "ytm-rs-0.3.0.nightly.20261111-1-x86_64.pkg.tar.zst");
+        assert_eq!(pacman_package("0.3.0-nightly.20261111.2", "x86_64"), "ytm-rs-0.3.0.nightly.20261111.2-1-x86_64.pkg.tar.zst");
+    }
+
+    #[test]
+    fn version_order() {
+        assert!(newer("v0.2.8", "0.2.7"));
+        assert!(newer("v0.10.0", "0.9.9"));
+        assert!(newer("1.0", "0.99.99"));
+        assert!(!newer("v0.2.7", "0.2.7"));
+        assert!(!newer("v0.2.6", "0.2.7"));
+        assert!(!newer("", "0.2.7"));
+    }
+
+    #[test]
+    fn nightly_order() {
+        // After its version's release, before the next one.
+        assert!(newer("v0.2.34-nightly.20261110", "0.2.34"));
+        assert!(!newer("v0.2.34", "0.2.34-nightly.20261110"));
+        assert!(newer("v0.2.35", "0.2.34-nightly.20261110"));
+        assert!(!newer("v0.2.34-nightly.20261110", "0.2.35"));
+        // By build, then a second build the same day.
+        assert!(newer("v0.2.34-nightly.20261111", "0.2.34-nightly.20261110"));
+        assert!(newer("v0.2.34-nightly.20261110.2", "0.2.34-nightly.20261110"));
+        assert!(!newer("v0.2.34-nightly.20261110", "0.2.34-nightly.20261110"));
+        assert!(newer("v0.2.35-nightly.20261101", "0.2.34-nightly.20261130"));
+    }
+
+    #[test]
+    fn channels() {
+        let r = |tag: &str, pre: bool| json!({ "tag_name": tag, "prerelease": pre, "draft": false });
+        let list = json!([r("test-wayland-tray-1", true), r("v0.2.34-nightly.20261110", true), r("v0.2.34", false), r("v0.2.33", false)]);
+        let tag = |nightly| pick_release(list.clone(), nightly).unwrap()["tag_name"].as_str().unwrap().to_owned();
+        assert_eq!(tag(false), "v0.2.34");
+        assert_eq!(tag(true), "v0.2.34-nightly.20261110");
+        // A stable release after the nightly wins on the nightly channel too.
+        let list = json!([r("v0.2.35", false), r("v0.2.34-nightly.20261110", true)]);
+        assert_eq!(pick_release(list, true).unwrap()["tag_name"], "v0.2.35");
+        // Back on stable from a nightly: the stable release, though older.
+        assert!(wanted("v0.2.34", "0.2.34-nightly.20261110", false));
+        assert!(!wanted("v0.2.34", "0.2.34-nightly.20261110", true));
+        assert!(!wanted("v0.2.34", "0.2.34", false));
+        assert!(wanted("v0.2.34-nightly.20261111", "0.2.34-nightly.20261110", true));
     }
 }

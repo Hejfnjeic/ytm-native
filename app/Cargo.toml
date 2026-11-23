@@ -1,53 +1,86 @@
 [package]
 name = "ytm-native"
-version = "0.3.0"
-license = "GPL-3.0-or-later"
+version = "0.4.0"
 edition = "2024"
+license = "GPL-3.0-only"
+authors = ["ytm-native contributors", "ytm-rs by grapedjuice"]
+repository = "https://github.com/Hejfnjeic/ytm-native"
+description = "Native YouTube Music player (UI and lyrics from ytm-rs)"
 
 [dependencies]
 anyhow = "1.0.104"
-# Pure-Rust bzip2 (libbz2-rs-sys backend) for applying update patches.
-bzip2 = "0.6.1"
-chacha20poly1305 = "0.11.0"
-cpal = "0.18.2"
-dirs = "7.0.0"
-hex = "0.4.3"
-image = "0.25.10"
-rand = "0.10.4"
-regex = "1.13.2"
-reqwest = { version = "0.13.5", default-features = false, features = ["rustls", "json", "gzip", "brotli", "http2"] }
-rfd = "0.18.0"
-roxmltree = "0.21.2"
+base64 = "0.22.1"
+bytes = "1.12.1"
+crossbeam-channel = "0.5.17"
+directories = "6.0.0"
+eframe = { version = "0.37", default-features = false, features = ["glow", "wgpu_no_default_features", "default_fonts", "system_fonts", "links", "clipboard", "accesskit", "persistence", "wayland", "x11"] }
+egui = { version = "0.37.0", features = ["monochrome_emoji_fonts"] }
+futures-util = { version = "0.3.34", default-features = false, features = ["std", "sink"] }
+egui_extras = { version = "0.37.0", default-features = false, features = ["image"] }
+env_logger = { version = "0.11.11", default-features = false, features = ["humantime"] }
+image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "webp"] }
+localzone = "0.3.1"
+log = "0.4.34"
+memmap2 = "0.9.11"
+raw-window-handle = "0.6"
+reqwest = { version = "0.12", default-features = false, features = ["default-tls", "gzip", "json", "socks"] }
+rodio = { version = "0.22.2", default-features = false, features = ["playback", "symphonia-aac", "symphonia-isomp4", "symphonia-mp3"] }
 rquickjs = "0.14.0"
+roxmltree = "0.21.1"
 serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-sha2 = "0.11.0"
-sha1 = "0.11.0"
-slint = "1.19.0"
-symphonia = { version = "0.6.1", default-features = false, features = ["mkv"] }
-tokio = { version = "1.54.1", features = ["macros", "rt-multi-thread", "sync", "time"] }
-url = "2.5.9"
-wsola = "0.3.0"
+skrifa = "0.44.0"
+sha1 = "0.10.7"
+sha2 = "0.10.9"
+serde_json = "1.0.151"
+souvlaki = "0.8.3"
+tao = "0.37.1"
+tokio = { version = "1.53.2", features = ["rt-multi-thread", "macros", "sync", "time", "net", "io-util"] }
+wry = "0.57.0"
+rfd = "0.17.2"
+tray-icon = "0.26.1"
+url = "2.5.8"
+# The opt-in renderer: Vulkan, Metal on macOS (renderer.rs).
+wgpu = { version = "30.0.1", default-features = false, features = ["std", "parking_lot", "wgsl", "vulkan", "metal"] }
+unicode-normalization = "0.1.26"
+symphonia = { version = "0.5.5", default-features = false, features = ["mkv", "aac"] }
+mpeg2ts-reader = "0.18.2"
+rusty-opus = "1.0.2"
+unicode-bidi = "0.3"
+# Cutting the tray menu's song line between letters a reader sees as one (tray.rs).
+unicode-segmentation = "1.13.3"
+# System-wide media shortcuts (hotkeys.rs).
+global-hotkey = "0.9"
+# The interface in the listener's language, from locales/, built in (i18n.rs).
+fluent-templates = "0.15.1"
+# The system's languages, for the default one.
+sys-locale = "0.3.2"
 
-# Linux: KWallet/Secret Service for the login key, MPRIS, system libopus, glibc malloc_trim.
-[target.'cfg(target_os = "linux")'.dependencies]
-keyring = "4.2.0"
-libc = "0.2.191"
-mpris-server = "0.11.0"
-opusic-sys = { version = "0.7.7", default-features = false }
-
-# Windows: DPAPI for the login key (not the Credential Manager), libopus built from source,
-# media controls.
 [target.'cfg(windows)'.dependencies]
-opusic-sys = { version = "0.7.7", default-features = true }
-windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Security_Cryptography"] }
-# Media controls (SMTC). Microsoft's Rust bindings to WinRT: no compiled C/C++.
-windows = { version = "0.62.2", features = ["Foundation", "Media", "Media_Playback", "Storage_Streams"] }
+# Windows Credential Manager, for the Google and Spotify sign-ins.
+keyring = { version = "3.6.3", features = ["windows-native"] }
+windows = { version = "0.62.2", features = ["Data_Xml_Dom", "Foundation", "UI_Notifications", "Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Graphics_Gdi", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Com", "Win32_System_Diagnostics_Debug", "Win32_System_IO", "Win32_System_Kernel", "Win32_System_LibraryLoader", "Win32_System_Pipes", "Win32_System_Power", "Win32_System_Registry", "Win32_System_Threading", "Win32_UI_Controls", "Win32_UI_HiDpi", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# The Secret Service (GNOME Keyring, KWallet) for the sign-ins.
+keyring = { version = "3.6.3", features = ["sync-secret-service", "crypto-rust"] }
+# The tray icon needs GTK running on a thread of its own.
+gtk = "0.18"
+# Keeping the computer awake while playing (awake.rs); souvlaki's MPRIS uses it already.
+dbus = "0.9"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# The login Keychain for the sign-ins.
+keyring = { version = "3.6.3", features = ["apple-native"] }
+# The window's traffic lights on the app's own top row (ui/titlebar.rs).
+objc2 = "0.6"
+objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "objc2-core-foundation", "NSButton", "NSControl", "NSResponder", "NSView", "NSWindow"] }
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "objc2-core-foundation", "NSGeometry", "NSString", "NSUserDefaults"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 
 [dev-dependencies]
-# Makes the bsdiff patches the updater's test applies (compiles C; never in the app itself).
-qbsdiff = "1.4.4"
+egui_system_font_provider = "0.37.0"
 
 [build-dependencies]
-embed-resource = "3.0.12"
-slint-build = "1.19.0"
+winresource = "0.1.31"

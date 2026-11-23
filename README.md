@@ -32,8 +32,8 @@ looks like the rest of a KDE desktop. Linux first; Windows builds are made too.
   reported to your YouTube history (or not: *Pause watch history*).
 - **Queue**: right-click any song for Play next, Add to queue, Start radio, Go to artist/album;
   shuffle lists; remove songs.
-- **Synced lyrics**: word-by-word karaoke, line-by-line, or plain, from BetterLyrics, lrc.red
-  and LRCLIB; optional translations; "Wrong lyrics?" to pick another version or search by hand.
+- **Synced lyrics**: word-by-word karaoke, line-by-line, or plain, from BetterLyrics, lrc.red,
+  LRCLIB and YouTube Music itself; optional translations; "Wrong lyrics?" to pick another version or search by hand.
 - **Desktop**: media keys and KDE's media controls (MPRIS), colors, font and icons from your KDE
   settings (follows changes live), keyboard shortcuts, remembers the queue and position.
 - **Updates itself** with small binary patches (a few MB) checked against SHA-256 sums.
@@ -81,7 +81,8 @@ tends to be logged out within hours, because the browser keeps rotating it.
 ## Privacy
 
 - Your YouTube cookies are only sent to YouTube. Lyrics sites (BetterLyrics, lrc.red, LRCLIB) get
-  the song's title, artist and length, nothing else. Update checks ask GitHub for the latest
+  the song's title, artist and length, nothing else. YouTube Music's own lyrics are fetched
+  without your login. Update checks ask GitHub for the latest
   release.
 - Stored on your computer: the encrypted login, the queue and position, settings, and the IDs of
   your last 500 songs (to keep radios fresh). Linux: `~/.local/share/ytm-native`; Windows: the
@@ -93,7 +94,7 @@ tends to be logged out within hours, because the browser keeps rotating it.
   (Unlicense/MIT/ISC, vendored in `vendor/ejs`) for YouTube's stream challenges.
 - [Breeze icons](https://invent.kde.org/frameworks/breeze-icons) by KDE (LGPL), bundled as a
   fallback.
-- Lyrics: BetterLyrics, [lrc.red](https://lrc.red), [LRCLIB](https://lrclib.net).
+- Lyrics: BetterLyrics, [lrc.red](https://lrc.red), [LRCLIB](https://lrclib.net), YouTube Music.
 - Ideas and protocol knowledge from Metrolist, yt-dlp and
   [spicy-lyrics](https://github.com/Spikerko/spicy-lyrics).
 

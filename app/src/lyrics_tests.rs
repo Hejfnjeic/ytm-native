@@ -104,3 +104,25 @@ fn ttml_translations_follow_line_keys() {
     assert!(l.has_translation());
     assert_eq!(l.lines.len(), 3);
 }
+
+#[test]
+fn youtube_timed_and_plain() {
+    let timed = serde_json::json!({ "contents": { "elementRenderer": { "newElement": { "type": { "componentType": { "model": {
+        "timedLyricsModel": { "lyricsData": { "sourceMessage": "Source: Somebody", "timedLyricsData": [
+            { "lyricLine": "first line", "cueRange": { "startTimeMilliseconds": "1500", "endTimeMilliseconds": "3000" } },
+            { "lyricLine": "♪", "cueRange": { "startTimeMilliseconds": "3000", "endTimeMilliseconds": "9000" } },
+            { "lyricLine": "second line", "cueRange": { "startTimeMilliseconds": "9000", "endTimeMilliseconds": "0" } },
+        ]}}}}}}}}});
+    let l = parse_youtube(&timed).unwrap();
+    assert_eq!((l.sync, l.lines.len(), l.source.as_str()), (Sync::Line, 2, "YouTube Music (Somebody)"));
+    assert_eq!((l.lines[0].start, l.lines[0].end), (1.5, 3.0));
+    assert_eq!((l.lines[1].start, l.lines[1].end), (9.0, 14.0));
+    assert_eq!(l.preview(), "first line");
+
+    let plain = serde_json::json!({ "contents": { "sectionListRenderer": { "contents": [{ "musicDescriptionShelfRenderer": {
+        "description": { "runs": [{ "text": "one\ntwo\n" }] }, "footer": { "runs": [{ "text": "Source: Other" }] },
+    }}]}}});
+    let l = parse_youtube(&plain).unwrap();
+    assert_eq!((l.sync, l.lines.len(), l.source.as_str()), (Sync::Static, 2, "YouTube Music (Other)"));
+    assert!(parse_youtube(&serde_json::json!({})).is_none());
+}

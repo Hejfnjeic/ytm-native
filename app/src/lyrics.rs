@@ -4,6 +4,8 @@
 //! - BetterLyrics (lyrics-api.boidu.dev): Apple-Music-style TTML, often word-timed.
 //! - lrc.red: TTML (Apple Music lyrics, some AI-timed); spicy-lyrics credits it.
 //! - LRCLIB (lrclib.net): community LRC, line-timed; best coverage.
+//! - YouTube Music's own lyrics (by video id, so always the right song): line-timed through
+//!   the Android app's identity, plain otherwise. Asked for without the login cookies.
 //!
 //! The data model follows spicy-lyrics' Syllable / Line / Static split. These requests use
 //! their own HTTP client: YouTube cookies never go to lyric sites.
@@ -316,6 +318,38 @@ fn parse_plain(text: &str, source: &str) -> Lyrics {
     Lyrics { sync: Sync::Static, lines, source: source.to_string() }
 }
 
+/// YouTube Music's lyrics page, as the Android app gets it: line-timed when YouTube has
+/// timing, else plain text with a "Source: …" footer.
+fn parse_youtube(v: &Value) -> Option<Lyrics> {
+    let credit = |src: &str| match src.trim().strip_prefix("Source:").map(str::trim) {
+        Some(who) if !who.is_empty() => format!("YouTube Music ({who})"),
+        _ => "YouTube Music".to_string(),
+    };
+    if let Some(m) = v.pointer("/contents/elementRenderer/newElement/type/componentType/model/timedLyricsModel/lyricsData") {
+        let cues: Vec<(f64, Option<f64>, String)> = m["timedLyricsData"].as_array().into_iter().flatten().filter_map(|c| {
+            let ms = |k: &str| c["cueRange"][k].as_str().and_then(|x| x.parse::<f64>().ok()).map(|x| x / 1000.0);
+            Some((ms("startTimeMilliseconds")?, ms("endTimeMilliseconds"), c["lyricLine"].as_str()?.trim().to_string()))
+        }).collect();
+        let mut lines = Vec::new();
+        for (i, (start, end, text)) in cues.iter().enumerate() {
+            if text.is_empty() || text == "♪" {
+                continue; // instrumental gap marker
+            }
+            let end = end.filter(|e| e > start).or_else(|| cues.get(i + 1).map(|n| n.0)).unwrap_or(start + 5.0);
+            let words = vec![Word { text: text.clone(), start: *start, end }];
+            lines.push(Line { start: *start, end, words, opposite: false, background: false, translation: None });
+        }
+        if !lines.is_empty() {
+            return Some(Lyrics { sync: Sync::Line, lines, source: credit(m["sourceMessage"].as_str().unwrap_or("")) });
+        }
+    }
+    let shelf = v.pointer("/contents/sectionListRenderer/contents")?.as_array()?.iter()
+        .find_map(|c| c.get("musicDescriptionShelfRenderer"))?;
+    let text: String = shelf["description"]["runs"].as_array()?.iter().filter_map(|r| r["text"].as_str()).collect();
+    let footer: String = shelf["footer"]["runs"].as_array().into_iter().flatten().filter_map(|r| r["text"].as_str()).collect();
+    (!text.trim().is_empty()).then(|| parse_plain(text.trim(), &credit(&footer)))
+}
+
 // ---------- matching ----------
 
 /// Title variants worth searching for. YT Music often titles Japanese songs
@@ -447,6 +481,42 @@ impl Finder {
     }
 
     /// The best match (automatic), or up to 5 candidates of any length (searching by hand).
+    /// YouTube Music's own lyrics for a video: the lyrics tab id from `next`, then that page as
+    /// the Android app (which gets timing). No cookies: lyrics don't need a login.
+    async fn youtube(&self, video_id: &str) -> Result<Option<Lyrics>> {
+        const WEB_UA: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36";
+        const ANDROID_VERSION: &str = "7.27.52";
+        let post = |endpoint: &str, ua: &str, client: Value, body: Value| {
+            let mut body = body;
+            body["context"] = serde_json::json!({ "client": client });
+            self.http.post(format!("https://music.youtube.com/youtubei/v1/{endpoint}?prettyPrint=false"))
+                .header("User-Agent", ua)
+                .json(&body)
+                .send()
+        };
+        let web = serde_json::json!({ "clientName": "WEB_REMIX", "clientVersion": "1.20251110.01.00", "hl": "en", "gl": "US" });
+        let r = post("next", WEB_UA, web, serde_json::json!({ "videoId": video_id, "isAudioOnly": true })).await?;
+        if !r.status().is_success() {
+            bail!("next: HTTP {}", r.status());
+        }
+        let v: Value = r.json().await?;
+        let tabs = v.pointer("/contents/singleColumnMusicWatchNextResultsRenderer/tabbedRenderer/watchNextTabbedResultsRenderer/tabs")
+            .and_then(Value::as_array).cloned().unwrap_or_default();
+        let Some(browse_id) = tabs.iter().find_map(|t| {
+            t.pointer("/tabRenderer/endpoint/browseEndpoint/browseId").and_then(Value::as_str).filter(|id| id.starts_with("MPLY")).map(str::to_string)
+        }) else {
+            return Ok(None); // no lyrics tab: YouTube has none
+        };
+        let android = serde_json::json!({ "clientName": "ANDROID_MUSIC", "clientVersion": ANDROID_VERSION, "androidSdkVersion": 34,
+                                          "osName": "Android", "osVersion": "14", "hl": "en", "gl": "US" });
+        let ua = format!("com.google.android.apps.youtube.music/{ANDROID_VERSION} (Linux; U; Android 14) gzip");
+        let r = post("browse", &ua, android, serde_json::json!({ "browseId": browse_id })).await?;
+        if !r.status().is_success() {
+            bail!("lyrics: HTTP {}", r.status());
+        }
+        Ok(parse_youtube(&r.json().await?))
+    }
+
     async fn lrclib(&self, variants: &[String], artist: &str, album: &str, duration: f64, manual: bool) -> Result<Vec<Lyrics>> {
         // Exact lookup first (fast, precise), then search.
         for title in variants.iter().take(if manual { 0 } else { 2 }) {
@@ -523,12 +593,14 @@ impl Finder {
     /// Best available lyrics for a song, or None.
     #[cfg(test)]
     pub async fn find(&self, title: &str, artist: &str, album: &str, duration: f64) -> Option<Lyrics> {
-        self.find_all(title, artist, album, duration, false).await.into_iter().next()
+        self.find_all(title, artist, album, duration, None).await.into_iter().next()
     }
 
     /// Every version the sources have, best first. `manual`: a search by hand, which takes
     /// versions of any length (labelled) and several LRCLIB candidates.
-    pub async fn find_all(&self, title: &str, artist: &str, album: &str, duration: f64, manual: bool) -> Vec<Lyrics> {
+    /// `video_id`: the playing song, for YouTube Music's own lyrics (None for a search by hand).
+    pub async fn find_all(&self, title: &str, artist: &str, album: &str, duration: f64, video_id: Option<&str>) -> Vec<Lyrics> {
+        let manual = video_id.is_none();
         let variants = title_variants(title);
         let artist = main_artist(artist);
         // Each source gets 6 s; one slow site mustn't hold up the others.
@@ -536,7 +608,7 @@ impl Finder {
         async fn deadline<T: Default>(limit: Duration, f: impl std::future::Future<Output = T>) -> T {
             tokio::time::timeout(limit, f).await.unwrap_or_default()
         }
-        let (better, red, lib) = tokio::join!(
+        let (better, red, lib, yt) = tokio::join!(
             deadline(limit, async {
                 for t in variants.iter().take(2) {
                     match self.better_lyrics(t, &artist, duration).await {
@@ -549,9 +621,13 @@ impl Finder {
             }),
             deadline(limit, async { self.lrc_red(&variants, &artist, duration, manual).await.unwrap_or_else(|e| { eprintln!("[lyrics] lrc.red: {e}"); None }) }),
             deadline(limit, async { self.lrclib(&variants, &artist, album, duration, manual).await.unwrap_or_else(|e| { eprintln!("[lyrics] LRCLIB: {e}"); vec![] }) }),
+            deadline(limit, async {
+                let id = video_id?;
+                self.youtube(id).await.unwrap_or_else(|e| { eprintln!("[lyrics] YouTube Music: {e}"); None })
+            }),
         );
         // Word timing beats line timing beats plain; human timing beats AI timing.
-        let mut all: Vec<Lyrics> = [better, red].into_iter().flatten().chain(lib).filter(|l| l.text_len() > 0).collect();
+        let mut all: Vec<Lyrics> = [better, red].into_iter().flatten().chain(lib).chain(yt).filter(|l| l.text_len() > 0).collect();
         for l in &mut all {
             if looks_translated(title, l) {
                 l.source = format!("{} (looks like a translation)", l.source);

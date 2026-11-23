@@ -80,7 +80,7 @@ binary is `target/release/ytm-native`. Debug builds work but are slow; use `--re
 | `solver.rs` | Solves stream `sig`/`n` challenges with yt-dlp's EJS in QuickJS (own thread, per-player cache) |
 | `audio.rs` | WebM demux (symphonia) → Opus (libopus) → optional WSOLA time-stretch → resample → cpal. `Stream`: a track's bytes while they download; the decoder waits for missing bytes |
 | `queue.rs` | Queue editing rules (Play next / Add to queue / Remove), unit-tested |
-| `lyrics.rs` | Lyrics from BetterLyrics, lrc.red (TTML, word timing, translations) and LRCLIB (LRC); ranking, translation detection, search by hand |
+| `lyrics.rs` | Lyrics from BetterLyrics, lrc.red (TTML, word timing, translations) LRCLIB (LRC) and YouTube Music (by video id, Android identity for timing, no cookies); ranking, translation detection, search by hand |
 | `report.rs` | Reports plays to YouTube like the website (watch history) |
 | `update.rs` | Self-updates from GitHub releases (bsdiff patches, SHA-256 checked) |
 | `settings.rs` / `state.rs` | `settings.json` (Settings page) / `state.json` (queue, volume, position) |

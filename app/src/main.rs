@@ -809,7 +809,7 @@ impl App {
         let Some(finder) = self.finder.clone() else { return };
         let (tx, s, dur) = (self.tx.clone(), song.clone(), self.duration);
         tokio::spawn(async move {
-            let found = finder.find_all(&s.title, &s.artist, &s.album, dur, false).await;
+            let found = finder.find_all(&s.title, &s.artist, &s.album, dur, Some(&s.id)).await;
             let _ = tx.send(Ev::LyricsLoaded(s.id, found, false));
         });
     }
@@ -2053,7 +2053,7 @@ impl App {
                 self.push_lyric_options();
                 let (tx, dur) = (self.tx.clone(), self.duration);
                 tokio::spawn(async move {
-                    let found = finder.find_all(title.trim(), artist.trim(), "", dur, true).await;
+                    let found = finder.find_all(title.trim(), artist.trim(), "", dur, None).await;
                     let _ = tx.send(Ev::LyricsLoaded(id, found, true));
                 });
             }

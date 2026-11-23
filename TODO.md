@@ -27,9 +27,9 @@
   - License is **AGPL-3.0**; this app is GPL-3.0-or-later. GPLv3 §13 allows combining with
     AGPLv3 code, but copied parts stay AGPL. Reimplementing from the TTML format and their
     behaviour as reference avoids that.
-- [ ] Other sources to compare: YT Music's own lyrics (Metrolist fetches them with an
-      `ANDROID_MUSIC` identity, see innertubex `YouTubeLyricsProvider`; mostly unsynced or
-      line-synced), LRCLIB (line-synced, some word-synced "enhanced LRC"), lrc.red.
+- [x] YT Music's own lyrics as a source: `next` gives the lyrics tab id, the `ANDROID_MUSIC`
+      identity (no cookies) returns them line-timed when YouTube has timing, plain otherwise.
+      Keyed by video id, so never the wrong song.
 
 ### Sign-in without hand-exporting cookies
 Currently: import from the GUI (below). Dev override: `cookies.txt` argument or `$YTM_COOKIES`.

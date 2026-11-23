@@ -1,5 +1,5 @@
-//! Stand-in for the MPRIS module on systems without it (Windows): same interface, no effect.
-//! (Windows media controls, SMTC, are a TODO.)
+//! Stand-in for the MPRIS module on systems with neither MPRIS nor SMTC (macOS): same
+//! interface, no effect.
 
 use tokio::sync::mpsc;
 

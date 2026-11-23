@@ -36,10 +36,13 @@ libc = "0.2.191"
 mpris-server = "0.11.0"
 opusic-sys = { version = "0.7.7", default-features = false }
 
-# Windows: DPAPI for the login key (not the Credential Manager), libopus built from source.
+# Windows: DPAPI for the login key (not the Credential Manager), libopus built from source,
+# media controls.
 [target.'cfg(windows)'.dependencies]
 opusic-sys = { version = "0.7.7", default-features = true }
 windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Security_Cryptography"] }
+# Media controls (SMTC). Microsoft's Rust bindings to WinRT: no compiled C/C++.
+windows = { version = "0.62.2", features = ["Foundation", "Media", "Media_Playback", "Storage_Streams"] }
 
 [dev-dependencies]
 # Makes the bsdiff patches the updater's test applies (compiles C; never in the app itself).

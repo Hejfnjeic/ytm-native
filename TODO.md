@@ -93,7 +93,8 @@ Currently: import from the GUI (below). Dev override: `cookies.txt` argument or 
 - [x] Remember volume, queue, current song, position and queue source between launches
       (restored paused).
 - [x] MPRIS: media keys, KDE media controls / lock screen, KDE Connect.
-- [ ] Windows: SMTC (low priority).
+- [x] Windows: SMTC (media keys, volume-flyout controls, lock screen) via a muted system
+      `MediaPlayer`'s controls. Cross-compiled only: **untested on Windows**, friends to report.
 
 ## Builds
 - [x] Windows build: portable .7z via `scripts/build-windows.sh` (MinGW cross-compile, DPAPI key file).

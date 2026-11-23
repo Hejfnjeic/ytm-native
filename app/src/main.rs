@@ -6,7 +6,11 @@ mod kde;
 mod lyrics;
 #[cfg(target_os = "linux")]
 mod mpris;
-#[cfg(not(target_os = "linux"))]
+// Windows media controls (SMTC), same interface as MPRIS.
+#[cfg(windows)]
+#[path = "smtc.rs"]
+mod mpris;
+#[cfg(not(any(target_os = "linux", windows)))]
 #[path = "mpris_stub.rs"]
 mod mpris;
 mod paths;

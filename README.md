@@ -34,7 +34,8 @@ looks like the rest of a KDE desktop. Linux first; Windows builds are made too.
   shuffle lists; remove songs.
 - **Synced lyrics**: word-by-word karaoke, line-by-line, or plain, from BetterLyrics, lrc.red,
   LRCLIB and YouTube Music itself; optional translations; "Wrong lyrics?" to pick another version or search by hand.
-- **Desktop**: media keys and KDE's media controls (MPRIS), colors, font and icons from your KDE
+- **Desktop**: media keys and KDE's media controls (MPRIS; on Windows the system media
+  controls), colors, font and icons from your KDE
   settings (follows changes live), keyboard shortcuts, remembers the queue and position.
 - **Updates itself** with small binary patches (a few MB) checked against SHA-256 sums.
 

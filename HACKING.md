@@ -87,7 +87,7 @@ binary is `target/release/ytm-native`. Debug builds work but are slow; use `--re
 | `store.rs` | Encrypted login (XChaCha20-Poly1305); key in Secret Service/KWallet, or a DPAPI file on Windows |
 | `paths.rs` | Data/cache dirs; portable mode (a `data/` folder next to the exe) |
 | `kde.rs` | Colors, font and icons from `~/.config/kdeglobals` (re-read when it changes) |
-| `mpris.rs` / `mpris_stub.rs` | Media keys and desktop media controls (Linux) / no-op elsewhere |
+| `mpris.rs` / `smtc.rs` / `mpris_stub.rs` | Media keys and desktop media controls: MPRIS (Linux) / SMTC (Windows, same interface) / no-op elsewhere |
 | `ui/app.slint` | All UI: Breeze-style controls (buttons, check box, slider, menus), lists, lyrics, Settings |
 
 ### How YouTube is used (why it's built this way)

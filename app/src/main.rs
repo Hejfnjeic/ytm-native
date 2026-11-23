@@ -2339,16 +2339,34 @@ struct Track {
     duration: f64,
 }
 
-/// Find the song's stream and start downloading it in the background. Returns as soon as the
-/// download has started; a failed download shows up as `Track::data.failed()`.
+/// Find the song's stream and start downloading it in the background. Returns once the first
+/// piece is in (from the first identity whose stream actually downloads); a later failure
+/// shows up as `Track::data.failed()`.
 async fn fetch_audio(yt: &Arc<yt::Client>, id: &str) -> Result<Track> {
-    let s = yt.stream(id).await?;
+    // Dev: YTM_IDENTITY=<n> starts at that identity (tests the fallbacks).
+    let mut skip = std::env::var("YTM_IDENTITY").ok().and_then(|v| v.parse().ok()).unwrap_or(0);
+    let (s, first) = loop {
+        let s = yt.stream(id, skip).await?;
+        match yt.piece(&s, 0, 256 * 1024).await {
+            Ok(first) => break (s, first),
+            // A URL that won't download: try the next identity.
+            Err(e) if s.identity + 1 < yt::IDENTITIES.len() => {
+                eprintln!("[stream] {id} as {}: {e}; trying the next identity", yt::IDENTITIES[s.identity].label);
+                skip = s.identity + 1;
+            }
+            Err(e) => return Err(e),
+        }
+    };
+    if s.identity > 0 {
+        eprintln!("[stream] {id}: playing via fallback identity {}", yt::IDENTITIES[s.identity].label);
+    }
     let (itag, duration) = (s.itag, s.duration);
     let data = audio::Stream::new(s.content_length);
-    let (yt, into, vid) = (yt.clone(), data.clone(), id.to_string());
+    data.push(&first);
+    let (yt, into, vid, from) = (yt.clone(), data.clone(), id.to_string(), first.len() as u64);
     tokio::spawn(async move {
         let started = std::time::Instant::now();
-        match yt.download_into(&s, &into).await {
+        match yt.download_into(&s, &into, from).await {
             Ok(()) => eprintln!("[download] {vid}: {} KiB in {:.1} s", into.downloaded() / 1024, started.elapsed().as_secs_f64()),
             Err(e) => {
                 eprintln!("[download] {vid}: {e}");
@@ -2511,6 +2529,29 @@ fn main() -> Result<()> {
             let v = if let Some(c) = id.strip_prefix("cont:") { yt.browse(None, Some(c)).await? } else { yt.browse(Some(&id), None).await? };
             std::fs::write(&out, serde_json::to_string_pretty(&v)?)?;
             eprintln!("saved {out}");
+            Ok(())
+        });
+    }
+    if args.get(1).map(String::as_str) == Some("--streams") {
+        // Which identities give a working stream for a video (fallback check).
+        let id = args.get(2).cloned().unwrap_or_default();
+        let rt = tokio::runtime::Runtime::new()?;
+        return rt.block_on(async move {
+            let cookies = tokio::task::spawn_blocking(store::load).await??.ok_or_else(|| anyhow::anyhow!("no stored login"))?;
+            let yt = yt::Client::connect(cookies, Solver::start(paths::cache_dir())).await?;
+            let probe: (u64, u64) = std::env::var("YTM_PROBE").ok().and_then(|v| { let (a, b) = v.split_once(',')?; Some((a.parse().ok()?, b.parse().ok()?)) }).unwrap_or((256 * 1024, 2 << 20));
+            for (i, ident) in yt::IDENTITIES.iter().enumerate() {
+                let t = std::time::Instant::now();
+                let res = match yt.stream_via(i, &id).await {
+                    // The start, then a later 2 MiB piece (some URLs only serve the start).
+                    Ok(s) => match async { Ok::<_, anyhow::Error>((yt.piece(&s, 0, 256 * 1024).await?, yt.piece(&s, probe.0, probe.1).await?)) }.await {
+                        Ok((a, b)) => format!("OK: itag {}, {} KiB; {} + {} KiB downloaded", s.itag, s.content_length / 1024, a.len() / 1024, b.len() / 1024),
+                        Err(e) => format!("stream found (itag {}) but won't download: {e}", s.itag),
+                    },
+                    Err(e) => format!("failed: {e}"),
+                };
+                println!("{:<26} {res} ({:.1} s)", ident.label, t.elapsed().as_secs_f64());
+            }
             Ok(())
         });
     }

@@ -72,8 +72,11 @@ Currently: import from the GUI (below). Dev override: `cookies.txt` argument or 
 - [ ] Non-Premium accounts: decide what happens with ads (requirement: ads still play if needed).
 - [x] HTTP/2: cause found. YouTube resets HTTP/2 requests with a full Firefox User-Agent (its h2
       fingerprint isn't Firefox's). Chrome UA now; HTTP/1.1 fallback on protocol errors.
-- [ ] If the TV identity stops serving streams: fall back to other identities (the probe shows
-      which formats each one offers); keep `vendor/ejs` updated from yt-dlp-ejs releases.
+- [x] If the TV identity stops serving streams: falls back to `mweb`, then `web_creator`
+      (logged in, Opus 128k), also when a URL won't download. Checked with `--streams`.
+      No-login identities (ANDROID_VR, TVHTML5_SIMPLY) stop at 1 MiB without a PO token.
+- [ ] Keep `vendor/ejs` updated from yt-dlp-ejs releases. If the fallbacks also need PO tokens
+      one day: look at BotGuard/PO-token generation (yt-dlp's providers) or HLS (AAC) formats.
 - [x] Like / dislike the current song.
 - [ ] Add to playlist / save to library (not planned yet). ("Start radio" from any song: done.)
 - [x] Library: Home feed (personal shelves), Liked Music, album and playlist pages; lists play

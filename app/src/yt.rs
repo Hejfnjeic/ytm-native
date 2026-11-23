@@ -22,8 +22,48 @@ const YT: &str = "https://www.youtube.com";
 /// be Firefox but don't look like Firefox on the wire (found Nov 2026; Chrome's is accepted).
 const UA_WEB: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36";
 
-const TV_VERSION: &str = "5.20260707";
 const TV_UA: &str = "Mozilla/5.0 (SMART-TV; Linux; Tizen 2.4.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/2.4.0 TV Safari/538.1";
+
+/// A client identity for the player request (who the app says it is to get a stream).
+pub struct Identity {
+    pub label: &'static str,
+    name: &'static str,
+    /// X-Youtube-Client-Name
+    header_id: &'static str,
+    version: &'static str,
+    ua: &'static str,
+    /// Extra `context.client` fields.
+    extra: fn() -> Value,
+    /// Sends the login (cookies): needed for Premium quality and age-restricted songs.
+    login: bool,
+    /// Its URLs need the `n` challenge solved (signed URLs always need solving).
+    js: bool,
+}
+
+/// Identities tried for a stream, in order. The first is the one that matters (Premium Opus
+/// 256k without a PO token, like yt-dlp's `tv_samsung`); the others are fallbacks for when
+/// YouTube stops serving it, with normal quality (Opus 128k). Check them with
+/// `ytm-native --streams <video id>`.
+///
+/// Tested Nov 2026: identities without the login (ANDROID_VR, TVHTML5_SIMPLY) give URLs that
+/// stop at 1 MiB (403: they'd need a PO token), and other TV versions/devices are refused
+/// ("The page needs to be reloaded"), so they aren't listed.
+pub const IDENTITIES: &[Identity] = &[
+    Identity {
+        label: "tv (Samsung)", name: "TVHTML5", header_id: "7", version: "5.20260707", ua: TV_UA,
+        extra: || json!({ "deviceMake": "Samsung", "deviceModel": "UKS9800", "osName": "Tizen", "osVersion": "2.4.0" }),
+        login: true, js: true,
+    },
+    Identity {
+        label: "mweb", name: "MWEB", header_id: "2", version: "2.20260115.01.00",
+        ua: "Mozilla/5.0 (iPad; CPU OS 16_7_10 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1,gzip(gfe)",
+        extra: || json!({}), login: true, js: true,
+    },
+    Identity {
+        label: "web_creator", name: "WEB_CREATOR", header_id: "62", version: "1.20260114.03.00", ua: UA_WEB,
+        extra: || json!({}), login: true, js: true,
+    },
+];
 
 /// Error text for a login YouTube no longer accepts (HTTP 401). The UI matches on it.
 pub const SIGNED_OUT: &str = "YouTube no longer accepts this login (HTTP 401)";
@@ -114,6 +154,9 @@ pub struct RadioPage {
 }
 
 pub struct Stream {
+    /// Index into `IDENTITIES` of the identity that gave it, and the User-Agent to fetch with.
+    pub identity: usize,
+    pub ua: &'static str,
     pub url: url::Url,
     pub content_length: u64,
     pub itag: u64,
@@ -733,37 +776,63 @@ impl Client {
         Ok(out)
     }
 
-    /// Best audio stream (Premium Opus if available) with a solved, playable URL.
-    pub async fn stream(&self, video_id: &str) -> Result<Stream> {
+    /// Best audio stream with a solved, playable URL, from the first identity (starting at
+    /// `skip`) that offers one. Order: the logged-in TV (Premium Opus 256k), other identities
+    /// as fallbacks if YouTube stops serving it (normal quality).
+    pub async fn stream(&self, video_id: &str, skip: usize) -> Result<Stream> {
+        let mut first_err = None;
+        for (i, ident) in IDENTITIES.iter().enumerate().skip(skip) {
+            match self.stream_as(ident, i, video_id).await {
+                Ok(s) => return Ok(s),
+                Err(e) if e.to_string().contains(SIGNED_OUT) => return Err(e),
+                Err(e) => {
+                    eprintln!("[stream] {video_id} as {}: {e}", ident.label);
+                    first_err.get_or_insert(e);
+                }
+            }
+        }
+        Err(first_err.unwrap_or_else(|| anyhow!("no identity left to try")))
+    }
+
+    /// A stream from one identity only (dev check: `--streams`).
+    pub async fn stream_via(&self, index: usize, video_id: &str) -> Result<Stream> {
+        self.stream_as(&IDENTITIES[index], index, video_id).await
+    }
+
+    async fn stream_as(&self, ident: &Identity, index: usize, video_id: &str) -> Result<Stream> {
         let (js, player_id, sts) = self.player().await?;
-        let mut context = json!({ "client": {
-            "clientName": "TVHTML5", "clientVersion": TV_VERSION, "userAgent": TV_UA,
-            "deviceMake": "Samsung", "deviceModel": "UKS9800", "osName": "Tizen", "osVersion": "2.4.0",
-            "hl": "en", "gl": "US", "visitorData": self.visitor,
-        }});
-        if let Some(id) = &self.datasync {
+        let mut client = (ident.extra)();
+        for (k, v) in [("clientName", ident.name), ("clientVersion", ident.version), ("userAgent", ident.ua), ("hl", "en"), ("gl", "US")] {
+            client[k] = json!(v);
+        }
+        client["visitorData"] = json!(self.visitor);
+        let mut context = json!({ "client": client });
+        if ident.login && let Some(id) = &self.datasync {
             context["user"] = json!({ "onBehalfOfUser": id });
         }
         let body = json!({
             "context": context, "videoId": video_id, "contentCheckOk": true, "racyCheckOk": true,
             "playbackContext": { "contentPlaybackContext": { "signatureTimestamp": sts, "html5Preference": "HTML5_PREF_WANTS" } },
         });
-        let resp = self.send(|c| c.post(format!("{YT}/youtubei/v1/player?prettyPrint=false"))
-            .header("User-Agent", TV_UA)
-            .header("Origin", YT)
-            .header("X-Origin", YT)
-            .header("X-Youtube-Client-Name", "7")
-            .header("X-Youtube-Client-Version", TV_VERSION)
-            .header("X-Goog-Visitor-Id", &self.visitor)
-            .header("X-Goog-AuthUser", "0")
-            .header("Cookie", self.cookie_header())
-            .header("Authorization", self.auth(YT))
-            .json(&body)).await?;
-        self.absorb(&resp);
+        let resp = self.send(|c| {
+            let mut r = c.post(format!("{YT}/youtubei/v1/player?prettyPrint=false"))
+                .header("User-Agent", ident.ua)
+                .header("X-Youtube-Client-Name", ident.header_id)
+                .header("X-Youtube-Client-Version", ident.version)
+                .header("X-Goog-Visitor-Id", &self.visitor);
+            if ident.login {
+                r = r.header("Origin", YT).header("X-Origin", YT).header("X-Goog-AuthUser", "0")
+                    .header("Cookie", self.cookie_header()).header("Authorization", self.auth(YT));
+            }
+            r.json(&body)
+        }).await?;
+        if ident.login {
+            self.absorb(&resp);
+        }
         let status = resp.status();
         let v: Value = serde_json::from_str(&resp.text().await?)?;
         if !status.is_success() {
-            if status == reqwest::StatusCode::UNAUTHORIZED {
+            if status == reqwest::StatusCode::UNAUTHORIZED && ident.login {
                 bail!("{SIGNED_OUT}");
             }
             bail!("player: HTTP {status}");
@@ -793,62 +862,65 @@ impl Client {
         };
         let mut url = url::Url::parse(&base)?;
         let mut pairs: Vec<(String, String)> = url.query_pairs().into_owned().collect();
-        let n = pairs.iter().find(|p| p.0 == "n").map(|p| p.1.clone());
-
-        let solved = self.solver.solve(player_id, js, sig.as_ref().map(|s| s.1.clone()), n.clone()).await?;
-        if let (Some((sp, _)), Some(s)) = (&sig, solved.sig) {
-            pairs.push((sp.clone(), s));
-        }
-        if let Some(n) = solved.n {
-            for p in pairs.iter_mut().filter(|p| p.0 == "n") {
-                p.1 = n.clone();
+        // Identities whose URLs don't need the `n` challenge skip it (unless signed).
+        let n = pairs.iter().find(|p| p.0 == "n").map(|p| p.1.clone()).filter(|_| ident.js);
+        if sig.is_some() || n.is_some() {
+            let solved = self.solver.solve(player_id, js, sig.as_ref().map(|s| s.1.clone()), n.clone()).await?;
+            if let (Some((sp, _)), Some(s)) = (&sig, solved.sig) {
+                pairs.push((sp.clone(), s));
+            }
+            if let Some(n) = solved.n {
+                for p in pairs.iter_mut().filter(|p| p.0 == "n") {
+                    p.1 = n.clone();
+                }
             }
         }
         url.query_pairs_mut().clear().extend_pairs(&pairs);
         let duration = pick["approxDurationMs"].as_str().and_then(|s| s.parse::<f64>().ok()).unwrap_or(0.0) / 1000.0;
-        Ok(Stream { url, content_length, itag, duration })
+        Ok(Stream { url, content_length, itag, duration, identity: index, ua: ident.ua })
     }
 
-    /// Download a whole stream into memory, in 2 MiB ranges like the official players.
-    /// Download a stream into `into`, in order, so it can play while it downloads. The first
-    /// piece is small (playback starts sooner); each piece is retried twice. Stops early when
-    /// nobody but this download holds `into` any more (the song was skipped and dropped).
-    pub async fn download_into(&self, s: &Stream, into: &std::sync::Arc<crate::audio::Stream>) -> Result<()> {
-        let mut start = 0u64;
-        let mut piece = 256 * 1024;
+    /// One byte range of a stream (retried twice).
+    pub async fn piece(&self, s: &Stream, start: u64, len: u64) -> Result<Vec<u8>> {
+        let end = (start + len - 1).min(s.content_length - 1);
+        let mut u = s.url.clone();
+        u.query_pairs_mut().append_pair("range", &format!("{start}-{end}"));
+        let mut attempt = 0;
+        loop {
+            let res = async {
+                let r = self.send(|c| c.get(u.clone()).header("User-Agent", s.ua)).await?;
+                if !r.status().is_success() {
+                    bail!("stream: HTTP {} at byte {start}", r.status());
+                }
+                let bytes = r.bytes().await?;
+                if bytes.is_empty() {
+                    bail!("stream: empty piece at byte {start}");
+                }
+                Ok(bytes.to_vec())
+            }.await;
+            match res {
+                Ok(b) => return Ok(b),
+                Err(e) if attempt < 2 => {
+                    attempt += 1;
+                    eprintln!("[download] {e}; retrying");
+                    tokio::time::sleep(Duration::from_millis(500 * attempt)).await;
+                }
+                Err(e) => return Err(e),
+            }
+        }
+    }
+
+    /// Download a stream into `into` from byte `start` on, in order, in 2 MiB ranges like the
+    /// official players, so it can play while it downloads. Stops early when nobody but this
+    /// download holds `into` any more (the song was skipped and dropped).
+    pub async fn download_into(&self, s: &Stream, into: &std::sync::Arc<crate::audio::Stream>, mut start: u64) -> Result<()> {
         while start < s.content_length {
             if std::sync::Arc::strong_count(into) == 1 {
                 return Ok(());
             }
-            let end = (start + piece - 1).min(s.content_length - 1);
-            let mut u = s.url.clone();
-            u.query_pairs_mut().append_pair("range", &format!("{start}-{end}"));
-            let mut attempt = 0;
-            let bytes = loop {
-                let res = async {
-                    let r = self.send(|c| c.get(u.clone()).header("User-Agent", TV_UA)).await?;
-                    if !r.status().is_success() {
-                        bail!("stream: HTTP {} at byte {start}", r.status());
-                    }
-                    let bytes = r.bytes().await?;
-                    if bytes.is_empty() {
-                        bail!("stream: empty piece at byte {start}");
-                    }
-                    Ok(bytes)
-                }.await;
-                match res {
-                    Ok(b) => break b,
-                    Err(e) if attempt < 2 => {
-                        attempt += 1;
-                        eprintln!("[download] {e}; retrying");
-                        tokio::time::sleep(Duration::from_millis(500 * attempt)).await;
-                    }
-                    Err(e) => return Err(e),
-                }
-            };
+            let bytes = self.piece(s, start, 2 * 1024 * 1024).await?;
             into.push(&bytes);
             start += bytes.len() as u64;
-            piece = 2 * 1024 * 1024;
         }
         Ok(())
     }

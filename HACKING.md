@@ -97,6 +97,11 @@ binary is `target/release/ytm-native`. Debug builds work but are slow; use `--re
 - **Playback**: the TV identity (`TVHTML5`) with cookies gives Premium's Opus 256k (itag 774)
   without a PO token, but stream URLs need YouTube's `sig`/`n` challenges solved: that's the JS
   solver. The first song after YouTube ships a new player takes ~10 s; later ones are cached.
+- **Fallback identities** (`yt::IDENTITIES`): if the TV identity gives no stream, or its URL
+  won't download, `mweb` and then `web_creator` (logged in, Opus 128k) are tried. Identities
+  without the login get URLs that stop at 1 MiB (they'd need a PO token), so none are listed.
+  `ytm-native --streams <video id>` checks every identity (`YTM_PROBE=<offset>,<len>` picks
+  the second range it reads); `YTM_IDENTITY=<n>` makes the app start at identity n.
 - **Endless radio**: the API keeps going where the website stops (~50); the queue refills when
   fewer than 15 songs are left, and songs heard in the last 500 plays are skipped.
 - **HTTP/2** with a Chrome User-Agent: YouTube resets HTTP/2 requests that claim to be Firefox
@@ -133,6 +138,8 @@ in `Ev::SettingsChanged`.
 | `ytm-native <cookies.txt>` / `YTM_COOKIES=<file>` | use a plain cookies file instead of the stored login |
 | `ytm-native --dump <browseId> <out.json>` | save a raw browse response |
 | `ytm-native --version` | version, platform, update mode |
+| `ytm-native --streams <video id>` | which player identities give a working stream |
+| `YTM_IDENTITY=<n>` | start at that player identity (test the fallbacks) |
 | `YTM_HTTP1=1` | HTTP/1.1 only |
 | `YTM_UPDATE_API=<url>` | GitHub API base for update checks (tests serve a fake release) |
 | `SLINT_BACKEND=…` | another Slint backend/renderer (default: winit + software) |

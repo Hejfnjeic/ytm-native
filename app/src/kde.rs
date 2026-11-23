@@ -84,7 +84,7 @@ fn bundled(name: &str) -> Option<&'static [u8]> {
         "media-playback-start", "media-playback-pause", "media-skip-forward", "media-skip-backward",
         "go-home", "emblem-favorite", "edit-find", "view-media-lyrics", "view-media-playlist", "radio",
         "go-previous", "audio-volume-high", "audio-volume-muted", "im-user", "system-log-out", "media-album-cover",
-        "media-playlist-shuffle", "configure",
+        "media-playlist-shuffle", "configure", "folder-music-symbolic",
     )
 }
 
@@ -154,4 +154,5 @@ pub fn apply(ui: &MainWindow) {
     i.set_album(icon(&["media-album-cover", "audio-x-generic"]));
     i.set_shuffle(icon(&["media-playlist-shuffle"]));
     i.set_settings(icon(&["configure", "settings-configure"]));
+    i.set_library(icon(&["folder-music-symbolic", "folder-music"]));
 }

@@ -277,6 +277,83 @@ fn parse_track_list(items: &Value, artist: &str, thumb: &Option<String>) -> (Vec
     (songs, continuation)
 }
 
+/// Pages fetched per library list (a page is 25–100 entries).
+const LIBRARY_MAX_PAGES: u32 = 40;
+
+/// The user's saved things (Library).
+#[derive(Default)]
+pub struct Library {
+    pub playlists: Vec<Item>,
+    pub albums: Vec<Item>,
+    pub songs: Vec<Song>,
+    pub artists: Vec<Item>,
+}
+
+/// A library row that opens something: an artist (followed, or "artist of saved songs"),
+/// album or playlist. Library-artist ids ("MPLA" + channel id) become the artist's own page.
+fn parse_library_row(r: &Value) -> Option<Item> {
+    let be = &r["navigationEndpoint"]["browseEndpoint"];
+    let id = be["browseId"].as_str()?;
+    let page = be.pointer("/browseEndpointContextSupportedConfigs/browseEndpointContextMusicConfig/pageType").and_then(Value::as_str)?;
+    let col = |i: usize| runs_text(&r["flexColumns"][i]["musicResponsiveListItemFlexColumnRenderer"]["text"]);
+    let (kind, id) = match page {
+        "MUSIC_PAGE_TYPE_ARTIST" | "MUSIC_PAGE_TYPE_USER_CHANNEL" => (Kind::Artist, id),
+        "MUSIC_PAGE_TYPE_LIBRARY_ARTIST" => (Kind::Artist, id.strip_prefix("MPLA").unwrap_or(id)),
+        "MUSIC_PAGE_TYPE_ALBUM" => (Kind::Album, id),
+        "MUSIC_PAGE_TYPE_PLAYLIST" => (Kind::Playlist, id),
+        _ => return None,
+    };
+    let thumb = last_thumb(&r["thumbnail"]["musicThumbnailRenderer"]["thumbnail"]["thumbnails"]);
+    Some(Item { kind, song: Song { id: id.into(), title: col(0), artist: col(1), thumb, ..Default::default() } })
+}
+
+/// Items and the continuation of a library page (first page or a continuation; grid of cards
+/// or a list of rows; old- and new-style continuations).
+fn parse_library_page(v: &Value) -> (Vec<Item>, Option<String>) {
+    let mut lists: Vec<&Value> = Vec::new();
+    if let Some(sections) = v.pointer("/contents/singleColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents").and_then(Value::as_array) {
+        for s in sections {
+            if let Some(x) = s.get("gridRenderer").or_else(|| s.get("musicShelfRenderer")) {
+                lists.push(x);
+            }
+        }
+    }
+    for key in ["gridContinuation", "musicShelfContinuation"] {
+        if let Some(x) = v["continuationContents"].get(key) {
+            lists.push(x);
+        }
+    }
+    let appended = v.pointer("/onResponseReceivedActions/0/appendContinuationItemsAction/continuationItems");
+    let mut items = Vec::new();
+    let mut next = None;
+    let mut take = |entries: &Value| {
+        for it in entries.as_array().into_iter().flatten() {
+            if let Some(t) = it.pointer("/continuationItemRenderer/continuationEndpoint/continuationCommand/token").and_then(Value::as_str) {
+                next = Some(t.to_string());
+            } else if let Some(r) = it.get("musicResponsiveListItemRenderer") {
+                // Songs have a video id; the "Shuffle all" row and artists don't.
+                if let Some(song) = parse_list_song(r, "", &None) {
+                    items.push(Item { kind: Kind::Song, song });
+                } else if let Some(item) = parse_library_row(r) {
+                    items.push(item);
+                }
+            } else if let Some(item) = parse_item(it) {
+                items.push(item);
+            }
+        }
+    };
+    for l in &lists {
+        take(l.get("items").unwrap_or(&l["contents"]));
+    }
+    if let Some(a) = appended {
+        take(a);
+    }
+    if next.is_none() {
+        next = lists.iter().find_map(|l| l.pointer("/continuations/0/nextContinuationData/continuation")).and_then(Value::as_str).map(str::to_string);
+    }
+    (items, next)
+}
+
 /// Netscape cookies.txt → name/value pairs for youtube.com.
 pub fn load_cookies(path: &Path) -> Result<HashMap<String, String>> {
     let text = fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
@@ -497,6 +574,52 @@ impl Client {
         let items = v.pointer("/onResponseReceivedActions/0/appendContinuationItemsAction/continuationItems")
             .ok_or_else(|| anyhow!("unexpected playlist continuation"))?;
         Ok(parse_track_list(items, artist, thumb))
+    }
+
+    /// Everything saved in the library: playlists, albums, songs and artists (followed ones
+    /// first, then the artists of saved songs). Each list is fetched with all its pages.
+    pub async fn library(&self) -> Result<Library> {
+        let (playlists, albums, songs, subs, track_artists) = tokio::try_join!(
+            self.library_list("FEmusic_liked_playlists"),
+            self.library_list("FEmusic_liked_albums"),
+            self.library_list("FEmusic_liked_videos"),
+            self.library_list("FEmusic_library_corpus_artists"),
+            self.library_list("FEmusic_library_corpus_track_artists"),
+        )?;
+        let mut artists: Vec<Item> = Vec::new();
+        for a in subs.into_iter().chain(track_artists).filter(|i| i.kind == Kind::Artist) {
+            if !artists.iter().any(|x| x.song.id == a.song.id) {
+                artists.push(a);
+            }
+        }
+        Ok(Library {
+            // "Episodes for Later" (VLSE) is podcasts, not music.
+            playlists: playlists.into_iter().filter(|i| i.kind == Kind::Playlist && i.song.id != "VLSE").collect(),
+            albums: albums.into_iter().filter(|i| i.kind == Kind::Album).collect(),
+            songs: songs.into_iter().filter(|i| i.kind == Kind::Song).map(|i| i.song).collect(),
+            artists,
+        })
+    }
+
+    /// One library list with all its pages (bounded).
+    async fn library_list(&self, browse_id: &str) -> Result<Vec<Item>> {
+        let first = self.browse(Some(browse_id), None).await?;
+        let (mut items, mut next) = parse_library_page(&first);
+        let mut pages = 1;
+        while let Some(c) = next.take() {
+            if pages >= LIBRARY_MAX_PAGES {
+                break;
+            }
+            let v = self.browse(None, Some(&c)).await?;
+            let (more, n) = parse_library_page(&v);
+            if more.is_empty() {
+                break;
+            }
+            items.extend(more);
+            next = n;
+            pages += 1;
+        }
+        Ok(items)
     }
 
     /// An artist's page ("UC…" channel ids).
@@ -856,6 +979,71 @@ mod parse_tests {
             let (t, cont) = parse_track_list(&shelf["contents"], "ALBUMARTIST", &Some("HEADERTHUMB".into()));
             let s = &t[0];
             println!("{f}: {} tracks, cont={}; first {:?} / {:?} / {:?} / {:?} thumb={:?}", t.len(), cont.is_some(), s.title, s.artist, s.album, s.duration, s.thumb.as_deref().map(|x| &x[..x.len().min(12)]));
+        }
+    }
+
+    fn row(page: &str, id: &str, title: &str, sub: &str) -> Value {
+        json!({ "musicResponsiveListItemRenderer": {
+            "navigationEndpoint": { "browseEndpoint": { "browseId": id, "browseEndpointContextSupportedConfigs":
+                { "browseEndpointContextMusicConfig": { "pageType": page } } } },
+            "flexColumns": [
+                { "musicResponsiveListItemFlexColumnRenderer": { "text": { "runs": [{ "text": title }] } } },
+                { "musicResponsiveListItemFlexColumnRenderer": { "text": { "runs": [{ "text": sub }] } } },
+            ],
+        }})
+    }
+
+    #[test]
+    fn library_rows_and_continuations() {
+        let song = json!({ "musicResponsiveListItemRenderer": {
+            "playlistItemData": { "videoId": "vid1" },
+            "flexColumns": [
+                { "musicResponsiveListItemFlexColumnRenderer": { "text": { "runs": [{ "text": "Some Song" }] } } },
+                { "musicResponsiveListItemFlexColumnRenderer": { "text": { "runs": [{ "text": "Some Artist" }] } } },
+            ],
+        }});
+        let shuffle_row = json!({ "musicResponsiveListItemRenderer": {
+            "navigationEndpoint": { "watchPlaylistEndpoint": { "playlistId": "MLCT" } },
+            "flexColumns": [{ "musicResponsiveListItemFlexColumnRenderer": { "text": { "runs": [{ "text": "Shuffle all" }] } } }],
+        }});
+        let first = json!({ "contents": { "singleColumnBrowseResultsRenderer": { "tabs": [{ "tabRenderer": { "content": {
+            "sectionListRenderer": { "contents": [{ "musicShelfRenderer": {
+                "contents": [shuffle_row, song, row("MUSIC_PAGE_TYPE_LIBRARY_ARTIST", "MPLAUCabc", "An Artist", "3 songs")],
+                "continuations": [{ "nextContinuationData": { "continuation": "TOKEN1" } }],
+            }}]}}}}]}}});
+        let (items, next) = parse_library_page(&first);
+        assert_eq!(items.len(), 2);
+        assert_eq!((items[0].kind, items[0].song.id.as_str()), (Kind::Song, "vid1"));
+        assert_eq!((items[1].kind, items[1].song.id.as_str(), items[1].song.artist.as_str()), (Kind::Artist, "UCabc", "3 songs"));
+        assert_eq!(next.as_deref(), Some("TOKEN1"));
+
+        let more = json!({ "onResponseReceivedActions": [{ "appendContinuationItemsAction": { "continuationItems": [
+            row("MUSIC_PAGE_TYPE_ALBUM", "MPREb_x", "An Album", "Album"),
+            { "continuationItemRenderer": { "continuationEndpoint": { "continuationCommand": { "token": "TOKEN2" } } } },
+        ]}}]});
+        let (items, next) = parse_library_page(&more);
+        assert_eq!((items.len(), items[0].kind), (1, Kind::Album));
+        assert_eq!(next.as_deref(), Some("TOKEN2"));
+
+        let old = json!({ "continuationContents": { "gridContinuation": { "items": [{ "musicTwoRowItemRenderer": {
+            "title": { "runs": [{ "text": "A Playlist" }] },
+            "navigationEndpoint": { "browseEndpoint": { "browseId": "VLPLx", "browseEndpointContextSupportedConfigs":
+                { "browseEndpointContextMusicConfig": { "pageType": "MUSIC_PAGE_TYPE_PLAYLIST" } } } },
+        }}]}}});
+        let (items, next) = parse_library_page(&old);
+        assert_eq!((items.len(), items[0].kind, items[0].song.id.as_str()), (1, Kind::Playlist, "VLPLx"));
+        assert!(next.is_none());
+    }
+
+    // YTM_FIXTURES=<dir with library dumps> cargo test -- --ignored parse_library --nocapture
+    #[test]
+    #[ignore]
+    fn parse_library_dumps() {
+        for f in ["FEmusic_liked_playlists", "FEmusic_liked_albums", "FEmusic_liked_videos", "FEmusic_library_corpus_artists", "FEmusic_library_corpus_track_artists"] {
+            let v = load(&format!("{f}.json")).expect("fixtures");
+            let (items, next) = parse_library_page(&v);
+            let kinds: Vec<Kind> = items.iter().map(|i| i.kind).collect();
+            println!("{f}: {} items, more: {}, kinds {:?}, thumbs {}", items.len(), next.is_some(), kinds.first(), items.iter().filter(|i| i.song.thumb.is_some()).count());
         }
     }
 }

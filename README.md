@@ -27,9 +27,9 @@ looks like the rest of a KDE desktop. Linux first; Windows builds are made too.
   fetched ahead of time, playback speed 0.1–3× with pitch preserved.
 - **Radio that doesn't stop**: radios keep refilling, and songs you heard recently are skipped.
   Albums and playlists continue with a radio when they end.
-- **Your account**: Home feed, Liked Music, albums, playlists, artist pages (with Shuffle and
-  Radio), likes and dislikes, plays reported to your YouTube history (or not: *Pause watch
-  history*).
+- **Your account**: Home feed, Liked Music, your Library (saved playlists, albums, songs and
+  artists), albums, playlists, artist pages (with Shuffle and Radio), likes and dislikes, plays
+  reported to your YouTube history (or not: *Pause watch history*).
 - **Queue**: right-click any song for Play next, Add to queue, Start radio, Go to artist/album;
   shuffle lists; remove songs.
 - **Synced lyrics**: word-by-word karaoke, line-by-line, or plain, from BetterLyrics, lrc.red

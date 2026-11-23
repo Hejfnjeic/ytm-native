@@ -81,7 +81,8 @@ Currently: import from the GUI (below). Dev override: `cookies.txt` argument or 
 - [x] Artist pages: top songs, albums, singles/EPs, videos, playlists, similar artists; Shuffle and
       Radio (YT's artist Mix, not repeat-filtered), All songs. Reached from Home artist cards, the
       player bar's artist name, "Go to artist" in row menus. Back button walks a history stack.
-- [ ] Library tabs (saved artists/albums/songs).
+- [x] Library page: saved playlists, albums, songs (play in order) and artists (followed, then
+      the artists of saved songs); reloaded each time it's opened.
 - [x] Right-click menu on songs/albums/playlists/queue rows: Play next, Add to queue (before the
       radio, like YT Music), Remove, Start radio, Play/Shuffle. Shuffle button on lists (all pages
       load at once and get mixed in).

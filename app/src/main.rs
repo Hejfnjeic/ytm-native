@@ -116,6 +116,7 @@ enum Ev {
     ArtistButton(String),
     /// Open the playing song's artist (click on the artist name in the player bar).
     GoToPlayingArtist,
+    LibraryLoaded(Result<yt::Library, String>),
 }
 
 const LIKED: &str = "VLLM";
@@ -135,6 +136,7 @@ enum View {
     Lyrics,
     Artist,
     Settings,
+    Library,
 }
 
 /// A page to go back to.
@@ -251,6 +253,10 @@ struct App {
     home_next: Option<String>,
     home_more_loading: bool,
     liked: Option<yt::Collection>,
+    /// Saved playlists, albums, songs and artists (Library page); reloaded when it's opened.
+    library: Option<yt::Library>,
+    library_error: String,
+    library_loading: bool,
     collection: Option<(String, yt::Collection)>,
     collection_badge: &'static str,
     browse_gen: u64,
@@ -461,6 +467,9 @@ impl App {
                 if view == View::Liked && self.liked.is_none() {
                     self.load_collection(LIKED.to_string());
                 }
+                if view == View::Library {
+                    self.load_library();
+                }
             }
             Page::Collection(id, badge) => {
                 self.view = View::Collection;
@@ -532,6 +541,33 @@ impl App {
         });
     }
 
+    /// (Re)load the Library: it changes whenever something is saved, here or elsewhere.
+    fn load_library(&mut self) {
+        let Some(yt) = self.yt.clone() else { return };
+        if self.library_loading {
+            return;
+        }
+        self.library_loading = true;
+        let tx = self.tx.clone();
+        tokio::spawn(async move {
+            let res = yt.library().await.map_err(|e| e.to_string());
+            let _ = tx.send(Ev::LibraryLoaded(res));
+        });
+    }
+
+    /// The Library's saved songs as a list to play.
+    fn library_songs(&self) -> Option<yt::Collection> {
+        let l = self.library.as_ref()?;
+        Some(yt::Collection {
+            title: "Songs in your library".into(),
+            subtitle: String::new(),
+            thumb: l.songs.first().and_then(|s| s.thumb.clone()),
+            artist: String::new(),
+            tracks: l.songs.clone(),
+            continuation: None,
+        })
+    }
+
     fn load_home(&mut self) {
         let Some(yt) = self.yt.clone() else { return };
         self.home_next = None;
@@ -578,9 +614,16 @@ impl App {
                     let index = c.tracks.iter().position(|t| t.id == item.song.id).unwrap_or(0);
                     self.play_list(&c, badge, index, false);
                 }
+                View::Library => {
+                    let Some(c) = self.library_songs() else { return };
+                    let index = c.tracks.iter().position(|t| t.id == item.song.id).unwrap_or(0);
+                    self.play_list(&c, "PLAYLIST", index, false);
+                }
                 _ => self.start_radio(item.song),
             },
             yt::Kind::Album => self.open_collection(item.song.id, "ALBUM"),
+            // Liked Music has its own page.
+            yt::Kind::Playlist if item.song.id == LIKED => self.show_view(View::Liked),
             yt::Kind::Playlist => self.open_collection(item.song.id, "PLAYLIST"),
             yt::Kind::Artist => self.open_artist(item.song.id),
         }
@@ -604,6 +647,21 @@ impl App {
             View::Search => (self.results.iter().map(song_item).collect(),
                              "Search for a song, then click it to start a radio from it.".into(), false),
             View::Lyrics | View::Settings => (vec![], String::new(), false),
+            View::Library => match &self.library {
+                Some(l) => {
+                    let song_items: Vec<yt::Item> = l.songs.iter().map(|s| yt::Item { kind: yt::Kind::Song, song: s.clone() }).collect();
+                    let sections = [("Playlists", &l.playlists), ("Albums", &l.albums), ("Songs", &song_items), ("Artists", &l.artists)];
+                    (
+                        sections.into_iter().filter(|(_, items)| !items.is_empty()).flat_map(|(title, items)| {
+                            std::iter::once(Row::Header(title.into())).chain(items.iter().cloned().map(Row::Item))
+                        }).collect(),
+                        "Nothing saved yet. Albums, playlists, songs and artists you save on YouTube Music show up here.".into(),
+                        false,
+                    )
+                }
+                None if !self.library_error.is_empty() => (vec![], self.library_error.clone(), false),
+                None => (vec![], "Loading your library…".into(), true),
+            },
             View::Artist => match &self.artist {
                 Some((_, a)) => (
                     a.shelves.iter().flat_map(|sh| {
@@ -656,7 +714,7 @@ impl App {
             }
         }).collect();
         self.rows = rows;
-        let view = match self.view { View::Home => 0, View::Liked => 1, View::Search => 2, View::Collection => 3, View::Lyrics => 4, View::Artist => 5, View::Settings => 6 };
+        let view = match self.view { View::Home => 0, View::Liked => 1, View::Search => 2, View::Collection => 3, View::Lyrics => 4, View::Artist => 5, View::Settings => 6, View::Library => 7 };
         self.ui(move |ui| {
             sync_model(ui.get_browse(), &data);
             ui.set_view(view);
@@ -1412,7 +1470,7 @@ impl App {
                 if let Some(song) = self.current.and_then(|c| self.queue.get(c)).cloned() {
                     self.request_lyrics(&song);
                 }
-                if std::env::var("YTM_SMOKE").is_ok_and(|v| v != "resume" && v != "home" && !v.starts_with("lyrics:") && !v.starts_with("lightbox:")) && std::env::var_os("YTM_SMOKE_INPUT").is_none() && !self.smoke_seek_done {
+                if std::env::var("YTM_SMOKE").is_ok_and(|v| v != "resume" && v != "home" && v != "library" && !v.starts_with("lyrics:") && !v.starts_with("lightbox:")) && std::env::var_os("YTM_SMOKE_INPUT").is_none() && !self.smoke_seek_done {
                     // Smoke test: jump near the end to exercise seeking and auto-advance.
                     self.smoke_seek_done = true;
                     let (tx, to) = (self.tx.clone(), (self.duration - 6.0).max(0.0) as f32);
@@ -1636,6 +1694,7 @@ impl App {
                 self.home = None;
                 self.home_error.clear();
                 self.liked = None;
+                self.library = None;
                 self.load_home();
                 self.push_browse();
                 self.restore();
@@ -1643,6 +1702,9 @@ impl App {
                     Some("home" | "resume") => {}
                     Some("liked") => {
                         let _ = self.tx.send(Ev::ShowView(1));
+                    }
+                    Some("library") => {
+                        let _ = self.tx.send(Ev::ShowView(7));
                     }
                     Some(q) => {
                         let q = q.strip_prefix("lyrics:").or_else(|| q.strip_prefix("lightbox:")).unwrap_or(q);
@@ -2163,6 +2225,26 @@ impl App {
                 }
                 self.push_browse();
             }
+            Ev::LibraryLoaded(res) => {
+                self.library_loading = false;
+                match res {
+                    Ok(l) => {
+                        eprintln!("[library] {} playlists, {} albums, {} songs, {} artists", l.playlists.len(), l.albums.len(), l.songs.len(), l.artists.len());
+                        self.library_error.clear();
+                        self.library = Some(l);
+                    }
+                    Err(e) if e.contains(yt::SIGNED_OUT) => self.mark_signed_out(),
+                    Err(e) if self.library.is_some() => eprintln!("[library] reload: {e}"),
+                    Err(e) => self.library_error = format!("Couldn't load your library: {e}"),
+                }
+                if self.view == View::Library {
+                    self.push_browse();
+                }
+                if self.smoke.take().as_deref() == Some("library") {
+                    // Scripted input (YTM_SMOKE_INPUT) gets time to click around.
+                    smoke_screenshot(self.ui.clone(), if std::env::var_os("YTM_SMOKE_INPUT").is_some() { 25 } else { 4 });
+                }
+            }
             Ev::ArtistButton(b) => {
                 let Some((_, a)) = self.artist.as_ref() else { return };
                 let name = a.name.clone();
@@ -2187,6 +2269,7 @@ impl App {
                     2 => View::Search,
                     4 => View::Lyrics,
                     6 => View::Settings,
+                    7 => View::Library,
                     _ => return,
                 };
                 self.show_view(view);
@@ -2623,6 +2706,9 @@ fn main() -> Result<()> {
             home_more_loading: false,
             home_error: String::new(),
             liked: None,
+            library: None,
+            library_error: String::new(),
+            library_loading: false,
             collection: None,
             collection_badge: "PLAYLIST",
             browse_gen: 0,

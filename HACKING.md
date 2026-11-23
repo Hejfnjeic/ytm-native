@@ -147,7 +147,7 @@ takes screenshots with Slint's own renderer and quits ~30 s after its search.
 |---|---|
 | `YTM_SMOKE=<query>` | search, start a radio from the first result, seek near the end (auto-advance) |
 | `YTM_SMOKE=lyrics:<query>` / `lightbox:<query>` | same, then open Lyrics / the image viewer |
-| `YTM_SMOKE=home` / `liked` / `resume` | Home / play Liked Music / restore the session and play |
+| `YTM_SMOKE=home` / `liked` / `library` / `resume` | Home / play Liked Music / Library / restore the session and play |
 | `YTM_SMOKE_SHOT=<file.png>` | final screenshot path |
 | `YTM_SMOKE_BURST=<n>` | also save n frames 120 ms apart (animation checks) |
 | `YTM_SMOKE_SIZE=<w>x<h>` | window size (the minimum width is 960) |

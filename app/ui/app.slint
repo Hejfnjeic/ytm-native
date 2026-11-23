@@ -92,6 +92,7 @@ export global Icons {
     in-out property <image> album;
     in-out property <image> shuffle;
     in-out property <image> settings;
+    in-out property <image> library;
 }
 
 // ---------- basic Breeze-like controls ----------
@@ -1160,7 +1161,7 @@ export component MainWindow inherits Window {
         }
     }
 
-    property <string> page-title: root.view == 0 ? "Home" : root.view == 1 ? "Liked Music" : root.view == 2 ? "Search" : root.view == 4 ? "Lyrics" : root.view == 6 ? "Settings"
+    property <string> page-title: root.view == 0 ? "Home" : root.view == 1 ? "Liked Music" : root.view == 2 ? "Search" : root.view == 4 ? "Lyrics" : root.view == 6 ? "Settings" : root.view == 7 ? "Library"
         : root.view == 5 && !root.coll-visible ? "Artist" : root.coll-title;
     /// Big header with picture (albums, playlists, Liked Music, artists).
     property <bool> has-header: root.coll-visible && (root.view == 1 || root.view == 3 || root.view == 5) && !root.show-sign-in;
@@ -1235,6 +1236,7 @@ export component MainWindow inherits Window {
                     SectionLabel { text: "  Browse"; height: 24px; vertical-alignment: center; }
                     SideItem { icon: Icons.home; text: "Home"; selected: root.view == 0; clicked => { root.show-view(0); } }
                     SideItem { icon: Icons.liked; text: "Liked Music"; selected: root.view == 1; clicked => { root.show-view(1); } }
+                    SideItem { icon: Icons.library; text: "Library"; selected: root.view == 7; clicked => { root.show-view(7); } }
                     SideItem { icon: Icons.search; text: "Search"; selected: root.view == 2; clicked => { root.show-view(2); } }
                     SectionLabel { text: "  Now playing"; height: 30px; vertical-alignment: bottom; }
                     SideItem { icon: Icons.lyrics; text: "Lyrics"; selected: root.view == 4; clicked => { root.show-view(4); } }

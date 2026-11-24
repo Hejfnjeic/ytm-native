@@ -64,7 +64,10 @@ impl Solver {
         let res = self.prepare(http).await;
         match &res {
             Ok(p) => *cached = Some((p.clone(), Instant::now())),
-            Err(_) => *self.failed.lock().unwrap() = Some(Instant::now()),
+            Err(e) => {
+                log::warn!("jsc: preparing the player failed: {e:#}");
+                *self.failed.lock().unwrap() = Some(Instant::now());
+            }
         }
         res
     }

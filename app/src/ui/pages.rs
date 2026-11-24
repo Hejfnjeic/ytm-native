@@ -1135,7 +1135,10 @@ fn artist(app: &mut App, ui: &mut Ui, id: &str, now: f64) {
         ui.painter().rect_filled(hero, 14.0, theme::with_alpha(accent, 0.25));
     }
     let [from, to] = crate::preset::active().app.header_gradient.unwrap_or([0.0, 0.85]);
-    super::shell::vgradient(ui.painter(), Rect::from_min_max(pos2(hero.left(), hero.center().y - 40.0), hero.max), theme::shade(from), theme::shade(to));
+    // In the banner's shape: its bottom corners are rounded, and a square shade showed past them.
+    let shade_rect = Rect::from_min_max(pos2(hero.left(), hero.center().y - 40.0), hero.max);
+    let corners = egui::CornerRadius { nw: 0, ne: 0, sw: 14, se: 14 };
+    super::shell::cover_vgradient(ui.painter(), shade_rect, corners, 0.0, theme::shade(from), theme::shade(to));
     let base = hero.left_bottom() + vec2(28.0, -30.0);
     ui.painter().text(base - vec2(0.0, 44.0), Align2::LEFT_BOTTOM, &a.name, theme::bold(58.0), Color32::WHITE);
     if let Some(s) = a.subscribers {

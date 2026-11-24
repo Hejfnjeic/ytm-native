@@ -510,7 +510,8 @@ impl App {
             self.toast = None;
             self.settle();
         }
-        self.mini.toggle(ctx, now, false);
+        // The lyrics window, unless Settings › Mini player picked the pill.
+        self.mini.toggle(ctx, now, !super::mini::pill_active());
     }
 
     pub(super) fn set_fullscreen(&mut self, ctx: &egui::Context, on: bool) {

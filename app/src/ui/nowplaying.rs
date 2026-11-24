@@ -81,7 +81,7 @@ pub fn overlay(app: &mut App, ctx: &egui::Context, now: f64) {
 
 /// A full-bleed cover behind the lyrics-only layout (reCover): it's there for the panel.
 #[derive(Clone, Copy)]
-struct BehindPanel {
+pub(super) struct BehindPanel {
     /// On a wide window it fills the height on the left, the panel beside it; else the whole window.
     beside: bool,
     /// How much of it shows: it leaves with the panel, for the cover on its own in the middle.
@@ -99,7 +99,7 @@ fn behind_panel(app: &App, ctx: &egui::Context, area: Rect, now: f64) -> Option<
 }
 
 /// Now playing's background laid out over `rect`, drawn only inside `clip`.
-fn backdrop(app: &mut App, ui: &mut Ui, rect: Rect, clip: Rect, now: f64, behind: Option<BehindPanel>) {
+pub(super) fn backdrop(app: &mut App, ui: &mut Ui, rect: Rect, clip: Rect, now: f64, behind: Option<BehindPanel>) {
     use crate::preset::BgMode;
     let look = app.look();
     let b = &look.background;
@@ -1362,7 +1362,7 @@ fn seek_line(app: &mut App, ui: &mut Ui, hit: Rect, id: egui::Id, (pos, total): 
 
 // ------------------------------------------------------------------ lyrics
 
-fn lyrics_panel(app: &mut App, ui: &mut Ui, rect: Rect, now: f64, centered: bool) {
+pub(super) fn lyrics_panel(app: &mut App, ui: &mut Ui, rect: Rect, now: f64, centered: bool) {
     // Lent out for the frame rather than cloned (the drawing needs `app` mutably).
     let Some((id, set)) = app.lyrics.take() else {
         ui.add_space(rect.height() * 0.35);

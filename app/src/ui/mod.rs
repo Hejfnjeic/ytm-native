@@ -1638,6 +1638,15 @@ impl eframe::App for App {
         titlebar::sync(&ctx, (layout != mini::Layout::Blank).then_some(layout == mini::Layout::Full));
         dev::dev_memory(&ctx, now);
         dev::dev_probe(&ctx);
+        if layout == mini::Layout::Mini && mini::lyrics_active() {
+            mini::lyrics_window(self, ui, now);
+            // Any size in its limits: by every edge and corner, unlike the strip.
+            titlebar::resize_edges(&ctx);
+            shell::toast(self, &ctx, now);
+            self.mini.fade_in(&ctx, now, Color32::BLACK);
+            dev_screenshot(&ctx, now);
+            return;
+        }
         if layout == mini::Layout::Mini && mini::pill_active() {
             mini::pill(self, ui, now);
             dev_screenshot(&ctx, now);

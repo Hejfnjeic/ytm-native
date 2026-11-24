@@ -56,3 +56,4 @@ player-sleep-timer = Sleep timer
 player-sleep-off = Off
 player-sleep-minutes = { $minutes } min
 player-sleep-song-end = End of song
+player-lyrics-window = Lyrics · ytm-native

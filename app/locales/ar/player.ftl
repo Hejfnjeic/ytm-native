@@ -8,7 +8,6 @@ player-time-show-length = { $time }. عرض مدة الأغنية
 # From the interface-wide catalog (#228).
 player-full-screen = ملء الشاشة
 player-exit-full-screen = الخروج من وضع ملء الشاشة
-player-pip = صورة داخل صورة
 player-with-shortcut = { $action } ({ $key })
 player-comments = التعليقات
 player-no-lyrics = لا تتوفّر كلمات لهذه الأغنية

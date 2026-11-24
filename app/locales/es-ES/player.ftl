@@ -6,7 +6,6 @@ player-time-show-length = { $time }. Mostrar duración de la canción
 # From the interface-wide catalog (#228).
 player-full-screen = Pantalla completa
 player-exit-full-screen = Salir de pantalla completa
-player-pip = Imagen en imagen
 player-with-shortcut = { $action } ({ $key })
 player-comments = Comentarios
 player-no-lyrics = No hay letra para esta canción

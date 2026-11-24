@@ -2,7 +2,6 @@
 
 player-full-screen = Schermo intero
 player-exit-full-screen = Esci da schermo intero
-player-pip = Picture-in-picture
 player-with-shortcut = { $action } ({ $key })
 player-comments = Commenti
 player-no-lyrics = Testo non disponibile

@@ -8,7 +8,6 @@ player-time-show-length = { $time }. Show song length
 # From the interface-wide catalog (#228).
 player-full-screen = Full screen
 player-exit-full-screen = Exit full screen
-player-pip = Picture in picture
 player-with-shortcut = { $action } ({ $key })
 player-comments = Comments
 player-no-lyrics = No lyrics for this song

@@ -2,7 +2,6 @@
 
 player-full-screen = 전체 화면
 player-exit-full-screen = 전체 화면 종료
-player-pip = PIP(Picture in Picture)
 player-with-shortcut = { $action } ({ $key })
 player-comments = 댓글
 player-no-lyrics = 이 노래에는 가사가 없습니다.

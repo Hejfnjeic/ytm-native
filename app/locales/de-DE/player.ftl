@@ -4,7 +4,6 @@ player-time-show-left = { $time }. Restzeit anzeigen
 player-time-show-length = { $time }. Titellänge anzeigen
 player-full-screen = Vollbild
 player-exit-full-screen = Vollbild verlassen
-player-pip = Bild im Bild
 player-with-shortcut = { $action } ({ $key })
 player-comments = Kommentare
 player-no-lyrics = Kein Liedtext für diesen Titel

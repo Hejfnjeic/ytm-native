@@ -2,7 +2,6 @@
 
 player-full-screen = पूर्ण स्क्रीन
 player-exit-full-screen = पूर्ण स्क्रीन से बाहर निकलें
-player-pip = चित्र में चित्र
 player-with-shortcut = { $action } ({ $key })
 player-comments = टिप्पणियाँ
 player-no-lyrics = इस गीत के लिए कोई गीत नहीं है

@@ -2,7 +2,6 @@
 
 player-full-screen = เต็มหน้าจอ
 player-exit-full-screen = ออกจากโหมดเต็มหน้าจอ
-player-pip = ภาพซ้อนภาพ
 player-with-shortcut = { $action } ({ $key })
 player-comments = ความคิดเห็น
 player-no-lyrics = ไม่มีเนื้อเพลงสำหรับเพลงนี้

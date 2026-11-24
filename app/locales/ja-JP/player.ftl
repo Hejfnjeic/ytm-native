@@ -2,7 +2,6 @@
 
 player-full-screen = 全画面表示
 player-exit-full-screen = 全画面表示を終了
-player-pip = ピクチャー イン ピクチャー
 player-with-shortcut = { $action }（{ $key }）
 player-comments = コメント
 player-no-lyrics = この曲の歌詞はありません

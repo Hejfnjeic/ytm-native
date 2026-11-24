@@ -2,7 +2,6 @@
 
 player-full-screen = Повноекранний режим
 player-exit-full-screen = Вийти з повноекранного режиму
-player-pip = Картинка в картинці
 player-with-shortcut = { $action } ({ $key })
 player-comments = Коментарі
 player-no-lyrics = Для цього треку немає тексту

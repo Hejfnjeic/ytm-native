@@ -2,7 +2,6 @@
 
 player-full-screen = Volledig scherm
 player-exit-full-screen = Volledig scherm verlaten
-player-pip = Beeld-in-beeld
 player-with-shortcut = { $action } ({ $key })
 player-comments = Reacties
 player-no-lyrics = Geen songtekst voor dit nummer

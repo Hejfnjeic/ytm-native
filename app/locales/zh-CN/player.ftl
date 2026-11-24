@@ -2,7 +2,6 @@
 
 player-full-screen = 全屏
 player-exit-full-screen = 退出全屏
-player-pip = 画中画
 player-with-shortcut = { $action }（{ $key }）
 player-comments = 评论
 player-no-lyrics = 这首歌没有歌词

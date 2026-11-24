@@ -2,7 +2,6 @@
 
 player-full-screen = 全螢幕
 player-exit-full-screen = 退出全螢幕
-player-pip = 畫中畫
 player-with-shortcut = { $action }（{ $key }）
 player-comments = 評論
 player-no-lyrics = 這首歌沒有歌詞

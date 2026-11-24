@@ -2,7 +2,6 @@
 
 player-full-screen = Toàn màn hình
 player-exit-full-screen = Thoát toàn màn hình
-player-pip = Hình trong hình
 player-with-shortcut = { $action } ({ $key })
 player-comments = Bình luận
 player-no-lyrics = Không có lời cho bài hát này

@@ -2,7 +2,6 @@
 
 player-full-screen = Pełny ekran
 player-exit-full-screen = Opuść pełny ekran
-player-pip = Obraz w obrazie
 player-with-shortcut = { $action } ({ $key })
 player-comments = Komentarze
 player-no-lyrics = Brak tekstu tego utworu

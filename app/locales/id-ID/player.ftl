@@ -8,7 +8,6 @@ player-time-show-length = { $time }. Tampilkan durasi lagu
 # From the interface-wide catalog (#228).
 player-full-screen = Layar penuh
 player-exit-full-screen = Keluar dari layar penuh
-player-pip = Picture in picture
 player-with-shortcut = { $action } ({ $key })
 player-comments = Komentar
 player-no-lyrics = Lagu ini nggak punya lirik

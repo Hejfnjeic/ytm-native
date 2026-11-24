@@ -2,7 +2,6 @@
 
 player-full-screen = Tam ekran
 player-exit-full-screen = Tam ekrandan çık
-player-pip = Resim içinde resim
 player-with-shortcut = { $action } ({ $key })
 player-comments = Yorumlar
 player-no-lyrics = Bu şarkının sözleri yok

@@ -33,7 +33,7 @@ pub fn title() -> &'static str {
     crate::tr!("player-lyrics-window")
 }
 
-fn viewport_id() -> ViewportId {
+pub(super) fn viewport_id() -> ViewportId {
     ViewportId::from_hash_of("ytm-native-lyrics-window")
 }
 
@@ -122,29 +122,56 @@ impl App {
             .with_decorations(!custom)
             .with_transparent(custom && crate::corners::available())
             .with_window_level(if self.mini.pinned { WindowLevel::AlwaysOnTop } else { WindowLevel::Normal });
-        ctx.show_viewport_immediate(viewport_id(), builder, |ctx, _class| {
-            if ctx.input(|i| i.viewport().close_requested()) {
-                self.mini.open = false;
-                return;
-            }
-            // Square: a resize that changed one side brings the other along.
-            if let Some(r) = ctx.input(|i| i.viewport().inner_rect) {
-                let size = r.size();
-                if (size.x - size.y).abs() > 1.0 {
-                    let side = if (size.x - self.mini.size.x).abs() >= (size.y - self.mini.size.y).abs() { size.x } else { size.y };
-                    let square = Vec2::splat(side).clamp(MIN, MAX);
-                    ctx.send_viewport_cmd(ViewportCommand::InnerSize(square));
-                    self.mini.size = square;
-                } else {
-                    self.mini.size = size.clamp(MIN, MAX);
-                }
-            }
-            egui::CentralPanel::default().frame(egui::Frame::NONE).show(ctx, |ui| lyrics_window(self, ui, now, custom));
-            if custom {
-                titlebar::resize_edges(ctx);
-            }
+        // Drawn in passes of its own, not inside the main window's: a minimized main window
+        // gets no frames (none at all on Wayland), and this one must keep going.
+        let me = MainThread::new(self.me.clone());
+        ctx.show_viewport_deferred(viewport_id(), builder, move |ui, _class| {
+            let Some(app) = me.get().and_then(std::rc::Weak::upgrade) else { return };
+            let Ok(mut app) = app.try_borrow_mut() else { return };
+            app.mini_pass(ui);
         });
         self.keep_mini_above(now);
+    }
+
+    /// One of the lyrics window's own passes.
+    fn mini_pass(&mut self, ui: &mut Ui) {
+        let ctx = ui.ctx().clone();
+        if !self.mini.open {
+            return;
+        }
+        if ctx.input(|i| i.viewport().close_requested()) {
+            self.mini.open = false;
+            ctx.request_repaint_of(ViewportId::ROOT);
+            return;
+        }
+        let now = ctx.input(|i| i.time);
+        let custom = titlebar::custom();
+        // Square: a resize that changed one side brings the other along.
+        if let Some(r) = ctx.input(|i| i.viewport().inner_rect) {
+            let size = r.size();
+            if (size.x - size.y).abs() > 1.0 {
+                let side = if (size.x - self.mini.size.x).abs() >= (size.y - self.mini.size.y).abs() { size.x } else { size.y };
+                let square = Vec2::splat(side).clamp(MIN, MAX);
+                ctx.send_viewport_cmd(ViewportCommand::InnerSize(square));
+                self.mini.size = square;
+            } else {
+                self.mini.size = size.clamp(MIN, MAX);
+            }
+        }
+        // Dark, as Now playing is, whatever the pages' mode.
+        let pages = theme::set_mode(&ctx, false);
+        egui::CentralPanel::default().frame(egui::Frame::NONE).show(ui, |ui| lyrics_window(self, ui, now, custom));
+        theme::set_mode(&ctx, pages);
+        if custom {
+            titlebar::resize_edges(&ctx);
+        }
+        if self.playing() || self.buffering {
+            ctx.request_repaint_after(Duration::from_millis(33));
+        }
+        // What was clicked here is done by the main window's next pass.
+        if !self.actions.is_empty() {
+            ctx.request_repaint_of(ViewportId::ROOT);
+        }
     }
 
     /// Wayland: ask KWin to keep the window above others (or not), once it's mapped.
@@ -344,6 +371,37 @@ fn seek_line(app: &mut App, ui: &mut Ui, r: Rect, track: Option<&crate::model::T
         if resp.drag_stopped() || resp.clicked() {
             app.seek_drag = None;
             app.actions.push(Action::Seek(at(p)));
+        }
+    }
+}
+
+/// A value used only on the thread that made it (the UI thread), so it can sit in egui's
+/// `Send + Sync` viewport callback: from any other thread it can't be reached, and it's
+/// left undropped rather than dropped there.
+struct MainThread<T> {
+    thread: std::thread::ThreadId,
+    value: std::mem::ManuallyDrop<T>,
+}
+
+// SAFETY: the value is only reached (`get`) or dropped on the thread that made it.
+unsafe impl<T> Send for MainThread<T> {}
+unsafe impl<T> Sync for MainThread<T> {}
+
+impl<T> MainThread<T> {
+    fn new(value: T) -> Self {
+        MainThread { thread: std::thread::current().id(), value: std::mem::ManuallyDrop::new(value) }
+    }
+
+    fn get(&self) -> Option<&T> {
+        (std::thread::current().id() == self.thread).then_some(&*self.value)
+    }
+}
+
+impl<T> Drop for MainThread<T> {
+    fn drop(&mut self) {
+        if std::thread::current().id() == self.thread {
+            // SAFETY: dropped once, here, on its own thread.
+            unsafe { std::mem::ManuallyDrop::drop(&mut self.value) };
         }
     }
 }

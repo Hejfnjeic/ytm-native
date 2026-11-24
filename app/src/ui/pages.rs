@@ -2489,28 +2489,16 @@ fn settings_window(app: &mut App, ui: &mut Ui) {
         let api = crate::renderer::api_name();
         let title = tr!("settings-draw-with", api = api);
         let desc = tr!("extra-renderer-desc", api = api);
-        let mut changed = false;
-        ui.add_enabled_ui(!app.software_renderer, |ui| {
-            setting_row(ui, &title, Some(&desc), |ui| {
-                changed |= toggle(ui, &mut app.wgpu_renderer, &title).changed();
-            });
+        setting_row(ui, &title, Some(&desc), |ui| {
+            if toggle(ui, &mut app.wgpu_renderer, &title).changed() {
+                use crate::renderer::Renderer;
+                let r = if app.wgpu_renderer { Renderer::Wgpu } else { Renderer::OpenGl };
+                if let Err(e) = crate::renderer::save(app.backend.data_dir(), r) {
+                    log::warn!("renderer: couldn't save the setting: {e}");
+                }
+            }
         });
-        divider(ui);
-        setting_row(ui, tr!("settings-software-rendering"), Some(tr!("settings-software-rendering-desc")), |ui| {
-            changed |= toggle(ui, &mut app.software_renderer, tr!("settings-software-rendering")).changed();
-        });
-        use crate::renderer::Renderer;
-        let wanted = if app.software_renderer {
-            Renderer::Software
-        } else if app.wgpu_renderer {
-            Renderer::Wgpu
-        } else {
-            Renderer::OpenGl
-        };
-        if changed && let Err(e) = crate::renderer::save(app.backend.data_dir(), wanted) {
-            log::warn!("renderer: couldn't save the setting: {e}");
-        }
-        if wanted != crate::renderer::active() {
+        if app.wgpu_renderer != (crate::renderer::active() == crate::renderer::Renderer::Wgpu) {
             divider(ui);
             let mut restart = false;
             setting_row(ui, tr!("settings-restart-to-apply"), Some(tr!("settings-renderer-restart-desc")), |ui| {

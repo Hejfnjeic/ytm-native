@@ -1083,14 +1083,25 @@ fn cover_column(app: &mut App, ui: &mut Ui, col: Rect, track: &crate::model::Tra
         vec2(x, y)
     });
     let art = Rect::from_center_size(art.center(), art.size() * opening).translate(vec2(cs.open_slide * side * (1.0 - opened), settling * window_h));
+    let round = cs.shape != Shape::Rounded && !fs.plain_shape;
+    // A music video takes the cover's place at its own shape: as tall as the cover at most,
+    // and as wide as the column allows, so a wide video has no black bars.
+    let video = if round { None } else { video_texture(app, ui.ctx(), track) };
+    let art = match &video {
+        Some(tex) => {
+            let size = tex.size_vec2();
+            let room = vec2(col.width().max(side), side) * (art.width() / side.max(1.0));
+            Rect::from_center_size(art.center(), size * (room.x / size.x).min(room.y / size.y))
+        }
+        None => art,
+    };
     if cs.open_fade {
         ui.multiply_opacity(opened.clamp(0.0, 1.0));
     }
     if settle_fade < 1.0 {
         ui.multiply_opacity(settle_fade);
     }
-    let round = cs.shape != Shape::Rounded && !fs.plain_shape;
-    let radius = if round { side / 2.0 } else { fs.radius.or(fs.radius_pct.map(|p| p * side)).unwrap_or(cs.radius_pct.map_or(cs.radius, |p| p * side)).clamp(0.0, (side / 2.0).max(0.0)) };
+    let radius = if round { side / 2.0 } else { fs.radius.or(fs.radius_pct.map(|p| p * side)).unwrap_or(cs.radius_pct.map_or(cs.radius, |p| p * side)).clamp(0.0, (art.width().min(art.height()) / 2.0).max(0.0)) };
     let top_only = cs.top_only || fs.top_only;
     let cr = if top_only && !round { egui::CornerRadius { nw: radius.min(255.0) as u8, ne: radius.min(255.0) as u8, sw: 0, se: 0 } } else { egui::CornerRadius::same(radius.min(255.0) as u8) };
     let shadow_a = fs.shadow.unwrap_or(cs.shadow);
@@ -1137,12 +1148,8 @@ fn cover_column(app: &mut App, ui: &mut Ui, col: Rect, track: &crate::model::Tra
             p.circle_filled(art.center(), side * 0.022, Color32::from_rgb(10, 10, 12));
         }
     } else {
-        if let Some(tex) = video_texture(app, ui.ctx(), track) {
-            // The music video in the cover's place: fitted in, on black.
-            ui.painter().rect_filled(art, cr, Color32::BLACK);
-            let size = tex.size_vec2();
-            let fit = size * (art.width() / size.x).min(art.height() / size.y);
-            egui::Image::from_texture((tex.id(), fit)).corner_radius(cr).paint_at(ui, Rect::from_center_size(art.center(), fit));
+        if let Some(tex) = &video {
+            egui::Image::from_texture((tex.id(), art.size())).corner_radius(cr).paint_at(ui, art);
         } else if top_only {
             widgets::paint_cover_corners(ui, art, &track.thumbs, cr, px);
         } else {

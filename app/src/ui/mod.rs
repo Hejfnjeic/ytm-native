@@ -355,6 +355,8 @@ pub struct Channels {
 type ProxyTest = Option<Option<(bool, String)>>;
 
 pub struct App {
+    /// The app itself, for the lyrics window, which draws in passes of its own.
+    me: std::rc::Weak<std::cell::RefCell<App>>,
     backend: Backend,
     audio: AudioHandle,
     ch: Channels,
@@ -689,8 +691,6 @@ pub struct App {
     close_to_tray: bool,
     /// Settings › Window: draw with wgpu (Vulkan) from the next start (renderer.rs).
     pub(super) wgpu_renderer: bool,
-    /// Settings › Window › Software rendering (from the next start).
-    pub(super) software_renderer: bool,
     /// Settings › App icon (`appicon::ALL` id).
     app_icon: &'static str,
     /// The tray icon, while "Close to tray" is on.
@@ -756,7 +756,6 @@ impl App {
         theme::set_font_choice(&dev_var("YTM_FONT").map(str::to_owned).or_else(|| get("font")).unwrap_or_default());
         let app_icon = crate::appicon::load(backend.data_dir());
         let wgpu_renderer = crate::renderer::load(backend.data_dir()) == crate::renderer::Renderer::Wgpu;
-        let software_renderer = crate::renderer::load(backend.data_dir()) == crate::renderer::Renderer::Software;
         // Updates reinstall the shortcuts with the classic icon.
         if app_icon != crate::appicon::CLASSIC {
             crate::appicon::sync_shortcuts(app_icon, backend.data_dir());
@@ -886,7 +885,6 @@ impl App {
                 .map_or_else(|| crate::update::is_nightly(&crate::update::build_version()), |v| v == "nightly"),
             close_to_tray: get("close_to_tray").is_some_and(|v| v == "1"),
             wgpu_renderer,
-            software_renderer,
             app_icon,
             tray: None,
             window_title: "YT Music".to_owned(),
@@ -995,6 +993,7 @@ impl App {
             // Dev hook: the full screen layout, leaving the window where it is.
             fullscreen: dev_var("YTM_FAKE_FULLSCREEN").is_some(),
             mini: mini::Mini::load(get),
+            me: std::rc::Weak::new(),
             lyrics: None,
             lyrics_extras: None,
             extras_asked: None,
@@ -1374,7 +1373,9 @@ impl eframe::App for App {
 
     fn logic(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         pace::frame(ctx);
-        self.lyric_view.release_hidden(ctx.cumulative_pass_nr());
+        // Counted in the passes of the window the lyrics show in.
+        let lyrics_in = if self.mini.active() { mini::viewport_id() } else { egui::ViewportId::ROOT };
+        self.lyric_view.release_hidden(ctx.cumulative_pass_nr_for(lyrics_in));
         let now = ctx.input(|i| i.time);
         let focused = ctx.input(|i| i.focused);
         let refocused = window_refocused(&mut self.was_focused, focused);
@@ -1510,7 +1511,7 @@ impl eframe::App for App {
             if playing || self.buffering {
                 ctx.request_repaint_after(Duration::from_millis(250));
             }
-        } else if (self.np_open || self.mini.active()) && playing {
+        } else if self.np_open && playing {
             pace::repaint_after(ctx, Duration::from_millis(33));
         } else if playing && widgets::equalizer_shown(ctx) {
             // The playing row's bars need a steady, full rate to read as smooth.
@@ -1540,6 +1541,8 @@ impl eframe::App for App {
         // or X11), and would otherwise draw the whole window, background and glass included,
         // for every frame the player asks for. The player's bookkeeping is all in `logic`.
         if self.window_hidden {
+            // The lyrics window stays: it's a window of its own.
+            self.show_mini(&ctx, now);
             return;
         }
         let screen = ctx.content_rect();
@@ -1954,6 +1957,46 @@ impl eframe::App for App {
         if self.restart_app && !update_ready {
             relaunch();
         }
+    }
+}
+
+/// What eframe runs: the app, shared with the lyrics window. That window is drawn in
+/// passes of its own (a deferred viewport), so it keeps going while the main window is
+/// minimized; it finds the app through `App::me`.
+pub struct Host(std::rc::Rc<std::cell::RefCell<App>>);
+
+impl Host {
+    pub fn new(app: App) -> Self {
+        let rc = std::rc::Rc::new(std::cell::RefCell::new(app));
+        rc.borrow_mut().me = std::rc::Rc::downgrade(&rc);
+        Host(rc)
+    }
+}
+
+impl eframe::App for Host {
+    fn clear_color(&self, visuals: &egui::Visuals) -> [f32; 4] {
+        eframe::App::clear_color(&*self.0.borrow(), visuals)
+    }
+    fn logic(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+        eframe::App::logic(&mut *self.0.borrow_mut(), ctx, frame);
+    }
+    fn ui(&mut self, ui: &mut Ui, frame: &mut eframe::Frame) {
+        eframe::App::ui(&mut *self.0.borrow_mut(), ui, frame);
+    }
+    fn raw_input_hook(&mut self, ctx: &egui::Context, raw: &mut egui::RawInput) {
+        // The main window's input only, as before the lyrics window had passes of its own.
+        if raw.viewport_id == egui::ViewportId::ROOT {
+            eframe::App::raw_input_hook(&mut *self.0.borrow_mut(), ctx, raw);
+        }
+    }
+    fn persist_egui_memory(&self) -> bool {
+        eframe::App::persist_egui_memory(&*self.0.borrow())
+    }
+    fn save(&mut self, storage: &mut dyn eframe::Storage) {
+        eframe::App::save(&mut *self.0.borrow_mut(), storage);
+    }
+    fn on_exit(&mut self, gl: Option<&eframe::glow::Context>) {
+        eframe::App::on_exit(&mut *self.0.borrow_mut(), gl);
     }
 }
 

@@ -90,7 +90,6 @@ fn main() -> eframe::Result {
     }
     init_logging();
     settle_window_system();
-    renderer::prepare(&data_dir());
     trim_heap_periodically();
     update::clean_portable();
     stream::init_dev_hooks();
@@ -126,7 +125,10 @@ fn main() -> eframe::Result {
     }
     let options = eframe::NativeOptions {
         viewport,
-        renderer: renderer::eframe_renderer(renderer),
+        renderer: match renderer {
+            renderer::Renderer::OpenGl => eframe::Renderer::Glow,
+            renderer::Renderer::Wgpu => eframe::Renderer::Wgpu,
+        },
         persist_window: !background,
         // Settings live with the rest of the data: beside the portable exe, or a
         // YTM_DATA_DIR profile (e.g. a clean signed-out one for screenshots).
@@ -237,8 +239,8 @@ fn main() -> eframe::Result {
             }
             // The animated background needs the GPU context; without it the UI falls back
             // to a flat gradient.
-            let shader = std::env::var_os("YTM_NO_SHADER").is_none() && renderer != renderer::Renderer::Software;
-            if let Some(gl) = cc.gl.as_ref().filter(|_| shader) {
+            let shader = std::env::var_os("YTM_NO_SHADER").is_none();
+            if let Some(gl) = &cc.gl {
                 shader::install_glass(gl);
                 if rounded {
                     corners::install(gl);
@@ -250,7 +252,7 @@ fn main() -> eframe::Result {
                 _ => None,
             };
 
-            Ok(Box::new(ui::App::new(
+            Ok(Box::new(ui::Host::new(ui::App::new(
                 backend,
                 audio,
                 ui::Channels { resp_rx, audio_rx, media_rx },
@@ -258,7 +260,7 @@ fn main() -> eframe::Result {
                 bg,
                 cc.storage,
                 language,
-            )))
+            ))))
         }),
     );
     // A wgpu window that won't open would fail the same way at every launch: go back

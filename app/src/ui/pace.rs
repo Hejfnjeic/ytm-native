@@ -70,7 +70,12 @@ pub(super) fn frame(ctx: &egui::Context) {
 /// Asks for the next frame `gap` after this one began. A delay given to egui counts from
 /// the moment it's asked, partway through the frame, so a whole frame's work and the
 /// drawing would add to it and miss the screen's refresh.
+/// The lyrics window keeps no frame clock of its own here: it asks from now.
 pub(super) fn repaint_after(ctx: &egui::Context, gap: Duration) {
+    if ctx.viewport_id() != egui::ViewportId::ROOT {
+        ctx.request_repaint_after(gap);
+        return;
+    }
     let began = STATE.lock().unwrap().as_ref().map_or_else(Instant::now, |p| p.last);
     ctx.request_repaint_after(gap.saturating_sub(began.elapsed()));
 }

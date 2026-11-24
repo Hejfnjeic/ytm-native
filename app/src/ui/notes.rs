@@ -295,7 +295,7 @@ pub fn dialog(app: &mut App, ctx: &egui::Context) {
                 ui.label(j);
             });
             ui.add_space(8.0);
-            ui.label(egui::RichText::new(format!("ytm-rs {}", d.version)).font(theme::bold(26.0)).color(theme::text()));
+            ui.label(egui::RichText::new(format!("YT Music native {}", d.version)).font(theme::bold(26.0)).color(theme::text()));
             ui.add_space(6.0);
             let sub = if available.is_some() {
                 crate::tr!("window-notes-status", version = crate::update::current_version(), step = crate::update::package_step())

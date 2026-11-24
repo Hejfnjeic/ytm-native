@@ -27,7 +27,6 @@ settings-channel = Канал
 settings-channel-desc = Обліковий запис Google і кожен пов’язаний із ним канал YouTube мають власну бібліотеку, вподобайки, історію та рекомендації.
 settings-not-signed-in = Вхід не виконано
 settings-not-signed-in-desc = Увійдіть, щоб відкрити свою стрічку, бібліотеку та вподобані треки.
-settings-sign-in-with-google = Увійти через Google
 settings-sign-in-finish = Завершіть вхід у відкритому вікні.
 settings-no-channel = { $name } (без каналу)
 settings-another-channel = Інший канал

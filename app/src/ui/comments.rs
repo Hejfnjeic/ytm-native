@@ -435,7 +435,7 @@ pub fn panel(app: &mut App, ui: &mut Ui) {
                 }
                 None => st.note = Some(crate::tr!("comment-like-unavailable").into()),
             },
-            Act::SignIn => app.start_sign_in(ui.ctx()),
+            Act::SignIn => app.open_sign_in(),
         }
     }
 }

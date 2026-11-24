@@ -27,7 +27,6 @@ settings-channel = Canal
 settings-channel-desc = Tu cuenta de Google y cada canal de YouTube que gestiona tienen su propia biblioteca, Me gusta, historial y recomendaciones.
 settings-not-signed-in = Sin iniciar sesión
 settings-not-signed-in-desc = Inicia sesión para obtener tu feed de inicio, biblioteca y Me gusta.
-settings-sign-in-with-google = Iniciar sesión con Google
 settings-sign-in-finish = Termina de iniciar sesión en la ventana que se abrió.
 settings-no-channel = { $name } (Sin canal)
 settings-another-channel = Otro canal

@@ -27,7 +27,6 @@ settings-channel = Canal
 settings-channel-desc = Sua conta Google e cada canal do YouTube que ela gerencia têm sua própria biblioteca, curtidas, histórico e recomendações.
 settings-not-signed-in = Não conectado
 settings-not-signed-in-desc = Entre para obter seu feed inicial, biblioteca e curtidas.
-settings-sign-in-with-google = Entrar com o Google
 settings-sign-in-finish = Conclua o login na janela que abriu.
 settings-no-channel = { $name } (Sem canal)
 settings-another-channel = Outro canal

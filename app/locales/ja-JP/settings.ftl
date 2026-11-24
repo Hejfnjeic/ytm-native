@@ -27,7 +27,6 @@ settings-channel = チャンネル
 settings-channel-desc = Google アカウントと、そのアカウントで管理する各 YouTube チャンネルには、それぞれライブラリ、高評価、履歴、おすすめがあります。
 settings-not-signed-in = 未ログイン
 settings-not-signed-in-desc = ログインすると、ホーム フィード、ライブラリ、高評価を利用できます。
-settings-sign-in-with-google = Google でログイン
 settings-sign-in-finish = 開いたウィンドウでログインを完了してください。
 settings-no-channel = { $name }（チャンネルなし）
 settings-another-channel = 別のチャンネル

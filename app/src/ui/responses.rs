@@ -566,8 +566,14 @@ impl App {
                     }
                 }
             }
-            Resp::LoggedIn(v) => self.on_logged_in(v, now),
-            Resp::Error(e) => self.on_error(e),
+            Resp::LoggedIn(v) => {
+                self.login_settled(v);
+                self.on_logged_in(v, now);
+            }
+            Resp::Error(e) => {
+                self.login_settled(false);
+                self.on_error(e);
+            }
         }
     }
 

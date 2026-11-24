@@ -27,7 +27,6 @@ settings-channel = القناة
 settings-channel-desc = يمتلك حساب Google الخاص بك وكل قناة على YouTube يديرها مكتبةً وإعجاباتٍ وسجلًا وتوصياتٍ خاصة بها.
 settings-not-signed-in = غير مسجّل الدخول
 settings-not-signed-in-desc = سجّل الدخول للحصول على خلاصتك الرئيسية ومكتبتك وإعجاباتك.
-settings-sign-in-with-google = تسجيل الدخول باستخدام Google
 settings-sign-in-finish = أكمل تسجيل الدخول في النافذة التي فُتحت.
 settings-no-channel = { $name } (بدون قناة)
 settings-another-channel = قناة أخرى

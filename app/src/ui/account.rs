@@ -43,18 +43,48 @@ impl App {
         if self.signing_in.swap(true, Ordering::Relaxed) {
             return;
         }
-        let (backend, busy, ctx) = (self.backend.clone(), self.signing_in.clone(), ctx.clone());
+        let (backend, busy, ctx, checking) = (self.backend.clone(), self.signing_in.clone(), ctx.clone(), self.cookie_file.clone());
         std::thread::spawn(move || {
             let picked = rfd::FileDialog::new().set_title(crate::tr!("login-pick-cookies")).add_filter("cookies.txt", &["txt"]).pick_file();
             if let Some(path) = picked {
                 match std::fs::read_to_string(&path).map_err(anyhow::Error::from).and_then(|text| cookie_header(&text)) {
-                    Ok(header) => backend.request(Req::SetCookie(header)),
+                    Ok(header) => {
+                        // Deleted once YouTube takes it (`login_settled`).
+                        *checking.lock().unwrap() = Some(path);
+                        backend.request(Req::SetCookie(header));
+                    }
                     Err(e) => backend.report_error(crate::tr!("login-failed", error = format!("{e:#}").as_str())),
                 }
             }
             busy.store(false, Ordering::Relaxed);
             ctx.request_repaint();
         });
+    }
+}
+
+impl App {
+    /// The sign-in's instructions and its button are in Settings › Account: other Sign in
+    /// buttons open it rather than the file picker.
+    pub(super) fn open_sign_in(&mut self) {
+        self.settings_tab = super::pages::SettingsTab::Account;
+        self.actions.push(super::Action::Go(super::Page::Settings));
+    }
+
+    /// The login being checked is settled: taken (its file is deleted, as the login lives
+    /// encrypted now) or refused (its file stays, to try again).
+    pub(super) fn login_settled(&mut self, taken: bool) {
+        let Some(path) = self.cookie_file.lock().unwrap().take() else { return };
+        if taken {
+            match std::fs::remove_file(&path) {
+                Ok(()) => log::info!("signed in; the cookies file is deleted"),
+                Err(e) => log::warn!("signed in, but the cookies file couldn't be deleted: {e}"),
+            }
+        }
+    }
+
+    /// A cookies file is being checked with YouTube.
+    pub(super) fn checking_login(&self) -> bool {
+        self.cookie_file.lock().unwrap().is_some()
     }
 }
 

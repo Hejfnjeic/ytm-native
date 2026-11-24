@@ -27,7 +27,6 @@ settings-channel = Canale
 settings-channel-desc = Il tuo account Google e ogni canale YouTube che gestisce hanno raccolta, «Mi piace», cronologia e suggerimenti propri.
 settings-not-signed-in = Accesso non eseguito
 settings-not-signed-in-desc = Accedi per ritrovare il feed della home, la raccolta e i «Mi piace».
-settings-sign-in-with-google = Accedi con Google
 settings-sign-in-finish = Completa l’accesso nella finestra che si è aperta.
 settings-no-channel = { $name } (nessun canale)
 settings-another-channel = Altro canale

@@ -27,7 +27,6 @@ settings-channel = Kanal
 settings-channel-desc = Dein Google-Konto und jeder darüber verwaltete YouTube-Kanal haben eine eigene Mediathek, eigene Likes, einen eigenen Verlauf und eigene Empfehlungen.
 settings-not-signed-in = Nicht angemeldet
 settings-not-signed-in-desc = Melde dich an, um deine Startseite, Mediathek und Likes zu sehen.
-settings-sign-in-with-google = Mit Google anmelden
 settings-sign-in-finish = Schließe die Anmeldung im geöffneten Fenster ab.
 settings-no-channel = { $name } (kein Kanal)
 settings-another-channel = Anderer Kanal

@@ -27,7 +27,6 @@ settings-channel = Chaîne
 settings-channel-desc = Votre compte Google et chaque chaîne YouTube qu’il gère ont leur propre bibliothèque, leurs « J’aime », leur historique et leurs recommandations.
 settings-not-signed-in = Non connecté
 settings-not-signed-in-desc = Connectez-vous pour retrouver votre accueil, votre bibliothèque et vos « J’aime ».
-settings-sign-in-with-google = Se connecter avec Google
 settings-sign-in-finish = Terminez la connexion dans la fenêtre qui s’est ouverte.
 settings-no-channel = { $name } (aucune chaîne)
 settings-another-channel = Autre chaîne

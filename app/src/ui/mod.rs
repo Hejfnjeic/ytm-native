@@ -637,6 +637,8 @@ pub struct App {
     // account / misc
     logged_in: bool,
     signing_in: Arc<AtomicBool>,
+    /// The cookies file whose login YouTube is checking (`account.rs`).
+    cookie_file: Arc<std::sync::Mutex<Option<std::path::PathBuf>>>,
     toast: Option<(String, f64)>,
     toast_after_unlike: Option<String>,
     /// What the toast up now can undo.
@@ -989,6 +991,7 @@ impl App {
             record_angle: 0.0,
             logged_in,
             signing_in: Default::default(),
+            cookie_file: Default::default(),
             toast: None,
             toast_after_unlike: None,
             undo: None,

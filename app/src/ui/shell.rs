@@ -476,7 +476,7 @@ pub fn sidebar(app: &mut App, ui: &mut Ui) {
                 widgets::note(ui, crate::tr!("nav-sign-in-playlists"), egui::TextStyle::Body.resolve(ui.style()), theme::text_dim());
                 ui.add_space(8.0);
                 if widgets::pill(ui, crate::tr!("nav-sign-in"), Some(icon::CIRCLE_USER), false).clicked() {
-                    app.start_sign_in(ui.ctx());
+                    app.open_sign_in();
                 }
             } else {
                 ui.multiply_opacity(2.0 * t - 1.0);

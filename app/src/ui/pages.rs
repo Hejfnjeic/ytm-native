@@ -1251,8 +1251,8 @@ fn library(app: &mut App, ui: &mut Ui, tab: LibTab, now: f64) {
         ui.add_space(10.0);
         widgets::note(ui, crate::tr!("nav-library-sign-in"), egui::TextStyle::Body.resolve(ui.style()), theme::text_dim());
         ui.add_space(12.0);
-        if pill(ui, crate::tr!("settings-sign-in-with-google"), Some(icon::CIRCLE_USER), true).clicked() {
-            app.start_sign_in(ui.ctx());
+        if pill(ui, crate::tr!("nav-sign-in"), Some(icon::CIRCLE_USER), true).clicked() {
+            app.open_sign_in();
         }
         return;
     }
@@ -1681,7 +1681,7 @@ fn settings_search(app: &mut App, ui: &mut Ui) {
 
 /// Settings › Account: signing in and out, and which channel to use.
 fn settings_account(app: &mut App, ui: &mut Ui) {
-    let busy = app.signing_in.load(Ordering::Relaxed);
+    let busy = app.signing_in.load(Ordering::Relaxed) || app.checking_login();
     let (mut sign_in, mut sign_out) = (false, false);
     // Asked again now and then while Settings shows: a failed ask, or a channel made since.
     let now = ui.input(|i| i.time);
@@ -1707,14 +1707,31 @@ fn settings_account(app: &mut App, ui: &mut Ui) {
                 if busy {
                     widgets::loader(ui);
                 } else {
-                    sign_in = pill(ui, tr!("settings-sign-in-with-google"), Some(icon::CIRCLE_USER), true).clicked();
+                    sign_in = pill(ui, tr!("settings-choose-cookies"), Some(icon::CIRCLE_USER), true).clicked();
                 }
             });
+            // How to get a login that lasts: the steps, numbered.
+            if !filtering() {
+                divider(ui);
+                ui.add_space(8.0);
+                widgets::note(ui, tr!("settings-sign-in-intro"), theme::regular(13.5), theme::text_dim());
+                ui.add_space(6.0);
+                let steps = [tr!("settings-sign-in-step-1"), tr!("settings-sign-in-step-2"), tr!("settings-sign-in-step-3"), tr!("settings-sign-in-step-4")];
+                for (i, step) in steps.into_iter().enumerate() {
+                    ui.horizontal_top(|ui| {
+                        ui.add_space(4.0);
+                        ui.label(RichText::new(format!("{}.", i + 1)).font(theme::bold(13.5)).color(app.accent_color()));
+                        ui.add(egui::Label::new(RichText::new(step).font(theme::regular(13.5)).color(theme::text())).wrap());
+                    });
+                    ui.add_space(4.0);
+                }
+                ui.add_space(6.0);
+            }
         }
     });
     if busy && !filtering() {
         ui.add_space(6.0);
-        widgets::note(ui, tr!("settings-sign-in-finish"), theme::regular(12.5), theme::text_dim());
+        widgets::note(ui, tr!("settings-sign-in-checking"), theme::regular(12.5), theme::text_dim());
     }
     if sign_in {
         app.start_sign_in(ui.ctx());

@@ -27,7 +27,6 @@ settings-channel = ช่อง
 settings-channel-desc = บัญชี Google ของคุณและแต่ละช่อง YouTube ที่จัดการจะมีไลบรารี การถูกใจ ประวัติ และคำแนะนำเป็นของตัวเอง
 settings-not-signed-in = ไม่ได้ลงชื่อเข้าใช้
 settings-not-signed-in-desc = ลงชื่อเข้าใช้เพื่อรับฟีดหน้าแรก ห้องสมุด และรายการที่ชอบ
-settings-sign-in-with-google = ลงชื่อเข้าใช้ด้วย Google
 settings-sign-in-finish = ลงชื่อเข้าใช้ให้เสร็จสิ้นในหน้าต่างที่เปิดขึ้นมา
 settings-no-channel = { $name } (ไม่มีช่อง)
 settings-another-channel = อีกช่อง

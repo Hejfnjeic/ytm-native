@@ -27,7 +27,6 @@ settings-channel = Канал
 settings-channel-desc = У аккаунта Google и каждого связанного с ним канала YouTube свои медиатека, лайки, история и рекомендации.
 settings-not-signed-in = Вход не выполнен
 settings-not-signed-in-desc = Войдите, чтобы открыть свою ленту, медиатеку и понравившиеся треки.
-settings-sign-in-finish = Завершите вход в открывшемся окне.
 settings-no-channel = { $name } (без канала)
 settings-another-channel = Другой канал
 settings-switching = Переключение…

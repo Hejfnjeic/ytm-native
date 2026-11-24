@@ -27,7 +27,6 @@ settings-channel = Channel
 settings-channel-desc = Akun Google kamu dan tiap channel YouTube yang dikelolanya punya koleksi, lagu favorit, riwayat, dan rekomendasi masing-masing.
 settings-not-signed-in = Belum masuk
 settings-not-signed-in-desc = Masuk dulu biar dapat beranda, koleksi, dan lagu favoritmu.
-settings-sign-in-finish = Selesaikan proses masuk di jendela yang baru kebuka.
 settings-no-channel = { $name } (Tanpa channel)
 settings-another-channel = Channel lain
 settings-switching = Lagi pindah…

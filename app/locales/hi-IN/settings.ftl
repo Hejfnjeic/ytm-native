@@ -27,7 +27,6 @@ settings-channel = चैनल
 settings-channel-desc = आपके Google खाते और उसके द्वारा प्रबंधित प्रत्येक YouTube चैनल की अपनी लाइब्रेरी, पसंद, इतिहास और सिफारिशें हैं।
 settings-not-signed-in = साइन इन नहीं है
 settings-not-signed-in-desc = अपना होम फ़ीड, लाइब्रेरी और लाइक पाने के लिए साइन इन करें।
-settings-sign-in-finish = खुलने वाली विंडो में साइन इन करना समाप्त करें।
 settings-no-channel = { $name } (कोई चैनल नहीं)
 settings-another-channel = एक और चैनल
 settings-switching = स्विचिंग…

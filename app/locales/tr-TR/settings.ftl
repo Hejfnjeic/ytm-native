@@ -27,7 +27,6 @@ settings-channel = Kanal
 settings-channel-desc = Google hesabınız ve yönettiği her YouTube kanalının kendi kitaplığı, beğenileri, geçmişi ve önerileri vardır.
 settings-not-signed-in = Oturum açılmadı
 settings-not-signed-in-desc = Ana sayfa akışınızı, kitaplığınızı ve beğenilerinizi almak için oturum açın.
-settings-sign-in-finish = Açılan pencerede oturum açmayı tamamlayın.
 settings-no-channel = { $name } (Kanal yok)
 settings-another-channel = Başka bir kanal
 settings-switching = Değiştiriliyor…

@@ -27,7 +27,6 @@ settings-channel = Kanaal
 settings-channel-desc = Je Google-account en elk YouTube-kanaal dat het beheert, hebben een eigen bibliotheek, likes, geschiedenis en aanbevelingen.
 settings-not-signed-in = Niet ingelogd
 settings-not-signed-in-desc = Log in om je startfeed, bibliotheek en likes te zien.
-settings-sign-in-finish = Rond het inloggen af in het geopende venster.
 settings-no-channel = { $name } (geen kanaal)
 settings-another-channel = Ander kanaal
 settings-switching = Wisselen…

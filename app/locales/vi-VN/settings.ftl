@@ -27,7 +27,6 @@ settings-channel = Kênh
 settings-channel-desc = Tài khoản Google của bạn và mỗi kênh YouTube mà tài khoản này quản lý đều có thư viện, lượt thích, lịch sử và đề xuất riêng.
 settings-not-signed-in = Chưa đăng nhập
 settings-not-signed-in-desc = Đăng nhập để nhận nguồn cấp dữ liệu trang chủ, thư viện và lượt thích của bạn.
-settings-sign-in-finish = Hoàn tất đăng nhập trong cửa sổ đã mở.
 settings-no-channel = { $name } (Không có kênh)
 settings-another-channel = Một kênh khác
 settings-switching = Đang chuyển đổi…

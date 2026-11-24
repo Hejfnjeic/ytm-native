@@ -27,7 +27,6 @@ settings-channel = 頻道
 settings-channel-desc = 您的 Google 帳戶及其管理的每個 YouTube 頻道都有自己的庫、喜歡、歷史記錄和推薦。
 settings-not-signed-in = 未登入
 settings-not-signed-in-desc = 登入以取得您的首頁、圖書館和按讚。
-settings-sign-in-finish = 在開啟的視窗中完成登入。
 settings-no-channel = { $name }（無通道）
 settings-another-channel = 另一個頻道
 settings-switching = 切換…

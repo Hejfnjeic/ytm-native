@@ -27,7 +27,6 @@ settings-channel = 채널
 settings-channel-desc = 귀하의 Google 계정과 이 계정이 관리하는 각 YouTube 채널에는 자체 라이브러리, 좋아요, 기록 및 권장 사항이 있습니다.
 settings-not-signed-in = 로그인되지 않음
 settings-not-signed-in-desc = 홈피드, 라이브러리, 좋아요를 받으려면 로그인하세요.
-settings-sign-in-finish = 열린 창에서 로그인을 완료하세요.
 settings-no-channel = { $name }(채널 없음)
 settings-another-channel = 다른 채널
 settings-switching = 전환 중…

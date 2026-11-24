@@ -109,7 +109,7 @@ settings-0-db = 0 เดซิเบล
 ## Playback speed
 
 settings-playback-speed = ความเร็วในการเล่น
-settings-playback-speed-desc = เล่นเพลงเร็วขึ้นหรือช้าลงจากปุ่มในแถบเครื่องเล่น เสียงเร็วขึ้นและช้าลงต่ำเหมือนแผ่นเสียง เนื้อเพลงคงอยู่ในกาลเวลา กลับไปที่ 1× แต่ละครั้งที่ ytm-native เริ่มทำงาน
+settings-playback-speed-desc = เล่นเพลงเร็วขึ้นหรือช้าลงจากปุ่มในแถบเครื่องเล่น เสียงเร็วขึ้นและช้าลงต่ำเหมือนแผ่นเสียง เนื้อเพลงคงอยู่ในกาลเวลา กลับไปที่ 1× แต่ละครั้งที่ YT Music native เริ่มทำงาน
 settings-speed = ความเร็ว
 
 ## Music videos
@@ -235,7 +235,7 @@ settings-song-notifications-unavailable = ต้องการแอปที�
 settings-song-notifications = การแจ้งเตือนเพลง
 settings-close-to-tray-restart-desc = ใน Wayland หน้าต่างสามารถซ่อนอยู่ในถาดเท่านั้นและกลับมาอีกครั้งหลังจากรีสตาร์ท จนกว่าจะถึงตอนนั้น x ย่อให้เล็กสุด
 settings-title-bar = แถบหัวเรื่อง
-settings-title-bar-desc = ใครเป็นคนวาดแถบหัวเรื่องและปุ่มของหน้าต่าง อัตโนมัติใช้ ytm-native โดยที่เดสก์ท็อปไม่ดึงเลย (GNOME บน Wayland)
+settings-title-bar-desc = ใครเป็นคนวาดแถบหัวเรื่องและปุ่มของหน้าต่าง อัตโนมัติใช้ YT Music native โดยที่เดสก์ท็อปไม่ดึงเลย (GNOME บน Wayland)
 settings-title-bar-restart-desc = แถบหัวเรื่องเปลี่ยนจากจุดเริ่มต้นครั้งถัดไป
 settings-collapse-sidebar = ยุบแถบด้านข้าง
 settings-collapse-sidebar-desc = แสดงเฉพาะไอคอนในแถบด้านข้างสำหรับหน้าต่างแคบ ปุ่มเมนูที่ด้านบนก็ทำเช่นเดียวกัน
@@ -251,11 +251,11 @@ settings-open = เปิด
 
 settings-network = เครือข่าย
 settings-proxy = หนังสือมอบฉันทะ
-settings-proxy-desc = ส่งทุกสิ่งที่ ytm-native ดึงมาผ่านพร็อกซี: เพลง เนื้อเพลง ลงชื่อเข้าใช้ และฟังด้วยกัน
+settings-proxy-desc = ส่งทุกสิ่งที่ YT Music native ดึงมาผ่านพร็อกซี: เพลง เนื้อเพลง ลงชื่อเข้าใช้ และฟังด้วยกัน
 settings-proxy-windows-uses = Windows ถูกตั้งค่าให้ใช้ { $proxy }
-settings-proxy-windows-none = Windows ไม่ได้ตั้งค่าให้ใช้พรอกซี ดังนั้น ytm-native จึงเชื่อมต่อโดยตรง
+settings-proxy-windows-none = Windows ไม่ได้ตั้งค่าให้ใช้พรอกซี ดังนั้น YT Music native จึงเชื่อมต่อโดยตรง
 settings-proxy-environment-sets = สภาพแวดล้อมตั้งค่า { $proxy }
-settings-proxy-environment-none = ไม่มีการตั้งค่า HTTPS_PROXY หรือ ALL_PROXY ดังนั้น ytm-native จึงเชื่อมต่อโดยตรง
+settings-proxy-environment-none = ไม่มีการตั้งค่า HTTPS_PROXY หรือ ALL_PROXY ดังนั้น YT Music native จึงเชื่อมต่อโดยตรง
 settings-windows-proxy = พร็อกซี Windows
 settings-system-proxy = พร็อกซีของระบบ
 settings-proxy-address = ที่อยู่พร็อกซี
@@ -307,7 +307,7 @@ settings-updates-dev-build = การอัปเดตใช้งานได
 settings-checking-for-updates = กำลังตรวจสอบการอัปเดต...
 settings-up-to-date = คุณกำลังใช้เวอร์ชันล่าสุด ({ $version })
 settings-update-downloading = กำลังดาวน์โหลด { $version }… { $percent }%
-settings-update-ready = เวอร์ชัน { $version } พร้อมใช้งานแล้ว จะติดตั้งเมื่อคุณปิด ytm-native
+settings-update-ready = เวอร์ชัน { $version } พร้อมใช้งานแล้ว จะติดตั้งเมื่อคุณปิด YT Music native
 settings-update-available = เวอร์ชัน { $version } ออกแล้ว { $step }
 settings-update-failed = ไม่สามารถตรวจสอบการอัปเดต: { $error }
 settings-version = เวอร์ชัน { $version }.
@@ -322,7 +322,7 @@ settings-restart-to-update = เริ่มต้นใหม่เพื่อ
 settings-download = ดาวน์โหลด
 settings-check-now = ตรวจสอบเลย
 settings-another-copy = อีกฉบับหนึ่ง
-settings-another-copy-desc = ytm-native ได้รับการติดตั้งจาก { $kind } ด้วย หากต้องการลบสำเนานั้น ให้รัน { $cmd }
+settings-another-copy-desc = YT Music native ได้รับการติดตั้งจาก { $kind } ด้วย หากต้องการลบสำเนานั้น ให้รัน { $cmd }
 settings-whats-new = มีอะไรใหม่
 settings-whats-new-in = มีอะไรใหม่ใน { $version }
 

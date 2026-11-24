@@ -117,7 +117,7 @@ settings-0-db = 0 dB
 ## Playback speed
 
 settings-playback-speed = Playback speed
-settings-playback-speed-desc = Play songs faster or slower, also from a button in the player bar. Lyrics stay in time. Back to 1× each time ytm-native starts.
+settings-playback-speed-desc = Play songs faster or slower, also from a button in the player bar. Lyrics stay in time. Back to 1× each time YT Music native starts.
 settings-speed = Speed
 settings-keep-pitch = Keep the pitch
 settings-keep-pitch-desc = Faster or slower without sounding higher or lower. Off, the pitch changes with the speed, like a record.
@@ -276,7 +276,7 @@ settings-song-notifications-unavailable = Needs the installed app: Windows only 
 settings-song-notifications = Song notifications
 settings-close-to-tray-restart-desc = On Wayland the window can only hide in the tray and come back after a restart. Until then × minimizes it.
 settings-title-bar = Title bar
-settings-title-bar-desc = Who draws the window's title bar and buttons. Automatic uses ytm-native's where the desktop draws none (GNOME on Wayland).
+settings-title-bar-desc = Who draws the window's title bar and buttons. Automatic uses YT Music native's where the desktop draws none (GNOME on Wayland).
 settings-title-bar-restart-desc = The title bar changes from the next start.
 settings-collapse-sidebar = Collapse sidebar
 settings-collapse-sidebar-desc = Show only icons in the sidebar, for narrow windows. The menu button at its top does the same.
@@ -292,11 +292,11 @@ settings-open = Open
 
 settings-network = Network
 settings-proxy = Proxy
-settings-proxy-desc = Send everything ytm-native fetches through a proxy: songs, lyrics, sign-in and Listen together.
+settings-proxy-desc = Send everything YT Music native fetches through a proxy: songs, lyrics and sign-in.
 settings-proxy-windows-uses = Windows is set to use { $proxy }.
-settings-proxy-windows-none = Windows isn't set to use a proxy, so ytm-native connects directly.
+settings-proxy-windows-none = Windows isn't set to use a proxy, so YT Music native connects directly.
 settings-proxy-environment-sets = The environment sets { $proxy }.
-settings-proxy-environment-none = No HTTPS_PROXY or ALL_PROXY is set, so ytm-native connects directly.
+settings-proxy-environment-none = No HTTPS_PROXY or ALL_PROXY is set, so YT Music native connects directly.
 settings-windows-proxy = Windows proxy
 settings-system-proxy = System proxy
 settings-proxy-address = Proxy address
@@ -348,7 +348,7 @@ settings-updates-dev-build = Updates only work in the installed or portable app 
 settings-checking-for-updates = Checking for updates…
 settings-up-to-date = You're on the latest version ({ $version }).
 settings-update-downloading = Downloading { $version }… { $percent }%
-settings-update-ready = Version { $version } is ready. It installs when you close ytm-native.
+settings-update-ready = Version { $version } is ready. It installs when you close YT Music native.
 settings-update-available = Version { $version } is out. { $step }
 settings-update-failed = Couldn't check for updates: { $error }
 settings-update-rate-limited = { $minutes ->
@@ -367,15 +367,15 @@ settings-restart-to-update = Restart to update
 settings-download = Download
 settings-check-now = Check now
 settings-another-copy = Another copy
-settings-another-copy-desc = ytm-native is also installed from { $kind }. To remove that copy, run { $cmd }
+settings-another-copy-desc = YT Music native is also installed from { $kind }. To remove that copy, run { $cmd }
 settings-whats-new = What's new
 settings-whats-new-in = What's new in { $version }
 
 ## About
 
 settings-about-tagline = A fast, native YouTube Music player.
-settings-about-based-on = Based on ytm-rs
-settings-about-based-on-credit = The interface and lyrics come from ytm-rs by grapedjuice (GPL-3.0)
+settings-about-based-on = Copied from ytm-rs
+settings-about-based-on-credit = Much of the interface, lyrics and playback code is copied from ytm-rs by grapedjuice (GPL-3.0): github.com/grapedjuice/ytm-rs
 settings-about-lyrics-sources = Better Lyrics API: Musixmatch, LRCLIB, QQ, KuGou and Better Lyrics TTML
 settings-background = Background
 settings-about-background-credit = A port of Kawarp, MIT © Better Lyrics

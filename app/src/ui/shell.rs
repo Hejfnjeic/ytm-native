@@ -393,7 +393,7 @@ pub fn sidebar(app: &mut App, ui: &mut Ui) {
         ui.add_space(8.0);
         let logo = app.look().app.top_bar.clone();
         let text_r = if logo.logo_text.is_empty() {
-            ui.label(egui::RichText::new("ytm-native").font(theme::bold(20.0)).color(theme::text())).rect
+            ui.label(egui::RichText::new("YT Music native").font(theme::bold(19.0)).color(theme::text())).rect
         } else {
             logo_name(ui, &logo, app.accent_color())
         };

@@ -109,7 +109,7 @@ settings-0-db = 0 dB
 ## Playback speed
 
 settings-playback-speed = Velocità di riproduzione
-settings-playback-speed-desc = Riproduci i brani più velocemente o più lentamente, anche dalla barra del lettore. Come con un disco, accelerando il suono è più acuto, rallentando più grave. I testi restano sincronizzati. All’avvio di ytm-native torna a 1×.
+settings-playback-speed-desc = Riproduci i brani più velocemente o più lentamente, anche dalla barra del lettore. Come con un disco, accelerando il suono è più acuto, rallentando più grave. I testi restano sincronizzati. All’avvio di YT Music native torna a 1×.
 settings-speed = Velocità
 
 ## Music videos
@@ -235,7 +235,7 @@ settings-song-notifications-unavailable = Richiede l’app installata. Windows m
 settings-song-notifications = Notifiche dei brani
 settings-close-to-tray-restart-desc = Su Wayland, nascondere e ripristinare la finestra tramite l’area di notifica richiede un riavvio. Fino ad allora × riduce a icona.
 settings-title-bar = Barra del titolo
-settings-title-bar-desc = Sceglie chi disegna la barra del titolo e i pulsanti. Automatico usa quelli di ytm-native se il desktop non li disegna, come GNOME su Wayland.
+settings-title-bar-desc = Sceglie chi disegna la barra del titolo e i pulsanti. Automatico usa quelli di YT Music native se il desktop non li disegna, come GNOME su Wayland.
 settings-title-bar-restart-desc = La barra del titolo cambierà al prossimo avvio.
 settings-collapse-sidebar = Comprimi la barra laterale
 settings-collapse-sidebar-desc = Mostra solo le icone nella barra laterale, utile nelle finestre strette. Il pulsante del menu in alto fa lo stesso.
@@ -251,11 +251,11 @@ settings-open = Apri
 
 settings-network = Rete
 settings-proxy = Proxy
-settings-proxy-desc = Fa passare tutto il traffico di ytm-native da un proxy, inclusi brani, testi, accesso e Ascolta insieme.
+settings-proxy-desc = Fa passare tutto il traffico di YT Music native da un proxy, inclusi brani, testi, accesso e Ascolta insieme.
 settings-proxy-windows-uses = Windows è configurato per usare { $proxy }.
-settings-proxy-windows-none = Windows non ha un proxy configurato, quindi ytm-native si connette direttamente.
+settings-proxy-windows-none = Windows non ha un proxy configurato, quindi YT Music native si connette direttamente.
 settings-proxy-environment-sets = L’ambiente imposta { $proxy }.
-settings-proxy-environment-none = HTTPS_PROXY e ALL_PROXY non sono impostate, quindi ytm-native si connette direttamente.
+settings-proxy-environment-none = HTTPS_PROXY e ALL_PROXY non sono impostate, quindi YT Music native si connette direttamente.
 settings-windows-proxy = Proxy di Windows
 settings-system-proxy = Proxy di sistema
 settings-proxy-address = Indirizzo del proxy
@@ -307,7 +307,7 @@ settings-updates-dev-build = Gli aggiornamenti funzionano con l’app installata
 settings-checking-for-updates = Ricerca di aggiornamenti…
 settings-up-to-date = Stai usando la versione più recente ({ $version }).
 settings-update-downloading = Download di { $version }… { $percent }%
-settings-update-ready = La versione { $version } è pronta. Verrà installata alla chiusura di ytm-native.
+settings-update-ready = La versione { $version } è pronta. Verrà installata alla chiusura di YT Music native.
 settings-update-available = È disponibile la versione { $version }. { $step }
 settings-update-failed = Impossibile verificare la disponibilità di aggiornamenti: { $error }
 settings-version = Versione { $version }.
@@ -322,7 +322,7 @@ settings-restart-to-update = Riavvia per aggiornare
 settings-download = Scarica
 settings-check-now = Verifica ora
 settings-another-copy = Altra installazione
-settings-another-copy-desc = ytm-native è installato anche tramite { $kind }. Comando di disinstallazione: { $cmd }
+settings-another-copy-desc = YT Music native è installato anche tramite { $kind }. Comando di disinstallazione: { $cmd }
 settings-whats-new = Novità
 settings-whats-new-in = Novità della versione { $version }
 

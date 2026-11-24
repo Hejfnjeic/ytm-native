@@ -109,7 +109,7 @@ settings-0-db = 0dB
 ## Playback speed
 
 settings-playback-speed = 재생 속도
-settings-playback-speed-desc = 플레이어 바에 있는 버튼으로도 노래를 더 빠르게 또는 느리게 재생할 수 있습니다. 레코드처럼 빠르게 들릴수록 높고 느리게 들립니다. 가사는 제 시간에 머물러 있습니다. ytm-native가 시작될 때마다 1×로 돌아갑니다.
+settings-playback-speed-desc = 플레이어 바에 있는 버튼으로도 노래를 더 빠르게 또는 느리게 재생할 수 있습니다. 레코드처럼 빠르게 들릴수록 높고 느리게 들립니다. 가사는 제 시간에 머물러 있습니다. YT Music native가 시작될 때마다 1×로 돌아갑니다.
 settings-speed = 속도
 
 ## Music videos
@@ -235,7 +235,7 @@ settings-song-notifications-unavailable = 설치된 앱 필요: Windows는 시�
 settings-song-notifications = 노래 알림
 settings-close-to-tray-restart-desc = Wayland에서는 창이 트레이에만 숨겨졌다가 다시 시작한 후에 다시 나타날 수 있습니다. 그때까지 ×는 그것을 최소화합니다.
 settings-title-bar = 제목 표시줄
-settings-title-bar-desc = 창의 제목 표시줄과 버튼을 그리는 사람. 자동은 데스크탑이 아무것도 그리지 않는 ytm-native를 사용합니다(Wayland의 GNOME).
+settings-title-bar-desc = 창의 제목 표시줄과 버튼을 그리는 사람. 자동은 데스크탑이 아무것도 그리지 않는 YT Music native를 사용합니다(Wayland의 GNOME).
 settings-title-bar-restart-desc = 다음 시작부터 제목 표시줄이 변경됩니다.
 settings-collapse-sidebar = 사이드바 접기
 settings-collapse-sidebar-desc = 좁은 창의 경우 사이드바에 아이콘만 표시합니다. 상단의 메뉴 버튼도 동일합니다.
@@ -251,11 +251,11 @@ settings-open = 열려 있는
 
 settings-network = 회로망
 settings-proxy = 대리
-settings-proxy-desc = 노래, 가사, 로그인 및 듣기 등 ytm-native가 가져오는 모든 항목을 프록시를 통해 보냅니다.
+settings-proxy-desc = 노래, 가사, 로그인 및 듣기 등 YT Music native가 가져오는 모든 항목을 프록시를 통해 보냅니다.
 settings-proxy-windows-uses = Windows는 { $proxy }를 사용하도록 설정되어 있습니다.
-settings-proxy-windows-none = Windows는 프록시를 사용하도록 설정되지 않았으므로 ytm-native가 직접 연결됩니다.
+settings-proxy-windows-none = Windows는 프록시를 사용하도록 설정되지 않았으므로 YT Music native가 직접 연결됩니다.
 settings-proxy-environment-sets = 환경은 { $proxy }를 설정합니다.
-settings-proxy-environment-none = HTTPS_PROXY 또는 ALL_PROXY가 설정되지 않았으므로 ytm-native가 직접 연결됩니다.
+settings-proxy-environment-none = HTTPS_PROXY 또는 ALL_PROXY가 설정되지 않았으므로 YT Music native가 직접 연결됩니다.
 settings-windows-proxy = Windows 프록시
 settings-system-proxy = 시스템 프록시
 settings-proxy-address = 프록시 주소
@@ -307,7 +307,7 @@ settings-updates-dev-build = 업데이트는 설치된 앱이나 휴대용 앱(�
 settings-checking-for-updates = 업데이트 확인 중…
 settings-up-to-date = 최신 버전({ $version })을 사용하고 있습니다.
 settings-update-downloading = { $version } 다운로드 중… { $percent }%
-settings-update-ready = 버전 { $version }가 준비되었습니다. ytm-native를 닫으면 설치됩니다.
+settings-update-ready = 버전 { $version }가 준비되었습니다. YT Music native를 닫으면 설치됩니다.
 settings-update-available = 버전 { $version }가 나왔습니다. { $step }
 settings-update-failed = 업데이트를 확인할 수 없습니다: { $error }
 settings-version = 버전 { $version }.
@@ -322,7 +322,7 @@ settings-restart-to-update = 업데이트하려면 다시 시작하세요.
 settings-download = 다운로드
 settings-check-now = 지금 확인하세요
 settings-another-copy = 또 다른 사본
-settings-another-copy-desc = ytm-native는 { $kind }에서도 설치됩니다. 해당 복사본을 제거하려면 { $cmd }를 실행하세요.
+settings-another-copy-desc = YT Music native는 { $kind }에서도 설치됩니다. 해당 복사본을 제거하려면 { $cmd }를 실행하세요.
 settings-whats-new = 새로운 소식
 settings-whats-new-in = { $version }의 새로운 기능
 

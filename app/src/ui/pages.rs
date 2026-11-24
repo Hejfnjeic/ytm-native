@@ -2722,7 +2722,7 @@ fn settings_shortcuts(ui: &mut Ui) {
 /// Settings › About.
 fn settings_about(ui: &mut Ui) {
     settings_section(ui, tr!("settings-about"), None, None, |ui| {
-        setting_row(ui, &format!("ytm-native {}", crate::update::build_version()), Some(tr!("settings-about-tagline")), |_| {});
+        setting_row(ui, &format!("YT Music native {}", crate::update::build_version()), Some(tr!("settings-about-tagline")), |_| {});
         for (title, desc) in [
             (tr!("settings-about-based-on"), tr!("settings-about-based-on-credit")),
             (tr!("settings-lyrics"), tr!("settings-about-lyrics-sources")),
@@ -2746,7 +2746,7 @@ fn settings_sign_off(app: &mut App, ui: &mut Ui) {
     ui.add_space(40.0);
     let (rect, _) = ui.allocate_exact_size(vec2(ui.available_width(), 96.0), Sense::hover());
     icon_at(ui, crate::appicon::get(app.app_icon), Rect::from_center_size(pos2(rect.center().x, rect.top() + 22.0), vec2(44.0, 44.0)));
-    ui.painter().text(pos2(rect.center().x, rect.top() + 58.0), Align2::CENTER_CENTER, "ytm-native", theme::bold(17.0), theme::text());
+    ui.painter().text(pos2(rect.center().x, rect.top() + 58.0), Align2::CENTER_CENTER, "YT Music native", theme::bold(17.0), theme::text());
     ui.painter().text(pos2(rect.center().x, rect.top() + 82.0), Align2::CENTER_CENTER, text, theme::regular(13.0), theme::text_dim());
 }
 

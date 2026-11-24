@@ -10,13 +10,16 @@
 > **what happens and what you expected**; fixes come from Claude. Use the app as it is, at your
 > own risk.
 
-# ytm-native (unofficial)
+# YT Music native (unofficial)
 
-A native desktop YouTube Music player for your own account, written in Rust with a
-[Slint](https://slint.dev) UI. No browser, no Electron: about 150 MB of RAM while playing.
+> **A lot of this app is copied from [ytm-rs](https://github.com/grapedjuice/ytm-rs) by
+> [grapedjuice](https://github.com/grapedjuice)** (GPL-3.0): the whole interface, the synced
+> lyrics and their karaoke display, and much of the YouTube Music and audio code. YT Music native
+> leaves some of its features out and changes or adds others (see below). All credit for those
+> parts goes to grapedjuice.
 
-It plays what YouTube Music plays (Premium: Opus 256 kbps), keeps your account in sync, and
-looks like the rest of a KDE desktop. Linux first; Windows builds are made too.
+A native desktop YouTube Music player for your own account, written in Rust with
+[egui](https://github.com/emilk/egui). No browser, no Electron.
 
 > Not affiliated with YouTube or Google. It talks to YouTube with your own login, like the
 > website does. Use it with your own account, at your own risk.

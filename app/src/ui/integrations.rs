@@ -284,7 +284,7 @@ fn window_title(song: Option<(&str, String)>) -> String {
     match song {
         Some((title, artist)) if !artist.is_empty() => format!("{title} – {artist}"),
         Some((title, _)) if !title.is_empty() => title.to_owned(),
-        _ => "YT Music".to_owned(),
+        _ => "YT Music native".to_owned(),
     }
 }
 
@@ -323,8 +323,8 @@ mod tests {
     fn window_title_is_the_song() {
         assert_eq!(window_title(Some(("Get Lucky", "Daft Punk".to_owned()))), "Get Lucky – Daft Punk");
         assert_eq!(window_title(Some(("Get Lucky", String::new()))), "Get Lucky");
-        assert_eq!(window_title(Some(("", String::new()))), "YT Music");
-        assert_eq!(window_title(None), "YT Music");
+        assert_eq!(window_title(Some(("", String::new()))), "YT Music native");
+        assert_eq!(window_title(None), "YT Music native");
     }
 
     #[test]

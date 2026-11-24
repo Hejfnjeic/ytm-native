@@ -109,7 +109,7 @@ settings-0-db = 0 дБ
 ## Playback speed
 
 settings-playback-speed = Скорость воспроизведения
-settings-playback-speed-desc = Ускоряет или замедляет треки. Настройка доступна и на панели плеера. Как на пластинке, при ускорении тон повышается, при замедлении понижается. Текст остаётся синхронным. При запуске ytm-native скорость возвращается к 1×.
+settings-playback-speed-desc = Ускоряет или замедляет треки. Настройка доступна и на панели плеера. Как на пластинке, при ускорении тон повышается, при замедлении понижается. Текст остаётся синхронным. При запуске YT Music native скорость возвращается к 1×.
 settings-speed = Скорость
 
 ## Music videos
@@ -235,7 +235,7 @@ settings-song-notifications-unavailable = Нужна установленная 
 settings-song-notifications = Уведомления о треках
 settings-close-to-tray-restart-desc = В Wayland скрытие и возврат окна через область уведомлений заработают после перезапуска. До этого кнопка × сворачивает окно.
 settings-title-bar = Строка заголовка
-settings-title-bar-desc = Выбирает, кто рисует строку заголовка и кнопки окна. В автоматическом режиме ytm-native рисует свою строку, если среда её не предоставляет, как GNOME в Wayland.
+settings-title-bar-desc = Выбирает, кто рисует строку заголовка и кнопки окна. В автоматическом режиме YT Music native рисует свою строку, если среда её не предоставляет, как GNOME в Wayland.
 settings-title-bar-restart-desc = Строка заголовка изменится при следующем запуске.
 settings-collapse-sidebar = Свернуть боковую панель
 settings-collapse-sidebar-desc = Оставляет на боковой панели только значки, чтобы освободить место в узких окнах. Кнопка меню вверху делает то же самое.
@@ -251,11 +251,11 @@ settings-open = Открыть
 
 settings-network = Сеть
 settings-proxy = Прокси
-settings-proxy-desc = Направляет весь трафик ytm-native через прокси, включая треки, тексты, вход и совместное прослушивание.
+settings-proxy-desc = Направляет весь трафик YT Music native через прокси, включая треки, тексты, вход и совместное прослушивание.
 settings-proxy-windows-uses = В Windows настроен прокси { $proxy }.
-settings-proxy-windows-none = В Windows прокси не настроен, поэтому ytm-native подключается напрямую.
+settings-proxy-windows-none = В Windows прокси не настроен, поэтому YT Music native подключается напрямую.
 settings-proxy-environment-sets = В переменных окружения указан прокси { $proxy }.
-settings-proxy-environment-none = Переменные HTTPS_PROXY и ALL_PROXY не заданы, поэтому ytm-native подключается напрямую.
+settings-proxy-environment-none = Переменные HTTPS_PROXY и ALL_PROXY не заданы, поэтому YT Music native подключается напрямую.
 settings-windows-proxy = Прокси Windows
 settings-system-proxy = Системный прокси
 settings-proxy-address = Адрес прокси
@@ -307,7 +307,7 @@ settings-updates-dev-build = Обновления доступны в устан
 settings-checking-for-updates = Проверка обновлений…
 settings-up-to-date = Установлена последняя версия ({ $version }).
 settings-update-downloading = Загрузка { $version }… { $percent }%
-settings-update-ready = Версия { $version } готова. Она установится при закрытии ytm-native.
+settings-update-ready = Версия { $version } готова. Она установится при закрытии YT Music native.
 settings-update-available = Доступна версия { $version }. { $step }
 settings-update-failed = Не удалось проверить обновления: { $error }
 settings-version = Версия { $version }.
@@ -322,7 +322,7 @@ settings-restart-to-update = Перезапустить для обновлен�
 settings-download = Скачать
 settings-check-now = Проверить сейчас
 settings-another-copy = Другая копия
-settings-another-copy-desc = ytm-native также установлен через { $kind }. Команда удаления этой копии: { $cmd }
+settings-another-copy-desc = YT Music native также установлен через { $kind }. Команда удаления этой копии: { $cmd }
 settings-whats-new = Что нового
 settings-whats-new-in = Что нового в { $version }
 

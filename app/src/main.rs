@@ -99,7 +99,7 @@ fn main() -> eframe::Result {
     let background = std::env::var_os("YTM_BACKGROUND").is_some();
     ui::init_titlebar(&data_dir());
     let mut viewport = egui::ViewportBuilder::default()
-        .with_title("ytm-native")
+        .with_title("YT Music native")
         .with_app_id("ytm-native")
         .with_inner_size(DEFAULT_SIZE)
         .with_min_inner_size(MIN_SIZE)

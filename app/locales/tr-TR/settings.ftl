@@ -109,7 +109,7 @@ settings-0-db = 0 dB
 ## Playback speed
 
 settings-playback-speed = Oynatma hızı
-settings-playback-speed-desc = Oynatıcı çubuğundaki bir düğmeyi kullanarak şarkıları daha hızlı veya daha yavaş çalın. Bir plak gibi, daha hızlı daha yüksek, daha yavaş ise daha alçak ses çıkarır. Şarkı sözleri, zamanın içinde kalıyor. ytm-native her başlatıldığında 1×'e geri döner.
+settings-playback-speed-desc = Oynatıcı çubuğundaki bir düğmeyi kullanarak şarkıları daha hızlı veya daha yavaş çalın. Bir plak gibi, daha hızlı daha yüksek, daha yavaş ise daha alçak ses çıkarır. Şarkı sözleri, zamanın içinde kalıyor. YT Music native her başlatıldığında 1×'e geri döner.
 settings-speed = Hız
 
 ## Music videos
@@ -235,7 +235,7 @@ settings-song-notifications-unavailable = Yüklü uygulamaya ihtiyaç var: Windo
 settings-song-notifications = Şarkı bildirimleri
 settings-close-to-tray-restart-desc = Wayland'de pencere yalnızca tepside gizlenebilir ve yeniden başlatmanın ardından geri gelebilir. O zamana kadar × onu en aza indirir.
 settings-title-bar = Başlık çubuğu
-settings-title-bar-desc = Pencerenin başlık çubuğunu ve düğmelerini kim çizer? Otomatik, masaüstünün hiçbir şey çekmediği ytm-native'leri kullanır (Wayland'de GNOME).
+settings-title-bar-desc = Pencerenin başlık çubuğunu ve düğmelerini kim çizer? Otomatik, masaüstünün hiçbir şey çekmediği YT Music native'leri kullanır (Wayland'de GNOME).
 settings-title-bar-restart-desc = Başlık çubuğu bir sonraki başlangıçtan itibaren değişir.
 settings-collapse-sidebar = Kenar çubuğunu daralt
 settings-collapse-sidebar-desc = Dar pencereler için yalnızca kenar çubuğundaki simgeleri göster. Üstteki menü düğmesi de aynısını yapar.
@@ -251,11 +251,11 @@ settings-open = Aç
 
 settings-network = Ağ
 settings-proxy = Vekil
-settings-proxy-desc = ytm-native'nin getirdiği her şeyi bir proxy aracılığıyla gönderin: şarkılar, şarkı sözleri, oturum açma ve birlikte dinleme.
+settings-proxy-desc = YT Music native'nin getirdiği her şeyi bir proxy aracılığıyla gönderin: şarkılar, şarkı sözleri, oturum açma ve birlikte dinleme.
 settings-proxy-windows-uses = Windows, { $proxy }'yi kullanacak şekilde ayarlandı.
-settings-proxy-windows-none = Windows proxy kullanacak şekilde ayarlanmadığından ytm-native doğrudan bağlanır.
+settings-proxy-windows-none = Windows proxy kullanacak şekilde ayarlanmadığından YT Music native doğrudan bağlanır.
 settings-proxy-environment-sets = Ortam { $proxy }'yi ayarlar.
-settings-proxy-environment-none = HTTPS_PROXY veya ALL_PROXY ayarlanmadığından ytm-native doğrudan bağlanır.
+settings-proxy-environment-none = HTTPS_PROXY veya ALL_PROXY ayarlanmadığından YT Music native doğrudan bağlanır.
 settings-windows-proxy = Windows proxy
 settings-system-proxy = Sistem proxy'si
 settings-proxy-address = Proxy adresi
@@ -307,7 +307,7 @@ settings-updates-dev-build = Güncellemeler yalnızca yüklü veya taşınabilir
 settings-checking-for-updates = Güncellemeler kontrol ediliyor…
 settings-up-to-date = En son sürümdesiniz ({ $version }).
 settings-update-downloading = { $version } indiriliyor… { $percent }%
-settings-update-ready = { $version } Sürümü hazır. ytm-native'yi kapattığınızda yüklenir.
+settings-update-ready = { $version } Sürümü hazır. YT Music native'yi kapattığınızda yüklenir.
 settings-update-available = { $version } Sürümü çıktı. { $step }
 settings-update-failed = Güncellemeler kontrol edilemedi: { $error }
 settings-version = Sürüm { $version }.
@@ -322,7 +322,7 @@ settings-restart-to-update = Güncellemek için yeniden başlatın
 settings-download = İndir
 settings-check-now = Şimdi kontrol et
 settings-another-copy = Başka bir kopya
-settings-another-copy-desc = ytm-native ayrıca { $kind }'den yüklenir. Bu kopyayı kaldırmak için { $cmd } komutunu çalıştırın
+settings-another-copy-desc = YT Music native ayrıca { $kind }'den yüklenir. Bu kopyayı kaldırmak için { $cmd } komutunu çalıştırın
 settings-whats-new = Yenilikler
 settings-whats-new-in = { $version }'deki yenilikler
 

@@ -233,7 +233,7 @@ mod os {
                 }
                 if keep == Keep::Display {
                     let screensaver = bus.with_proxy(SCREENSAVER, "/org/freedesktop/ScreenSaver", TIMEOUT);
-                    match screensaver.method_call(SCREENSAVER, "Inhibit", ("ytm-native", REASON)) {
+                    match screensaver.method_call(SCREENSAVER, "Inhibit", ("YT Music native", REASON)) {
                         Ok((cookie,)) => self.screensaver = Some(cookie),
                         Err(e) => log::debug!("keep awake: no screensaver: {e}"),
                     }
@@ -241,7 +241,7 @@ mod os {
             }
             let logind = Connection::new_system().and_then(|c| {
                 c.with_proxy("org.freedesktop.login1", "/org/freedesktop/login1", TIMEOUT)
-                    .method_call("org.freedesktop.login1.Manager", "Inhibit", ("idle", "ytm-native", REASON, "block"))
+                    .method_call("org.freedesktop.login1.Manager", "Inhibit", ("idle", "YT Music native", REASON, "block"))
                     .map(|(fd,)| fd)
             });
             match logind {

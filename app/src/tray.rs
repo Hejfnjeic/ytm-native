@@ -145,10 +145,10 @@ impl Icon {
     }
 }
 
-/// "ytm-native", with the song under it. Windows cuts a tooltip off at 127 characters
+/// "YT Music native", with the song under it. Windows cuts a tooltip off at 127 characters
 /// (UTF-16 ones), so a long one ends in "…" there instead.
 fn tooltip(song: Option<&str>) -> String {
-    let Some(song) = song else { return "ytm-native".to_owned() };
+    let Some(song) = song else { return "YT Music native".to_owned() };
     cut(&format!("YT Music\n{song}"), 127, |g| g.encode_utf16().count())
 }
 
@@ -207,7 +207,7 @@ fn build(png: image::RgbaImage) -> anyhow::Result<Icon> {
     #[allow(unused_mut)]
     let mut builder = TrayIconBuilder::new()
         .with_icon(tray_icon::Icon::from_rgba(png.into_raw(), w, h)?)
-        .with_tooltip("ytm-native")
+        .with_tooltip("YT Music native")
         .with_menu(Box::new(menu))
         .with_menu_on_left_click(false);
     #[cfg(target_os = "linux")]
@@ -381,7 +381,7 @@ mod tests {
 
     #[test]
     fn tooltip_fits_windows() {
-        assert_eq!(tooltip(None), "ytm-native");
+        assert_eq!(tooltip(None), "YT Music native");
         assert_eq!(tooltip(Some("Song — Artist")), "YT Music\nSong — Artist");
         // Just fits: left as it is.
         let fits = "a".repeat(127 - 9);

@@ -17,14 +17,14 @@ use super::widgets::{self, icon_at, named, paint_cover, text_at};
 use super::{Action, App, titlebar};
 use crate::theme::{self, icon};
 
-/// The window when first opened, and as small and as big as it goes.
-const SIZE: Vec2 = vec2(400.0, 540.0);
-const MIN: Vec2 = vec2(280.0, 220.0);
-const MAX: Vec2 = vec2(1200.0, 1400.0);
+/// The window when first opened, and as small and as big as it goes. Always square.
+const SIZE: Vec2 = vec2(440.0, 440.0);
+const MIN: Vec2 = vec2(300.0, 300.0);
+const MAX: Vec2 = vec2(1200.0, 1200.0);
 /// The window's top: the song, and where it's dragged by.
 const HEADER: f32 = 60.0;
 /// The lyrics' size against Now playing's: a small window wants smaller text.
-pub const TEXT_SCALE: f32 = 0.62;
+pub const TEXT_SCALE: f32 = 0.78;
 /// Kept above other windows until unpinned.
 const PINNED_BY_DEFAULT: bool = true;
 
@@ -54,7 +54,7 @@ impl Mini {
     pub fn load(get: impl Fn(&str) -> Option<String>) -> Self {
         let size = get("lyrics_window_size")
             .and_then(|v| serde_json::from_str::<[f32; 2]>(&v).ok())
-            .map(|[w, h]| vec2(w, h).clamp(MIN, MAX))
+            .map(|[w, h]| Vec2::splat(w.max(h)).clamp(MIN, MAX))
             .unwrap_or(SIZE);
         Mini { open: false, wanted: None, pinned: get("mini_pinned").map_or(PINNED_BY_DEFAULT, |v| v == "1"), size, opened_at: f64::NEG_INFINITY, kept_above: None }
     }
@@ -127,8 +127,17 @@ impl App {
                 self.mini.open = false;
                 return;
             }
+            // Square: a resize that changed one side brings the other along.
             if let Some(r) = ctx.input(|i| i.viewport().inner_rect) {
-                self.mini.size = r.size().clamp(MIN, MAX);
+                let size = r.size();
+                if (size.x - size.y).abs() > 1.0 {
+                    let side = if (size.x - self.mini.size.x).abs() >= (size.y - self.mini.size.y).abs() { size.x } else { size.y };
+                    let square = Vec2::splat(side).clamp(MIN, MAX);
+                    ctx.send_viewport_cmd(ViewportCommand::InnerSize(square));
+                    self.mini.size = square;
+                } else {
+                    self.mini.size = size.clamp(MIN, MAX);
+                }
             }
             egui::CentralPanel::default().frame(egui::Frame::NONE).show(ctx, |ui| lyrics_window(self, ui, now, custom));
             if custom {

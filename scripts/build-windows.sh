@@ -37,4 +37,5 @@ TXT
 archive="dist/ytm-native-$version-windows-x86_64.7z"
 rm -f "$archive"
 (cd dist && 7z a -t7z -mx=9 "$(basename "$archive")" "YT Music native" >/dev/null)
+rm -r "$out"
 ls -l "$archive" "dist/ytm-native-$version-windows-x86_64.exe"

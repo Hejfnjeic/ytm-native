@@ -7,8 +7,8 @@ pkgrel=1
 pkgdesc="Native desktop YouTube Music player (unofficial): radio, account sync, synced lyrics"
 arch=('x86_64')
 url="https://github.com/Hejfnjeic/ytm-native"
-license=('GPL-3.0-or-later')
-depends=('alsa-lib' 'fontconfig' 'freetype2' 'gcc-libs' 'glibc' 'libxkbcommon' 'opus' 'wayland')
+license=('GPL-3.0-only')
+depends=('alsa-lib' 'dbus' 'fontconfig' 'freetype2' 'gcc-libs' 'glibc' 'gtk3' 'libxkbcommon' 'openssl' 'wayland' 'webkit2gtk-4.1')
 makedepends=('cargo')
 optdepends=(
     'kwallet: keeps the key of the stored login (or another Secret Service provider)'
@@ -50,9 +50,9 @@ package() {
     cd "$pkgname-$pkgver"
     install -Dm755 "${CARGO_TARGET_DIR:-target}/release/ytm-native" "$pkgdir/usr/bin/ytm-native"
     install -Dm644 packaging/ytm-native.desktop "$pkgdir/usr/share/applications/ytm-native.desktop"
-    install -Dm644 app/assets/icon.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/ytm-native.svg"
+    install -Dm644 app/assets/icon/icon.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/ytm-native.svg"
     for n in 16 22 24; do
-        install -Dm644 app/assets/icon-small.svg "$pkgdir/usr/share/icons/hicolor/${n}x${n}/apps/ytm-native.svg"
+        install -Dm644 app/assets/icon/icon-small.svg "$pkgdir/usr/share/icons/hicolor/${n}x${n}/apps/ytm-native.svg"
     done
     install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
     install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"

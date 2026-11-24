@@ -71,7 +71,7 @@ stage="$out/ytm-native-$version"
 mkdir -p "$stage"
 cp "$linux" "$stage/ytm-native"
 cp scripts/install-linux.sh "$stage/install.sh"
-cp packaging/ytm-native.desktop app/assets/icon.svg app/assets/icon-small.svg README.md LICENSE "$stage/"
+cp packaging/ytm-native.desktop app/assets/icon/icon.svg app/assets/icon/icon-small.svg README.md LICENSE "$stage/"
 tar -C "$out" -czf "$out/ytm-native-$version-linux-x86_64.tar.gz" "ytm-native-$version"
 mv "$stage" "$out/.staging-linux"
 

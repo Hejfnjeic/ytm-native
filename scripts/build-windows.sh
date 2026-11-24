@@ -15,6 +15,12 @@ mkdir -p dist
 rm -rf "$out"   # the unpacked folder is rebuilt from scratch every time
 mkdir -p "$out/data"
 cp "$exe" "$out/ytm-native.exe"
+# The lyrics check's web view (WebView2) needs Microsoft's loader beside the exe: MinGW
+# links it as a DLL, not statically.
+loader=$(ls -d ~/.cargo/registry/src/*/webview2-com-sys-*/x64/WebView2Loader.dll | sort -V | tail -1)
+cp "$loader" "$out/WebView2Loader.dll"
+# Portable: settings and login in data\ beside the exe, and updates replace it in place.
+echo "Portable build: everything is kept in the data folder beside ytm-native.exe." > "$out/portable.txt"
 cp "$exe" "dist/ytm-native-$version-windows-x86_64.exe"
 cat > "$out/README.txt" <<'TXT'
 YT Music native (unofficial)

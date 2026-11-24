@@ -183,8 +183,6 @@ settings-dim-bright-covers = Przyciemniaj jasne okładki
 settings-dim-bright-covers-desc = Przyciemnia tło jasnych okładek, aby teksty i tytuły były czytelne. Ciemne okładki zachowują jasność.
 settings-font = Czcionka
 settings-font-desc = Czcionka całej aplikacji i tekstów utworów. Możesz wybrać dowolną zainstalowaną czcionkę, np. przeznaczoną dla Twojego języka.
-settings-themes = Motywy
-settings-themes-note = Motywy zaadaptowane z kolekcji społeczności Better Lyrics. Każdy zmienia tło, tekst, okładkę, pasek odtwarzacza i wygląd aplikacji. Powyższe ustawienia działają w każdym motywie.
 settings-zoom = Skala
 settings-zoom-desc = Zmienia rozmiar interfejsu. Ctrl + plus i Ctrl + minus robią to samo. Ctrl + 0 przywraca 100%.
 settings-window-material-desc = Używa materiału Windows 11 za stronami zamiast tła motywu.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = Nowe ustawienie proxy zacznie działać przy nast�
 
 ## Storage
 
-settings-cache-cleared = Wyczyszczono pamięć podręczną. Zwolniono { $size }.
-settings-storage = Pamięć
-settings-clearing = Czyszczenie…
-settings-measuring = Obliczanie…
-settings-cache = Pamięć podręczna
-settings-clear-cache = Wyczyść pamięć podręczną
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = Co nowego w wersji { $version }
 
 settings-about-tagline = Szybki, natywny klient YouTube Music.
 settings-about-lyrics-sources = API Better Lyrics: Musixmatch, LRCLIB, QQ, KuGou i Better Lyrics TTML
-settings-about-themes-credit = Zaadaptowane ze sklepu z motywami Better Lyrics. Każda karta wymienia twórców.
 settings-background = Tło
 settings-about-background-credit = Port Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Czcionki i ikony

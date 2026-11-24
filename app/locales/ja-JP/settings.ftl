@@ -183,8 +183,6 @@ settings-dim-bright-covers = 明るいカバーを暗くする
 settings-dim-bright-covers-desc = 明るいカバーの背景を暗くして、歌詞やタイトルを読みやすくします。暗いカバーはそのままです。
 settings-font = フォント
 settings-font-desc = アプリ全体と歌詞に適用します。お使いの言語向けのフォントなど、この PC にあるフォントが使えます。
-settings-themes = テーマ
-settings-themes-note = Better Lyrics コミュニティのテーマを移植しました。各テーマは背景、歌詞、カバー、プレーヤーバーなどアプリ全体のスタイルを変えます。上の設定はどのテーマでも使えます。
 settings-zoom = 拡大率
 settings-zoom-desc = 全体を拡大・縮小します。Ctrl + プラス、Ctrl + マイナスでも操作できます。Ctrl + 0 で 100% に戻ります。
 settings-window-material-desc = テーマの背景を Windows 11 のマテリアルに置き換えます。
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = 新しいプロキシ設定は次回の起動時�
 
 ## Storage
 
-settings-cache-cleared = キャッシュを削除し、{ $size } を解放しました。
-settings-storage = ストレージ
-settings-clearing = 削除中…
-settings-measuring = 計算中…
-settings-cache = キャッシュ
-settings-clear-cache = キャッシュを削除
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = { $version } の新機能
 
 settings-about-tagline = 高速なネイティブ YouTube Music クライアント。
 settings-about-lyrics-sources = Better Lyrics API：Musixmatch、LRCLIB、QQ、KuGou、Better Lyrics TTML
-settings-about-themes-credit = Better Lyrics のテーマ ストアから移植。各カードに作者を記載しています。
 settings-background = 背景
 settings-about-background-credit = Kawarp の移植版、MIT © Better Lyrics
 settings-fonts-and-icons = フォントとアイコン

@@ -2105,12 +2105,6 @@ pub fn active() -> &'static Preset {
     &all()[ACTIVE.load(std::sync::atomic::Ordering::Relaxed).min(all().len() - 1)]
 }
 
-/// The preset's cover thumbnail (JPEG), if it has one.
-pub fn cover(id: &str) -> Option<&'static [u8]> {
-    const COVERS: &[(&str, &[u8])] = include!(concat!(env!("OUT_DIR"), "/theme_covers.rs"));
-    COVERS.iter().find(|(k, _)| *k == id).map(|(_, b)| *b)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2137,15 +2131,6 @@ mod tests {
         assert_eq!(all().len(), FILES.len());
         assert_eq!(get("nope").id, DEFAULT_ID);
         assert_eq!(all()[0].id, DEFAULT_ID);
-        assert_eq!(all()[1].id, "classic");
-    }
-
-    /// Every theme has a cover for its card in Settings.
-    #[test]
-    fn themes_have_covers() {
-        for p in all().iter().filter(|p| p.source != "ytm-rs") {
-            assert!(cover(&p.id).is_some(), "{} has no cover", p.id);
-        }
     }
 
     /// No theme gets a feature by name: nothing outside this file's tests looks at an id.

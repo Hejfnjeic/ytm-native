@@ -183,8 +183,6 @@ settings-dim-bright-covers = Затемнювати світлі обклади�
 settings-dim-bright-covers-desc = Затемнює тло світлих обкладинок, щоб тексти й назви добре читалися. Яскравість темних обкладинок зберігається.
 settings-font = Шрифт
 settings-font-desc = Шрифт усього застосунку й текстів пісень. Можна вибрати будь-який установлений шрифт, наприклад придатний для вашої мови.
-settings-themes = Теми
-settings-themes-note = Теми адаптовано з колекції Better Lyrics. Кожна змінює тло, текст пісень, обкладинку, панель програвача й решту оформлення. Налаштування вище працюють у всіх темах.
 settings-zoom = Масштаб
 settings-zoom-desc = Змінює масштаб інтерфейсу. Ctrl + плюс і Ctrl + мінус роблять те саме. Ctrl + 0 повертає 100%.
 settings-window-material-desc = Використовує матеріал Windows 11 замість тла теми за сторінками.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = Нове налаштування проксі з�
 
 ## Storage
 
-settings-cache-cleared = Кеш очищено. Звільнено { $size }.
-settings-storage = Сховище
-settings-clearing = Очищення…
-settings-measuring = Вимірювання…
-settings-cache = Кеш
-settings-clear-cache = Очистити кеш
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = Що нового у { $version }
 
 settings-about-tagline = Швидкий нативний клієнт для YouTube Music.
 settings-about-lyrics-sources = API Better Lyrics: Musixmatch, LRCLIB, QQ, KuGou та Better Lyrics TTML
-settings-about-themes-credit = Адаптовано з магазину тем Better Lyrics. Авторів указано на картках тем.
 settings-background = Тло
 settings-about-background-credit = Порт Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Шрифти й піктограми

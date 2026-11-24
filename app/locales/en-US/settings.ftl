@@ -216,8 +216,6 @@ settings-dim-bright-covers = Dim bright covers
 settings-dim-bright-covers-desc = Darkens the background when the album art is bright, so the lyrics and titles over it stay easy to read. Dark covers are left as they are.
 settings-font = Font
 settings-font-desc = For the whole app and the lyrics. Any font installed on this PC works, e.g. one made for your language.
-settings-themes = Themes
-settings-themes-note = Ported from the Better Lyrics community themes. Each one restyles the background, lyrics, cover, player bar and the rest of the app, and every setting above works in all of them.
 settings-zoom = Zoom
 settings-zoom-desc = Makes everything bigger or smaller. Ctrl + plus and Ctrl + minus do the same, and Ctrl + 0 goes back to 100%.
 settings-window-material-desc = Windows 11's material behind the pages, in place of the theme's background.
@@ -323,12 +321,6 @@ settings-proxy-restart-desc = The new proxy setting is used from the next start.
 
 ## Storage
 
-settings-cache-cleared = Cache cleared: { $size } freed
-settings-storage = Storage
-settings-clearing = Clearing…
-settings-measuring = Measuring…
-settings-cache = Cache
-settings-clear-cache = Clear cache
 
 ## Keyboard shortcuts
 
@@ -392,7 +384,6 @@ settings-about-tagline = A fast, native YouTube Music player.
 settings-about-based-on = Based on ytm-rs
 settings-about-based-on-credit = The interface and lyrics come from ytm-rs by grapedjuice (GPL-3.0)
 settings-about-lyrics-sources = Better Lyrics API: Musixmatch, LRCLIB, QQ, KuGou and Better Lyrics TTML
-settings-about-themes-credit = Adapted from the Better Lyrics theme store; each card credits its creators
 settings-background = Background
 settings-about-background-credit = A port of Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Fonts and icons

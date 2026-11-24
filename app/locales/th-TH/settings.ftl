@@ -183,8 +183,6 @@ settings-dim-bright-covers = ปกสว่างสลัว
 settings-dim-bright-covers-desc = ทำให้พื้นหลังมืดลงเมื่อปกอัลบั้มมีความสว่าง ดังนั้นเนื้อเพลงและชื่อเรื่องจึงง่ายต่อการอ่าน ปกสีเข้มก็เหลืออยู่เหมือนเดิม
 settings-font = แบบอักษร
 settings-font-desc = สำหรับทั้งแอพและเนื้อเพลง ฟอนต์ใดๆ ที่ติดตั้งบนพีซีเครื่องนี้ใช้งานได้ เช่น หนึ่งรายการที่สร้างขึ้นสำหรับภาษาของคุณ
-settings-themes = ธีมส์
-settings-themes-note = ย้ายจากธีมชุมชน Better Lyrics แต่ละรายการจะปรับสไตล์พื้นหลัง เนื้อเพลง หน้าปก แถบเครื่องเล่น และส่วนอื่นๆ ของแอป และการตั้งค่าด้านบนทั้งหมดจะใช้ได้กับการตั้งค่าทั้งหมด
 settings-zoom = ซูม
 settings-zoom-desc = ทำให้ทุกสิ่งใหญ่ขึ้นหรือเล็กลง Ctrl + plus และ Ctrl + ลบทำเช่นเดียวกัน และ Ctrl + 0 กลับไปเป็น 100%
 settings-window-material-desc = เนื้อหาของ Windows 11 อยู่ด้านหลังหน้า แทนที่พื้นหลังของธีม
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = การตั้งค่าพร็อกซ�
 
 ## Storage
 
-settings-cache-cleared = ล้างแคชแล้ว: ปล่อย { $size } แล้ว
-settings-storage = ที่เก็บข้อมูล
-settings-clearing = กำลังเคลียร์...
-settings-measuring = กำลังวัด...
-settings-cache = แคช
-settings-clear-cache = ล้างแคช
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = มีอะไรใหม่ใน { $version }
 
 settings-about-tagline = ไคลเอ็นต์ YouTube Music ที่รวดเร็วและเนทีฟ
 settings-about-lyrics-sources = Better Lyrics API: Musixmatch, LRCLIB, QQ, KuGou และ Better Lyrics TTML
-settings-about-themes-credit = ดัดแปลงมาจากที่เก็บธีม Better Lyrics การ์ดแต่ละใบให้เครดิตผู้สร้าง
 settings-background = พื้นหลัง
 settings-about-background-credit = พอร์ตของ Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = แบบอักษรและไอคอน

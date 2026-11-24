@@ -183,8 +183,6 @@ settings-dim-bright-covers = 昏暗明亮的封面
 settings-dim-bright-covers-desc = 當專輯封面明亮時使背景變暗，以便其上的歌詞和標題易於閱讀。深色封面保持原樣。
 settings-font = 字體
 settings-font-desc = 對於整個應用程式和歌詞。此電腦上安裝的任何字體都可以使用，例如專為您的語言而設計的。
-settings-themes = 主題
-settings-themes-note = 從 Better Lyrics 社群主題移植。每一个都重新设计了背景、歌词、封面、播放器栏和应用程序的其余部分，上面的每一个设置都适用于所有这些。
 settings-zoom = 縮放
 settings-zoom-desc = 使一切變大或變小。 Ctrl + 加號和 Ctrl + 減號執行相同操作，Ctrl + 0 返回 100%。
 settings-window-material-desc = Windows 11 的資料位於頁後面，取代主題背景。
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = 下次啟動時將使用新的代理設定。
 
 ## Storage
 
-settings-cache-cleared = 快取已清除：{ $size } 已釋放
-settings-storage = 存儲
-settings-clearing = 正在清理中…
-settings-measuring = 測量…
-settings-cache = 快取
-settings-clear-cache = 清除緩存
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = { $version } 的新功能
 
 settings-about-tagline = 快速、本機 YouTube Music 用戶端。
 settings-about-lyrics-sources = Better Lyrics API：Musixmatch、LRCLIB、QQ、酷狗和 Better Lyrics TTML
-settings-about-themes-credit = 改編自Better Lyrics主題商店；每張卡片都歸功於其創作者
 settings-background = 背景
 settings-about-background-credit = Kawarp 的端口，麻省理工學院 © Better Lyrics
 settings-fonts-and-icons = 字體和圖標

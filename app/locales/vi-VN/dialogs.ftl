@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = Xóa bộ nhớ đệm?
-dialog-cache-freed-size = Điều này giải phóng { $size }.
-dialog-cache-frees-space = Điều này giải phóng không gian.
 dialog-delete-playlist-title = Xóa danh sách phát?
 dialog-delete-playlist = Xóa danh sách phát
 dialog-delete-upload-title = Xóa nội dung tải lên?

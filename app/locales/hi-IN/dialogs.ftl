@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = कैश साफ़ करें?
-dialog-cache-freed-size = यह { $size } को मुक्त कर देता है।
-dialog-cache-frees-space = इससे जगह खाली हो जाती है।
 dialog-delete-playlist-title = प्लेलिस्ट हटाएं?
 dialog-delete-playlist = प्लेलिस्ट हटाएं
 dialog-delete-upload-title = अपलोड हटाएं?

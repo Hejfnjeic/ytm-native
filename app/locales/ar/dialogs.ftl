@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = مسح ذاكرة التخزين المؤقت؟
-dialog-cache-freed-size = سيؤدي هذا إلى تحرير { $size }.
-dialog-cache-frees-space = سيؤدي هذا إلى تحرير مساحة.
 dialog-delete-playlist-title = حذف قائمة التشغيل؟
 dialog-delete-playlist = حذف قائمة التشغيل
 dialog-delete-upload-title = حذف الملف المرفوع؟

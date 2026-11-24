@@ -2,10 +2,6 @@
 
 extra-renderer-desc = Використовує { $api } (wgpu) замість OpenGL. Потребує приблизно втричі більше пам’яті. Спробуйте, якщо OpenGL відображає інтерфейс із помилками. Якщо { $api } не запуститься, застосунок повернеться до OpenGL.
 extra-channel-release-desc = Стабільні випуски придатні для щоденного використання. В експериментальних нічних збірках можливі збої.
-extra-theme-accessible-name = Тема: { $name }
-extra-built-in = Вбудована
-extra-theme-author = Автор: { $name }
-extra-theme-source = Джерело: { $source }
 extra-system-shortcuts = Глобальні комбінації клавіш
 extra-system-shortcuts-desc = Працюють, навіть якщо активний інший застосунок або вікно згорнуто чи приховано в області сповіщень.
 extra-shortcut-failed = Не вдалося зберегти комбінацію клавіш

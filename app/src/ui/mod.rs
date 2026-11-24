@@ -285,8 +285,6 @@ enum Dialog {
     ConfirmDelete { id: String, title: String },
     /// Deleting an uploaded song (`Track::upload`), asked about first.
     ConfirmDeleteUpload { entity: String, title: String },
-    /// Clearing the cache (Settings › Storage), asked about first.
-    ConfirmClearCache,
     /// `info` until it loads; `busy` while a change is on its way; `confirm_off` asks
     /// before turning collaboration off (that removes the collaborators).
     Collaborate { id: String, info: Option<crate::ytm::Collaboration>, busy: bool, confirm_off: bool },
@@ -648,7 +646,6 @@ pub struct App {
     // updates
     updater: Option<crate::update::Updater>,
     /// The cache Settings › Storage measures and clears.
-    storage: crate::cache::Storage,
     auto_update: bool,
     /// Updates from the nightly channel rather than stable.
     update_nightly: bool,
@@ -867,7 +864,6 @@ impl App {
             output_devices: Vec::new(),
             language,
             updater: None,
-            storage: Default::default(),
             auto_update: get("auto_update").is_none_or(|v| v == "1"),
             // A nightly build stays on nightlies until told otherwise. In a Flatpak,
             // Flatpak picks the version, so it's whichever this build is.
@@ -1072,23 +1068,6 @@ impl App {
             Ok("upnext") => app.np_tab = NpTab::UpNext,
             Ok("art") => app.np_tab = NpTab::Art,
             _ => {}
-        }
-        // Last launch's name, picture and playlists, so they show at once; the account
-        // menu and the library replace them when they arrive.
-        if app.logged_in
-            && let Some(c) = get("account_cache").and_then(|j| serde_json::from_str::<AccountCache>(&j).ok())
-        {
-            app.account_name = c.name;
-            app.account_avatar = c.avatar;
-            app.sidebar_cache = Some(c.playlists).filter(|p| !p.is_empty());
-        }
-        // Last launch's Home, so it shows at once; the request above replaces it.
-        if let Some(c) = std::fs::read(app.backend.data_dir().join(HOME_CACHE))
-            .ok()
-            .and_then(|b| serde_json::from_slice::<HomeCache>(&b).ok())
-            .filter(|c| c.logged_in == app.logged_in && c.hl == app.locale.hl && c.gl == app.locale.gl && !c.shelves.is_empty())
-        {
-            app.home = Some(HomeState { chips: c.chips, shelves: c.shelves, continuation: None, loading_more: None, picks_loading: false, picks_expanded: false });
         }
         // Dev hook: YTM_QUEUE opens the queue drawer.
         if std::env::var_os("YTM_QUEUE").is_some() {
@@ -1355,14 +1334,6 @@ impl App {
     fn toast_hold(&self) -> f32 {
         let secs = self.look().app.toast_look.secs.max(1.5);
         if self.undo.is_some() { secs.max(7.0) } else { secs }
-    }
-
-    /// Settings › Storage's Clear cache, once asked. An update that's downloading or
-    /// waiting to install keeps its files.
-    fn clear_cache(&mut self, ctx: &egui::Context) {
-        use crate::update::State;
-        let keep_updates = self.updater.as_ref().is_some_and(|u| matches!(u.state(), State::Downloading { .. } | State::Ready { .. }));
-        self.storage.clear(ctx, self.backend.data_dir(), keep_updates);
     }
 
 
@@ -1831,11 +1802,7 @@ impl eframe::App for App {
         // Back from the mini player.
         self.mini.fade_in(&ctx, now, shell::base_color(self));
 
-        if dev_var("YTM_THEME_TOUR").is_some() {
-            self.theme_tour(&ctx, now);
-        } else {
-            dev_screenshot(&ctx, now);
-        }
+        dev_screenshot(&ctx, now);
         // Next frame's root starts from the pages' mode.
         theme::set_mode(&ctx, light);
     }
@@ -1880,12 +1847,8 @@ impl eframe::App for App {
         let b = |v: bool| if v { "1" } else { "0" }.to_owned();
         storage.set_string("autoplay", b(self.autoplay));
         storage.set_string("smart_shuffle", b(self.smart_shuffle));
-        let cache = self.logged_in.then(|| AccountCache {
-            name: self.account_name.clone(),
-            avatar: self.account_avatar.clone(),
-            playlists: self.library.as_ref().map(|l| l.playlists.clone()).or_else(|| self.sidebar_cache.clone()).unwrap_or_default(),
-        });
-        storage.set_string("account_cache", cache.and_then(|c| serde_json::to_string(&c).ok()).unwrap_or_default());
+        // Earlier builds kept the account's name and playlists here.
+        storage.set_string("account_cache", String::new());
         storage.set_string("normalize", self.normalize.key().to_owned());
         storage.set_string("log_volume", b(self.log_volume));
         storage.set_string("pause_fade", b(self.pause_fade));
@@ -2042,64 +2005,6 @@ fn relaunch() {
     let Ok(exe) = std::env::current_exe() else { return };
     log::info!("restarting");
     crate::update::start_after_exit(&exe);
-}
-
-/// The last unfiltered Home feed, shown at launch until the new one arrives.
-#[derive(serde::Serialize, serde::Deserialize)]
-pub(super) struct HomeCache {
-    pub logged_in: bool,
-    /// The Song info language and country it came in (older caches: English, US).
-    #[serde(default = "english")]
-    pub hl: String,
-    #[serde(default = "us")]
-    pub gl: String,
-    pub chips: Vec<crate::model::Chip>,
-    pub shelves: Vec<crate::model::Shelf>,
-}
-
-fn english() -> String {
-    crate::locale::ENGLISH.hl.to_owned()
-}
-
-fn us() -> String {
-    crate::locale::ENGLISH.gl.to_owned()
-}
-
-impl HomeCache {
-    /// Writes it (`None` removes it) off the UI thread. A write started later always wins,
-    /// and a half-written file is never left behind.
-    pub(super) fn store(dir: &std::path::Path, cache: Option<Self>) {
-        static STARTED: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-        static WRITTEN: std::sync::Mutex<u64> = std::sync::Mutex::new(0);
-        let n = STARTED.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
-        let path = dir.join(HOME_CACHE);
-        std::thread::spawn(move || {
-            let mut written = WRITTEN.lock().unwrap_or_else(|e| e.into_inner());
-            if *written > n {
-                return;
-            }
-            *written = n;
-            match cache.and_then(|c| serde_json::to_vec(&c).ok()) {
-                Some(json) => {
-                    let tmp = path.with_extension("json.tmp");
-                    let _ = std::fs::write(&tmp, json).and_then(|_| std::fs::rename(&tmp, &path));
-                }
-                None => {
-                    let _ = std::fs::remove_file(&path);
-                }
-            }
-        });
-    }
-}
-
-const HOME_CACHE: &str = "home.json";
-
-/// What the sidebar and the account button show, kept for the next launch.
-#[derive(serde::Serialize, serde::Deserialize)]
-struct AccountCache {
-    name: Option<String>,
-    avatar: Option<String>,
-    playlists: Vec<Card>,
 }
 
 /// What's saved between launches so the player picks up where it left off.

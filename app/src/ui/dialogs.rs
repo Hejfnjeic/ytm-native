@@ -10,21 +10,6 @@ use super::{Action, App, Dialog, notes, pages, widgets};
 
 impl App {
     pub(super) fn draw_dialog(&mut self, ctx: &egui::Context) {
-        if let Some(Dialog::ConfirmClearCache) = &self.dialog {
-            let body = match self.storage.known() {
-                Some(n) => crate::tr!("dialog-cache-freed-size", size = crate::cache::size_text(n)),
-                None => crate::tr!("dialog-cache-frees-space").to_owned(),
-            };
-            match confirm(ctx, crate::tr!("dialog-clear-cache-title"), &body, crate::tr!("settings-clear"), crate::tr!("settings-clear-cache")) {
-                Some(true) => {
-                    self.clear_cache(ctx);
-                    self.dialog = None;
-                }
-                Some(false) => self.dialog = None,
-                None => {}
-            }
-            return;
-        }
         if let Some(Dialog::ConfirmDelete { id, title }) = &self.dialog {
             let (id, title) = (id.clone(), title.clone());
             let body = crate::tr!("dialog-delete-playlist-body", title = title.as_str());
@@ -60,7 +45,6 @@ impl App {
             Dialog::EditPlaylist { .. } => crate::tr!("dialog-edit-playlist"),
             Dialog::ConfirmDelete { .. } => crate::tr!("dialog-delete-playlist"),
             Dialog::ConfirmDeleteUpload { .. } => crate::tr!("dialog-delete-upload"),
-            Dialog::ConfirmClearCache => crate::tr!("settings-clear-cache"),
             Dialog::Collaborate { .. } => crate::tr!("ui-collaborate"),
         };
         // The same modal card as "Delete playlist?" and the update dialog.
@@ -124,7 +108,7 @@ impl App {
                         done |= cancel;
                     }
                     Dialog::Collaborate { info, busy, confirm_off, .. } => done = self.collaborate_dialog(ui, info, busy, confirm_off, accent),
-                    Dialog::ConfirmDelete { .. } | Dialog::ConfirmDeleteUpload { .. } | Dialog::ConfirmClearCache => unreachable!("drawn by confirm"),
+                    Dialog::ConfirmDelete { .. } | Dialog::ConfirmDeleteUpload { .. } => unreachable!("drawn by confirm"),
                 }
             });
         });

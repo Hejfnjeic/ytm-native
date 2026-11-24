@@ -187,8 +187,6 @@ settings-dim-bright-covers = تعتيم الأغلفة الفاتحة
 settings-dim-bright-covers-desc = يغمّق الخلفية عندما يكون غلاف الألبوم فاتحًا، لتظل الكلمات والعناوين فوقه سهلة القراءة. وتُترك الأغلفة الداكنة كما هي.
 settings-font = الخط
 settings-font-desc = للتطبيق بأكمله والكلمات. يعمل أي خط مثبّت على هذا الجهاز، مثل خط مخصّص للغتك.
-settings-themes = السمات
-settings-themes-note = منقولة من سمات مجتمع Better Lyrics. تعيد كل سمة تنسيق الخلفية والكلمات والغلاف وشريط المشغّل وبقية التطبيق، وتعمل جميع الإعدادات أعلاه في كلها.
 settings-zoom = التكبير
 settings-zoom-desc = يجعل كل شيء أكبر أو أصغر. يؤدي الاختصار Ctrl + plus و Ctrl + minus إلى النتيجة نفسها، ويعيد الاختصار Ctrl + 0 الحجم إلى 100%.
 settings-window-material-desc = خامة Windows 11 خلف الصفحات بدلًا من خلفية السمة.
@@ -292,12 +290,6 @@ settings-proxy-restart-desc = سيتم تطبيق إعداد الوكيل الج
 
 ## Storage
 
-settings-cache-cleared = تم مسح التخزين المؤقت: تم تحرير { $size }
-settings-storage = التخزين
-settings-clearing = جارٍ المسح…
-settings-measuring = جارٍ القياس…
-settings-cache = التخزين المؤقت
-settings-clear-cache = مسح التخزين المؤقت
 
 ## Keyboard shortcuts
 
@@ -353,7 +345,6 @@ settings-whats-new-in = ما الجديد في { $version }
 
 settings-about-tagline = عميل سريع وأصلي لـ YouTube Music.
 settings-about-lyrics-sources = واجهة برمجة تطبيقات Better Lyrics: Musixmatch, LRCLIB, QQ, KuGou و Better Lyrics TTML
-settings-about-themes-credit = مقتبس من متجر سمات Better Lyrics؛ وتنسب كل بطاقة الفضل إلى منشئيها
 settings-background = الخلفية
 settings-about-background-credit = منفذ منقول من Kawarp، رخصة MIT © Better Lyrics
 settings-fonts-and-icons = الخطوط والأيقونات

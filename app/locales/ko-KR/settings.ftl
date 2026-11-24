@@ -183,8 +183,6 @@ settings-dim-bright-covers = 어둡고 밝은 커버
 settings-dim-bright-covers-desc = 앨범 아트가 밝을 때 배경을 어둡게 하여 그 위에 있는 가사와 제목을 읽기 쉽게 유지합니다. 어두운 덮개는 그대로 남아 있습니다.
 settings-font = 세례반
 settings-font-desc = 전체 앱과 가사에 사용됩니다. 이 PC에 설치된 모든 글꼴이 작동합니다. 귀하의 언어로 만들어진 것입니다.
-settings-themes = 테마
-settings-themes-note = Better Lyrics 커뮤니티 테마에서 이식되었습니다. 각각은 배경, 가사, 표지, 플레이어 표시줄 및 앱의 나머지 부분의 스타일을 변경하며 위의 모든 설정은 모두에서 작동합니다.
 settings-zoom = 줌
 settings-zoom-desc = 모든 것을 더 크게 또는 더 작게 만듭니다. Ctrl + 더하기와 Ctrl + 빼기는 동일한 작업을 수행하며 Ctrl + 0은 100%로 돌아갑니다.
 settings-window-material-desc = Windows 11의 자료는 테마 배경 대신 페이지 뒤에 있습니다.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = 다음 시작부터 새 프록시 설정이 사용
 
 ## Storage
 
-settings-cache-cleared = 캐시가 삭제됨: { $size }가 해제됨
-settings-storage = 보관
-settings-clearing = 지우는 중…
-settings-measuring = 측정 중…
-settings-cache = 캐시
-settings-clear-cache = 캐시 지우기
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = { $version }의 새로운 기능
 
 settings-about-tagline = 빠른 기본 YouTube Music 클라이언트.
 settings-about-lyrics-sources = Better Lyrics API: Musixmatch, LRCLIB, QQ, KuGou 및 Better Lyrics TTML
-settings-about-themes-credit = Better Lyrics 테마 스토어에서 채택되었습니다. 각 카드는 제작자에게 크레딧을 제공합니다.
 settings-background = 배경
 settings-about-background-credit = Kawarp 포트, MIT © Better Lyrics
 settings-fonts-and-icons = 글꼴 및 아이콘

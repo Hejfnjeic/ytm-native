@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = 清除快取？
-dialog-cache-freed-size = 這釋放了 { $size }。
-dialog-cache-frees-space = 這可以釋放空間。
 dialog-delete-playlist-title = 刪除播放清單？
 dialog-delete-playlist = 刪除播放清單
 dialog-delete-upload-title = 刪除上傳內容？

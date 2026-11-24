@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = ล้างแคช?
-dialog-cache-freed-size = สิ่งนี้ทำให้ { $size } ว่างขึ้น
-dialog-cache-frees-space = ซึ่งจะทำให้มีพื้นที่ว่างมากขึ้น
 dialog-delete-playlist-title = ลบเพลย์ลิสต์ใช่ไหม
 dialog-delete-playlist = ลบเพลย์ลิสต์
 dialog-delete-upload-title = ลบการอัปโหลดใช่ไหม

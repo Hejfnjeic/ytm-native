@@ -2,10 +2,6 @@
 
 extra-renderer-desc = Gebruikt { $api } (wgpu) in plaats van OpenGL. Kost ongeveer drie keer zoveel geheugen. Probeer dit bij weergaveproblemen met OpenGL. Als { $api } niet start, schakelt de app terug.
 extra-channel-release-desc = Stabiele versies zijn voor dagelijks gebruik. Nachtelijke builds zijn experimenteel en kunnen fouten bevatten.
-extra-theme-accessible-name = Thema: { $name }
-extra-built-in = Ingebouwd
-extra-theme-author = door { $name }
-extra-theme-source = Van { $source }
 extra-system-shortcuts = Globale sneltoetsen
 extra-system-shortcuts-desc = Werken ook met een andere app vooraan of met het venster geminimaliseerd of in het systeemvak.
 extra-shortcut-failed = Sneltoets kon niet worden opgeslagen

@@ -183,8 +183,6 @@ settings-dim-bright-covers = Vỏ sáng mờ
 settings-dim-bright-covers-desc = Làm tối nền khi ảnh bìa album sáng, để lời bài hát và tiêu đề trên ảnh luôn dễ đọc. Các bìa màu tối vẫn được giữ nguyên.
 settings-font = Phông chữ
 settings-font-desc = Dành cho toàn bộ ứng dụng và lời bài hát. Mọi phông chữ được cài đặt trên PC này đều hoạt động, ví dụ: một cái được tạo cho ngôn ngữ của bạn.
-settings-themes = Chủ đề
-settings-themes-note = Được chuyển từ chủ đề cộng đồng Better Lyrics. Mỗi cái đều thiết kế lại nền, lời bài hát, bìa, thanh trình phát và phần còn lại của ứng dụng, đồng thời mọi cài đặt ở trên đều hoạt động trong tất cả chúng.
 settings-zoom = Thu phóng
 settings-zoom-desc = Làm cho mọi thứ lớn hơn hoặc nhỏ hơn. Ctrl + plus và Ctrl + trừ làm tương tự và Ctrl + 0 quay lại 100%.
 settings-window-material-desc = Tài liệu của Windows 11 phía sau các trang, thay cho nền của chủ đề.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = Cài đặt proxy mới được sử dụng từ 
 
 ## Storage
 
-settings-cache-cleared = Đã xóa bộ nhớ đệm: { $size } đã giải phóng
-settings-storage = Lưu trữ
-settings-clearing = Đang dọn dẹp…
-settings-measuring = Đo…
-settings-cache = Bộ nhớ đệm
-settings-clear-cache = Xóa bộ nhớ đệm
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = { $version } có gì mới
 
 settings-about-tagline = Máy khách YouTube Music gốc, nhanh chóng.
 settings-about-lyrics-sources = API Better Lyrics: Musixmatch, LRCLIB, QQ, KuGou và Better Lyrics TTML
-settings-about-themes-credit = Được chuyển thể từ kho chủ đề Better Lyrics; mỗi thẻ ghi công cho người tạo ra nó
 settings-background = Bối cảnh
 settings-about-background-credit = Một cổng của Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Phông chữ và biểu tượng

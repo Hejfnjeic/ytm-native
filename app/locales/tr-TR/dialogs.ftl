@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = Önbellek temizlensin mi?
-dialog-cache-freed-size = Bu, { $size }'de yer açar.
-dialog-cache-frees-space = Bu, alanı boşaltır.
 dialog-delete-playlist-title = Çalma listesi silinsin mi?
 dialog-delete-playlist = Çalma listesini sil
 dialog-delete-upload-title = Yükleme silinsin mi?

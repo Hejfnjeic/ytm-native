@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = キャッシュを削除しますか？
-dialog-cache-freed-size = { $size } を解放します。
-dialog-cache-frees-space = 空き容量が増えます。
 dialog-delete-playlist-title = プレイリストを削除しますか？
 dialog-delete-playlist = プレイリストを削除
 dialog-delete-upload-title = アップロードを削除しますか？

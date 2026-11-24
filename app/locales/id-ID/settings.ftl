@@ -187,8 +187,6 @@ settings-dim-bright-covers = Redupkan sampul terang
 settings-dim-bright-covers-desc = Gelapkan latar belakang kalau sampul albumnya terang, biar lirik dan judul di atasnya tetap enak dibaca. Sampul gelap dibiarkan apa adanya.
 settings-font = Font
 settings-font-desc = Untuk seluruh aplikasi dan lirik. Font apa pun yang terpasang di PC ini bisa dipakai, misalnya yang dibuat khusus untuk bahasamu.
-settings-themes = Tema
-settings-themes-note = Diadaptasi dari tema komunitas Better Lyrics. Tiap tema mengubah gaya latar belakang, lirik, sampul, bilah pemutar, dan bagian aplikasi lainnya, dan semua pengaturan di atas berlaku di semua tema.
 settings-zoom = Zoom
 settings-zoom-desc = Bikin semuanya lebih besar atau lebih kecil. Ctrl + plus dan Ctrl + minus fungsinya sama, dan Ctrl + 0 balik ke 100%.
 settings-window-material-desc = Material Windows 11 di belakang halaman, menggantikan latar belakang tema.
@@ -291,12 +289,6 @@ settings-proxy-restart-desc = Pengaturan proxy baru dipakai mulai dari peluncura
 
 ## Storage
 
-settings-cache-cleared = Cache dibersihkan: { $size } lega
-settings-storage = Penyimpanan
-settings-clearing = Lagi dibersihin…
-settings-measuring = Lagi ngukur…
-settings-cache = Cache
-settings-clear-cache = Bersihkan cache
 
 ## Keyboard shortcuts
 
@@ -354,7 +346,6 @@ settings-whats-new-in = Yang baru di { $version }
 
 settings-about-tagline = Klien YouTube Music native yang ngebuuuttt.
 settings-about-lyrics-sources = API lirik: Musixmatch, LRCLIB, QQ, KuGou, dan Better Lyrics TTML
-settings-about-themes-credit = Diadaptasi dari toko tema Better Lyrics; tiap kartu mencantumkan pembuatnya
 settings-background = Latar belakang
 settings-about-background-credit = Port dari Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Font dan ikon

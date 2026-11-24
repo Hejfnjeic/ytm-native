@@ -2,10 +2,6 @@
 
 extra-renderer-desc = OpenGL 대신 { $api }(wgpu)를 사용하세요. 메모리가 약 3배 정도 필요하며 OpenGL가 잘못 그리는 경우 유용합니다. { $api }를 시작할 수 없는 경우 OpenGL로 대체됩니다.
 extra-channel-release-desc = 일상적인 청취를 위한 안정적인 릴리스가 준비되어 있습니다. Nightly 빌드는 실험적이므로 중단될 수 있습니다.
-extra-theme-accessible-name = 테마: { $name }
-extra-built-in = 내장
-extra-theme-author = 작성자: { $name }
-extra-theme-source = { $source }에서
 extra-system-shortcuts = 시스템 전반에 걸친 단축키
 extra-system-shortcuts-desc = 다른 앱이 앞에 있거나 창이 최소화되어 있거나 트레이에 있는 동안 작동합니다.
 extra-shortcut-failed = 바로가기를 저장할 수 없습니다.

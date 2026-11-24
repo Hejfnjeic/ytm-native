@@ -1578,8 +1578,6 @@ fn settings_tab(app: &mut App, ui: &mut Ui, tab: SettingsTab) {
             settings_song_info(app, ui);
             settings_window(app, ui);
             settings_section(ui, tr!("settings-network"), None, None, |ui| network(app, ui));
-            // Last, as most apps keep it.
-            settings_storage(app, ui);
         }
         SettingsTab::Shortcuts => {
             super::hotkeys::settings_section(app, ui);
@@ -1930,28 +1928,6 @@ fn settings_playback(app: &mut App, ui: &mut Ui) {
     });
 }
 
-/// Settings › Storage: how much room the cache takes, and clearing it.
-fn settings_storage(app: &mut App, ui: &mut Ui) {
-    if let Some(freed) = app.storage.take_freed() {
-        app.toast(tr!("settings-cache-cleared", size = crate::cache::size_text(freed)));
-    }
-    let now = ui.input(|i| i.time);
-    let size = app.storage.size(ui.ctx(), app.backend.data_dir(), now);
-    let clearing = app.storage.clearing();
-    settings_section(ui, tr!("settings-storage"), None, None, |ui| {
-        let desc = match size {
-            _ if clearing => tr!("settings-clearing").to_owned(),
-            Some(n) => crate::cache::size_text(n),
-            None => tr!("settings-measuring").to_owned(),
-        };
-        setting_row(ui, tr!("settings-cache"), Some(&desc), |ui| {
-            if pill(ui, tr!("settings-clear-cache"), None, false).clicked() && !clearing {
-                app.dialog = Some(super::Dialog::ConfirmClearCache);
-            }
-        });
-    });
-}
-
 /// Settings › Lyrics: the better-lyrics extension's options.
 fn settings_lyrics(app: &mut App, ui: &mut Ui) {
     settings_section(ui, tr!("settings-lyrics"), None, None, |ui| {
@@ -2250,21 +2226,6 @@ fn settings_appearance(app: &mut App, ui: &mut Ui) {
         settings_zoom(ui);
     });
 
-    let current = crate::preset::get(&app.theme_id).name.clone();
-    // Not a card of rows, so it's narrowed here: to the themes that match.
-    let shown: Vec<&crate::preset::Preset> = FILTER.with_borrow_mut(|f| {
-        f.section = tr!("settings-themes").to_owned();
-        crate::preset::all().iter().filter(|p| f.words.is_empty() || words_match(&f.words, &f.section, &format!("{} {} {}", p.name, p.creators.join(" "), p.blurb))).collect()
-    });
-    if !shown.is_empty() {
-        FILTER.with_borrow_mut(|f| f.total += shown.len());
-        section_label(ui, tr!("settings-themes"), settings_value(Some(&current)).as_deref());
-        if !filtering() {
-            widgets::note(ui, tr!("settings-themes-note"), theme::regular(13.0), theme::text_dim());
-            ui.add_space(12.0);
-        }
-        themes(app, ui, &shown);
-    }
     if was_theme != app.theme_id {
         // The blur is baked into the art when it arrives: the same song needs it again.
         app.art_key = None;
@@ -2808,7 +2769,6 @@ fn settings_about(ui: &mut Ui) {
         for (title, desc) in [
             (tr!("settings-about-based-on"), tr!("settings-about-based-on-credit")),
             (tr!("settings-lyrics"), tr!("settings-about-lyrics-sources")),
-            (tr!("settings-themes"), tr!("settings-about-themes-credit")),
             (tr!("settings-background"), tr!("settings-about-background-credit")),
             (tr!("settings-fonts-and-icons"), tr!("settings-about-fonts-credit")),
         ] {
@@ -3632,80 +3592,6 @@ pub(super) fn keycap(ui: &Ui, right: egui::Pos2, key: &str) -> f32 {
     ui.painter().rect_filled(Rect::from_min_max(pos2(rect.left() + 2.0, rect.bottom() - 2.0), pos2(rect.right() - 2.0, rect.bottom())), 2.0, theme::shade(0.25));
     ui.painter().galley(rect.center() - g.size() / 2.0, g, theme::text());
     rect.left()
-}
-
-/// Theme preset gallery: one card per preset with its cover, name and creators.
-fn themes(app: &mut App, ui: &mut Ui, shown: &[&crate::preset::Preset]) {
-    let avail = ui.available_width();
-    let gap = 16.0;
-    let cols = ((avail + gap) / (200.0 + gap)).floor().max(1.0);
-    let w = ((avail + gap) / cols - gap).floor();
-    let mut picked = None;
-    ui.scope(|ui| {
-        ui.spacing_mut().item_spacing = vec2(gap, gap + 4.0);
-        ui.horizontal_wrapped(|ui| {
-            for p in shown {
-                let selected = app.theme_id == p.id;
-                if theme_card(ui, p, w, selected, app.accent_color()).clicked() {
-                    picked = Some(p.id.clone());
-                }
-            }
-        });
-    });
-    if let Some(id) = picked {
-        app.theme_id = id;
-    }
-}
-
-fn theme_card(ui: &mut Ui, p: &crate::preset::Preset, w: f32, selected: bool, accent: Color32) -> egui::Response {
-    let img_h = (w * 0.625).round();
-    let (rect, resp) = ui.allocate_exact_size(vec2(w, img_h + 52.0), Sense::click());
-    let resp = named(resp, &tr!("extra-theme-accessible-name", name = p.name.as_str())).on_hover_cursor(egui::CursorIcon::PointingHand);
-    if !ui.is_rect_visible(rect) {
-        return resp;
-    }
-    let h = theme::anim_bool(ui.ctx(), resp.id.with("h"), resp.hovered(), 0.15);
-    let s = theme::anim_bool(ui.ctx(), resp.id.with("s"), selected, 0.2);
-    let img = Rect::from_min_size(rect.min, vec2(w, img_h));
-    let painter = ui.painter();
-    painter.rect_filled(rect.expand(6.0), 16.0, theme::glass(0.04 * h + 0.06 * s));
-    match crate::preset::cover(&p.id) {
-        Some(bytes) => {
-            egui::Image::from_bytes(format!("bytes://theme-cover/{}.jpg", p.id), bytes)
-                .corner_radius(egui::CornerRadius::same(10))
-                .paint_at(ui, img);
-        }
-        None => {
-            // The built-in look has no screenshot: a small abstract of it instead.
-            painter.rect_filled(img, 10.0, Color32::from_rgb(22, 18, 28));
-            let c = img.center();
-            painter.circle_filled(c - vec2(w * 0.18, 0.0), img_h * 0.42, theme::with_alpha(accent, 0.35));
-            painter.circle_filled(c + vec2(w * 0.2, img_h * 0.1), img_h * 0.36, theme::with_alpha(Color32::from_rgb(110, 80, 200), 0.3));
-            painter.rect_filled(Rect::from_center_size(c - vec2(w * 0.22, 0.0), Vec2::splat(img_h * 0.42)), 6.0, theme::glass_panel(0.25));
-            for (i, len) in [0.34f32, 0.42, 0.28].iter().enumerate() {
-                let y = c.y - img_h * 0.12 + i as f32 * img_h * 0.13;
-                let a = if i == 1 { 0.9 } else { 0.35 };
-                painter.rect_filled(Rect::from_min_size(pos2(c.x - w * 0.02, y), vec2(w * len, img_h * 0.07)), 4.0, theme::with_alpha(Color32::WHITE, a));
-            }
-        }
-    }
-    if h > 0.0 {
-        painter.rect_filled(img, 10.0, theme::glass(0.06 * h));
-    }
-    if s > 0.0 {
-        painter.rect_stroke(img.expand(2.0), 12.0, egui::Stroke::new(2.5, theme::with_alpha(Color32::WHITE, s)), egui::StrokeKind::Outside);
-        let badge = pos2(img.right() - 18.0, img.top() + 18.0);
-        painter.circle_filled(badge, 12.0 * s, Color32::WHITE);
-        widgets::icon_at(ui, badge, icon::CHECK, 14.0 * s, Color32::from_gray(15));
-    }
-    let name_y = img.bottom() + 10.0;
-    widgets::text_at(ui, pos2(rect.left() + 2.0, name_y), &p.name, theme::semibold(14.5), theme::text(), w - 4.0);
-    let by = if p.creators.is_empty() { tr!("extra-built-in").to_owned() } else { tr!("extra-theme-author", name = p.creators.join(", ")) };
-    widgets::text_at(ui, pos2(rect.left() + 2.0, name_y + 20.0), &by, theme::regular(12.0), theme::text_faint(), w - 4.0);
-    // Just where it comes from, on one small line: the card already has its name and maker.
-    resp.on_hover_ui(|ui| {
-        ui.add(egui::Label::new(egui::RichText::new(tr!("extra-theme-source", source = p.source.as_str())).font(theme::regular(12.0)).color(theme::text_dim())).extend());
-    })
 }
 
 #[cfg(test)]

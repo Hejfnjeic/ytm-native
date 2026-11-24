@@ -183,8 +183,6 @@ settings-dim-bright-covers = Scurisci le copertine luminose
 settings-dim-bright-covers-desc = Scurisce lo sfondo delle copertine luminose per mantenere leggibili testi e titoli. Le copertine scure conservano la propria luminosità.
 settings-font = Carattere
 settings-font-desc = Carattere per tutta l’app e per i testi. Puoi usare qualunque carattere installato, anche uno adatto alla tua lingua.
-settings-themes = Temi
-settings-themes-note = Adattati dai temi della comunità Better Lyrics. Ogni tema cambia sfondo, testi, copertina, barra del lettore e il resto dell’app. Tutte le impostazioni sopra funzionano con ogni tema.
 settings-zoom = Zoom
 settings-zoom-desc = Cambia la dimensione dell’interfaccia. Puoi usare anche Ctrl + più e Ctrl + meno. Ctrl + 0 ripristina il 100%.
 settings-window-material-desc = Usa il materiale di Windows 11 dietro le pagine al posto dello sfondo del tema.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = La nuova impostazione del proxy si applica dal pro
 
 ## Storage
 
-settings-cache-cleared = Cache svuotata. Liberati { $size }.
-settings-storage = Archiviazione
-settings-clearing = Svuotamento…
-settings-measuring = Calcolo in corso…
-settings-cache = Cache
-settings-clear-cache = Svuota la cache
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = Novità della versione { $version }
 
 settings-about-tagline = Un client nativo e veloce per YouTube Music.
 settings-about-lyrics-sources = API di Better Lyrics: Musixmatch, LRCLIB, QQ, KuGou e Better Lyrics TTML
-settings-about-themes-credit = Adattati dal catalogo di temi di Better Lyrics. Ogni scheda indica i suoi autori.
 settings-background = Sfondo
 settings-about-background-credit = Versione adattata di Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Caratteri e icone

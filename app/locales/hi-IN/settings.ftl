@@ -183,8 +183,6 @@ settings-dim-bright-covers = मंद चमकीले आवरण
 settings-dim-bright-covers-desc = जब एल्बम कला उज्ज्वल होती है तो पृष्ठभूमि को गहरा कर देता है, ताकि उसके ऊपर के गीत और शीर्षक पढ़ने में आसान रहें। अँधेरे आवरणों को वैसे ही छोड़ दिया जाता है।
 settings-font = फ़ॉन्ट
 settings-font-desc = संपूर्ण ऐप और गीत के लिए। इस पीसी पर स्थापित कोई भी फ़ॉन्ट काम करता है, उदा. एक आपकी भाषा के लिए बनाया गया है।
-settings-themes = थीम्स
-settings-themes-note = Better Lyrics समुदाय थीम से पोर्ट किया गया। प्रत्येक पृष्ठभूमि, गीत, कवर, प्लेयर बार और बाकी ऐप को पुनर्स्थापित करता है, और उपरोक्त प्रत्येक सेटिंग उन सभी में काम करती है।
 settings-zoom = ज़ूम करें
 settings-zoom-desc = हर चीज़ को बड़ा या छोटा बनाता है। Ctrl + प्लस और Ctrl + माइनस भी ऐसा ही करते हैं, और Ctrl + 0 100% पर वापस चला जाता है।
 settings-window-material-desc = विषय की पृष्ठभूमि के स्थान पर Windows 11 की सामग्री पन्नों के पीछे है।
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = नई प्रॉक्सी सेटिंग
 
 ## Storage
 
-settings-cache-cleared = कैश साफ़ किया गया: { $size } मुक्त किया गया
-settings-storage = भंडारण
-settings-clearing = समाशोधन…
-settings-measuring = मापना...
-settings-cache = कैश
-settings-clear-cache = कैश साफ़ करें
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = { $version } में नया क्या है
 
 settings-about-tagline = एक तेज़, देशी YouTube Music क्लाइंट।
 settings-about-lyrics-sources = Better Lyrics API: म्यूसिक्समैच, LRCLIB, QQ, KuGou और Better Lyrics TTML
-settings-about-themes-credit = Better Lyrics थीम स्टोर से अनुकूलित; प्रत्येक कार्ड अपने रचनाकारों को श्रेय देता है
 settings-background = पृष्ठभूमि
 settings-about-background-credit = Kawarp का एक बंदरगाह, एमआईटी © Better Lyrics
 settings-fonts-and-icons = फ़ॉन्ट और चिह्न

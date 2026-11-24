@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = Wyczyścić pamięć podręczną?
-dialog-cache-freed-size = Zwolni to { $size }.
-dialog-cache-frees-space = Zwolni to miejsce.
 dialog-delete-playlist-title = Usunąć playlistę?
 dialog-delete-playlist = Usuń playlistę
 dialog-delete-upload-title = Usunąć przesłany utwór?

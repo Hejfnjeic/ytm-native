@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = 캐시를 삭제하시겠습니까?
-dialog-cache-freed-size = 이렇게 하면 { $size }가 해제됩니다.
-dialog-cache-frees-space = 이렇게 하면 공간이 확보됩니다.
 dialog-delete-playlist-title = 재생목록을 삭제하시겠습니까?
 dialog-delete-playlist = 재생목록 삭제
 dialog-delete-upload-title = 업로드를 삭제하시겠습니까?

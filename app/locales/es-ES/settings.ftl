@@ -185,8 +185,6 @@ settings-dim-bright-covers = Atenuar portadas claras
 settings-dim-bright-covers-desc = Oscurece el fondo cuando la portada es clara, para que letras y títulos encima sigan legibles. Las portadas oscuras se dejan igual.
 settings-font = Fuente
 settings-font-desc = Para toda la app y las letras. Cualquier fuente instalada en este PC vale, p. ej. una hecha para tu idioma.
-settings-themes = Temas
-settings-themes-note = Portados de los temas de la comunidad Better Lyrics. Cada uno reestiliza el fondo, las letras, la portada, la barra del reproductor y el resto de la app, y cada ajuste de arriba funciona en todos.
 settings-zoom = Zoom
 settings-zoom-desc = Hace todo más grande o más pequeño. Ctrl + más y Ctrl + menos hacen lo mismo, y Ctrl + 0 vuelve al 100 %.
 settings-window-material-desc = El material de Windows 11 detrás de las páginas, en lugar del fondo del tema.
@@ -281,12 +279,6 @@ settings-proxy-restart-desc = El nuevo ajuste de proxy se usa en el próximo ini
 
 ## Storage
 
-settings-cache-cleared = Caché borrada: { $size } liberados
-settings-storage = Almacenamiento
-settings-clearing = Borrando…
-settings-measuring = Midiendo…
-settings-cache = Caché
-settings-clear-cache = Borrar caché
 
 ## Keyboard shortcuts
 
@@ -344,7 +336,6 @@ settings-whats-new-in = Novedades en { $version }
 
 settings-about-tagline = Un cliente nativo y rápido de YouTube Music.
 settings-about-lyrics-sources = Better Lyrics API: Musixmatch, LRCLIB, QQ, KuGou y Better Lyrics TTML
-settings-about-themes-credit = Adaptado de la tienda de temas Better Lyrics; cada tarjeta acredita a sus creadores
 settings-background = Fondo
 settings-about-background-credit = Un port de Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Fuentes e iconos

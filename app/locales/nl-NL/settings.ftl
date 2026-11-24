@@ -183,8 +183,6 @@ settings-dim-bright-covers = Heldere hoezen dimmen
 settings-dim-bright-covers-desc = Maakt de achtergrond van lichte hoezen donkerder, zodat songteksten en titels leesbaar blijven. Donkere hoezen houden hun helderheid.
 settings-font = Lettertype
 settings-font-desc = Lettertype voor de hele app en de songteksten. Je kunt elk geïnstalleerd lettertype gebruiken, bijvoorbeeld een voor jouw taal.
-settings-themes = Thema’s
-settings-themes-note = Aangepast uit de thema’s van de Better Lyrics-community. Elk thema verandert de achtergrond, songteksten, hoes, spelerbalk en de rest van de app. De instellingen hierboven werken met elk thema.
 settings-zoom = Zoom
 settings-zoom-desc = Maakt alles groter of kleiner. Ctrl + plus en Ctrl + min doen hetzelfde. Met Ctrl + 0 ga je terug naar 100%.
 settings-window-material-desc = Gebruikt het venstermateriaal van Windows 11 achter de pagina’s als thema-achtergrond.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = De nieuwe proxy-instelling geldt vanaf de volgende
 
 ## Storage
 
-settings-cache-cleared = Cache gewist. { $size } vrijgemaakt.
-settings-storage = Opslag
-settings-clearing = Wissen…
-settings-measuring = Berekenen…
-settings-cache = Cache
-settings-clear-cache = Cache wissen
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = Nieuw in { $version }
 
 settings-about-tagline = Een snelle, native client voor YouTube Music.
 settings-about-lyrics-sources = Better Lyrics-API: Musixmatch, LRCLIB, QQ, KuGou en Better Lyrics TTML
-settings-about-themes-credit = Aangepast uit de Better Lyrics-themawinkel. Op elke kaart staan de makers.
 settings-background = Achtergrond
 settings-about-background-credit = Een port van Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Lettertypen en pictogrammen

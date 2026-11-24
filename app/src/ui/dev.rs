@@ -28,48 +28,6 @@ impl App {
         }
     }
 
-    /// Dev hook: `YTM_THEME_TOUR=<secs>` steps through every theme preset from
-    /// `YTM_SCREENSHOT_AT`, saving `<YTM_SCREENSHOT stem>_<id>.png` for each, then exits.
-    pub(super) fn theme_tour(&mut self, ctx: &egui::Context, now: f64) {
-        let Some(path) = dev_var("YTM_SCREENSHOT").map(std::path::PathBuf::from) else { return };
-        let at: f64 = dev_var("YTM_SCREENSHOT_AT").and_then(|v| v.parse().ok()).unwrap_or(8.0);
-        let step: f64 = dev_var("YTM_THEME_TOUR").and_then(|v| v.parse().ok()).unwrap_or(3.0);
-        // YTM_TOUR_ONLY=id,id limits the tour to those presets.
-        let only = dev_var("YTM_TOUR_ONLY").unwrap_or_default();
-        let all: Vec<&crate::preset::Preset> = crate::preset::all().iter().filter(|p| only.is_empty() || only.split(',').any(|o| o == p.id)).collect();
-        ctx.request_repaint_after(Duration::from_millis(100));
-        if now < at {
-            return;
-        }
-        let n = ((now - at) / step) as usize;
-        if n >= all.len() {
-            // Let the last screenshot land, then quit.
-            if now - at > step * all.len() as f64 + 1.5 {
-                self.quit(ctx);
-            }
-        } else if self.theme_id != all[n].id {
-            self.theme_id = all[n].id.clone();
-            self.art_key = None;
-            self.request_art();
-        }
-        let shot_id = egui::Id::unique("tour-shot");
-        let requested: usize = ctx.data(|d| d.get_temp(shot_id)).unwrap_or(usize::MAX);
-        let in_slot = (now - at) - n as f64 * step;
-        if n < all.len() && requested != n && in_slot > step * 0.8 {
-            ctx.data_mut(|d| d.insert_temp(shot_id, n));
-            let id = all[n].id.clone();
-            let stem = path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
-            let out = path.with_file_name(format!("{stem}_{n:02}_{id}.png"));
-            ctx.request_screenshot(move |img| {
-                let [w, h] = img.size;
-                let bytes: Vec<u8> = img.pixels.iter().flat_map(|c| c.to_array()).collect();
-                match image::RgbaImage::from_raw(w as u32, h as u32, bytes).map(|im| im.save(&out)) {
-                    Some(Ok(())) => log::info!("tour screenshot saved: {id}"),
-                    other => log::warn!("tour screenshot failed: {other:?}"),
-                }
-            });
-        }
-    }
 }
 
 /// Dev hook: `YTM_SCREENSHOT=out.png` saves the app's own framebuffer after

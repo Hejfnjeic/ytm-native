@@ -2,10 +2,6 @@
 
 extra-renderer-desc = 使用 { $api } (wgpu) 而不是 OpenGL。它大约需要三倍的内存，并且在 OpenGL 绘制不正确时很有用。如果 { $api } 无法启动，则回退到 OpenGL。
 extra-channel-release-desc = 稳定版本已准备好供日常收听。每晚构建是实验性的，可能会崩溃。
-extra-theme-accessible-name = 主题：{ $name }
-extra-built-in = 内置
-extra-theme-author = 作者：{ $name }
-extra-theme-source = 来自{ $source }
 extra-system-shortcuts = 系统范围的快捷方式
 extra-system-shortcuts-desc = 当另一个应用程序位于前面，或者窗口最小化或位于托盘中时，这些功能可以工作。
 extra-shortcut-failed = 无法保存该快捷方式

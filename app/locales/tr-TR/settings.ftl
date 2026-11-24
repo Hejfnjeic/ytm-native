@@ -183,8 +183,6 @@ settings-dim-bright-covers = Loş parlak kapaklar
 settings-dim-bright-covers-desc = Albüm kapağı parlak olduğunda arka planı karartır, böylece şarkı sözleri ve başlıklar kolayca okunabilir. Koyu örtüler olduğu gibi bırakılmıştır.
 settings-font = Yazı Tipi
 settings-font-desc = Uygulamanın tamamı ve şarkı sözleri için. Bu bilgisayarda yüklü olan herhangi bir yazı tipi çalışır; dilinize uygun bir tane.
-settings-themes = Temalar
-settings-themes-note = Better Lyrics topluluk temalarından taşınmıştır. Her biri arka planı, şarkı sözlerini, kapağı, oynatıcı çubuğunu ve uygulamanın geri kalanını yeniden şekillendirir ve yukarıdaki her ayar hepsinde çalışır.
 settings-zoom = Yakınlaştır
 settings-zoom-desc = Her şeyi büyütür veya küçültür. Ctrl + artı ve Ctrl + eksi aynısını yapar ve Ctrl + 0 %100'e geri döner.
 settings-window-material-desc = Temanın arka planı yerine sayfaların arkasında Windows 11'in materyali.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = Yeni proxy ayarı bir sonraki başlangıçtan itib
 
 ## Storage
 
-settings-cache-cleared = Önbellek temizlendi: { $size } serbest bırakıldı
-settings-storage = Depolama
-settings-clearing = Temizleniyor…
-settings-measuring = Ölçülüyor…
-settings-cache = Önbellek
-settings-clear-cache = Önbelleği temizle
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = { $version }'deki yenilikler
 
 settings-about-tagline = Hızlı, yerel bir YouTube Music istemcisi.
 settings-about-lyrics-sources = Better Lyrics API: Musixmatch, LRCLIB, QQ, KuGou ve Better Lyrics TTML
-settings-about-themes-credit = Better Lyrics tema mağazasından uyarlanmıştır; her kart yaratıcılarına kredi verir
 settings-background = Arkaplan
 settings-about-background-credit = Kawarp limanı, MIT © Better Lyrics
 settings-fonts-and-icons = Yazı tipleri ve simgeler

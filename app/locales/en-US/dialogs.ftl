@@ -1,8 +1,5 @@
 ### Dialog titles, buttons and explanatory text.
 
-dialog-clear-cache-title = Clear cache?
-dialog-cache-freed-size = This frees up { $size }.
-dialog-cache-frees-space = This frees up space.
 dialog-delete-playlist-title = Delete playlist?
 dialog-delete-playlist = Delete playlist
 dialog-delete-upload-title = Delete upload?

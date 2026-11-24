@@ -183,8 +183,6 @@ settings-dim-bright-covers = Assombrir les pochettes claires
 settings-dim-bright-covers-desc = Assombrit le fond des pochettes claires pour que les paroles et les titres restent lisibles. Les pochettes sombres gardent leur luminosité.
 settings-font = Police
 settings-font-desc = Police de toute l’application et des paroles. Vous pouvez utiliser n’importe quelle police installée, par exemple une conçue pour votre langue.
-settings-themes = Thèmes
-settings-themes-note = Adaptés des thèmes de la communauté Better Lyrics. Chaque thème change le fond, les paroles, la pochette, la barre du lecteur et le reste de l’application. Tous les paramètres ci-dessus s’appliquent à chaque thème.
 settings-zoom = Zoom
 settings-zoom-desc = Agrandit ou réduit l’interface. Ctrl + plus et Ctrl + moins font la même chose. Ctrl + 0 ramène le zoom à 100 %.
 settings-window-material-desc = Applique le matériau de Windows 11 derrière les pages à la place du fond du thème.
@@ -279,12 +277,6 @@ settings-proxy-restart-desc = Le nouveau réglage du proxy sera utilisé au proc
 
 ## Storage
 
-settings-cache-cleared = Cache vidé. { $size } libérés.
-settings-storage = Stockage
-settings-clearing = Effacement…
-settings-measuring = Calcul en cours…
-settings-cache = Cache
-settings-clear-cache = Vider le cache
 
 ## Keyboard shortcuts
 
@@ -342,7 +334,6 @@ settings-whats-new-in = Nouveautés de { $version }
 
 settings-about-tagline = Un client natif et rapide pour YouTube Music.
 settings-about-lyrics-sources = API Better Lyrics : Musixmatch, LRCLIB, QQ, KuGou et Better Lyrics TTML
-settings-about-themes-credit = Adaptés du catalogue Better Lyrics. Chaque carte indique les auteurs du thème.
 settings-background = Arrière-plan
 settings-about-background-credit = Portage de Kawarp, MIT © Better Lyrics
 settings-fonts-and-icons = Polices et icônes

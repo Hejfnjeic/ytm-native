@@ -699,6 +699,7 @@ impl Backend {
             .build()?;
         std::fs::create_dir_all(&storage)?;
         let data_dir = storage;
+        crate::cache::remove_left_over(&data_dir);
         let http = crate::proxy::http();
         let lyrics = Arc::new(lyrics::Client::new(http.clone(), &data_dir));
         let translate = Arc::new(crate::translate::Client::new(http));

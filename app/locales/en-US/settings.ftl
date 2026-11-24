@@ -130,6 +130,8 @@ settings-keep-pitch-desc = Faster or slower without sounding higher or lower. Of
 ## Music videos
 
 settings-music-videos = Music videos
+settings-show-music-videos = Show music videos
+settings-show-music-videos-desc = Play an official music video as the video in Now playing, with its own sound, in place of the cover. Up to 720p, decoded on the processor.
 settings-songs-not-videos = Play songs, not music videos
 settings-songs-not-videos-desc = An official music video plays as its song, the album recording, when YouTube Music has one: no intros, skits or video-only edits. Lists still show what they hold.
 settings-hide-videos-in-search = Hide videos in search

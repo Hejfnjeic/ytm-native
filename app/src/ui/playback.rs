@@ -90,7 +90,7 @@ impl App {
     }
 
     fn wants_song_version(&self, t: &Track) -> bool {
-        self.play_songs && t.music_video
+        self.play_songs && !self.show_video && t.music_video
     }
 
     /// `t`, when it's a music video to play as its song version. Not in a jam: everyone

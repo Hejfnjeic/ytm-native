@@ -67,6 +67,8 @@ pub enum Req {
     Lyrics(Track),
     /// SponsorBlock's parts of a video to skip.
     Segments { video_id: String },
+    /// A music video's picture stream, for showing it: the tallest at most `max_height`.
+    VideoStream { video_id: String, max_height: u32 },
     /// Romanization and translation for the lyric lines of one source.
     LyricsExtras { video_id: String, source: String, lines: Vec<String>, lang: Option<String>, target: String },
     /// Process cover art for the background; `key` is echoed back.
@@ -149,6 +151,7 @@ impl Req {
             Req::Upload(_) => crate::tr!("nav-upload-music"),
             Req::Lyrics(_) => crate::tr!("settings-lyrics"),
             Req::Segments { .. } => "SponsorBlock",
+            Req::VideoStream { .. } => crate::tr!("settings-show-music-videos"),
             Req::LyricsExtras { .. } => crate::tr!("settings-translation"),
             Req::Art { .. } => crate::tr!("discord-album-art"),
             Req::Radio { .. } => crate::tr!("ui-radio"),
@@ -384,6 +387,7 @@ pub enum Resp {
     /// Every source's lyrics for a song (empty when nobody has them).
     Lyrics { video_id: String, lyrics: LyricsSet },
     Segments { video_id: String, segments: Vec<crate::sponsorblock::Segment> },
+    VideoStream { video_id: String, stream: Option<innertube::VideoStream> },
     /// Romanization/translation for one source's lines, arriving after them.
     LyricsExtras { video_id: String, source: String, target: String, extras: crate::translate::Extras },
     Art { key: String, art: Art },
@@ -1003,6 +1007,13 @@ impl Backend {
                         log::warn!("comments page: {e:#}");
                     }
                     Resp::CommentsPage { token, page: page.ok() }
+                }
+                Req::VideoStream { video_id, max_height } => {
+                    let found = async { innertube::video_stream(&self.http(), &video_id, &api.visitor_data(false).await?, max_height.into()).await }.await;
+                    if let Err(e) = &found {
+                        log::warn!("video of {video_id}: {e:#}");
+                    }
+                    Resp::VideoStream { video_id, stream: found.ok() }
                 }
                 Req::Segments { video_id } => {
                     let segments = crate::sponsorblock::segments(&self.http(), &video_id).await?;

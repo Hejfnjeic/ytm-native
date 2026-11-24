@@ -44,6 +44,8 @@ url = "2.5.8"
 # The opt-in renderer: Vulkan, Metal on macOS (renderer.rs).
 wgpu = { version = "30.0.1", default-features = false, features = ["std", "parking_lot", "wgsl", "vulkan", "metal"] }
 unicode-normalization = "0.1.26"
+# Music videos (video.rs): pure-Rust H.264, no C or C++; its own allocator left out.
+rusty_h264 = { version = "0.17.4", default-features = false, features = ["std", "asm"] }
 symphonia = { version = "0.5.5", default-features = false, features = ["mkv", "aac"] }
 rusty-opus = "1.0.2"
 unicode-bidi = "0.3"

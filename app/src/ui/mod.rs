@@ -482,6 +482,12 @@ pub struct App {
     high_quality: bool,
     /// Play an official music video as its song version when one is found.
     play_songs: bool,
+    /// Settings › Music videos › Show music videos: the picture in Now playing, with the
+    /// video's own audio (it stays in time with that).
+    show_video: bool,
+    /// The video on show or on its way, by id, and its last picture.
+    video: Option<(String, Option<crate::video::Player>)>,
+    video_frame: Option<egui::TextureHandle>,
     hide_search_videos: bool,
     /// Leave explicit songs out of lists and the queue.
     hide_explicit: bool,
@@ -851,6 +857,9 @@ impl App {
             skip_silence: get("skip_silence").is_some_and(|v| v == "1"),
             high_quality: get("high_quality").is_none_or(|v| v == "1"),
             play_songs: get("play_songs").is_none_or(|v| v == "1"),
+            show_video: get("show_video").is_some_and(|v| v == "1"),
+            video: None,
+            video_frame: None,
             hide_search_videos: get("hide_search_videos").is_some_and(|v| v == "1"),
             hide_explicit,
             show_podcasts,
@@ -1826,6 +1835,7 @@ impl eframe::App for App {
         storage.set_string("skip_silence", b(self.skip_silence));
         storage.set_string("high_quality", b(self.high_quality));
         storage.set_string("play_songs", b(self.play_songs));
+        storage.set_string("show_video", b(self.show_video));
         storage.set_string("hide_search_videos", b(self.hide_search_videos));
         storage.set_string("hide_explicit", b(self.hide_explicit));
         self.rating_settings.save(storage);

@@ -1932,8 +1932,14 @@ fn settings_playback(app: &mut App, ui: &mut Ui) {
     settings_equalizer(app, ui);
     settings_tempo(app, ui);
     settings_section(ui, tr!("settings-music-videos"), None, None, |ui| {
-        setting_row(ui, tr!("settings-songs-not-videos"), Some(tr!("settings-songs-not-videos-desc")), |ui| {
-            toggle(ui, &mut app.play_songs, tr!("settings-songs-not-videos"));
+        setting_row(ui, tr!("settings-show-music-videos"), Some(tr!("settings-show-music-videos-desc")), |ui| {
+            toggle(ui, &mut app.show_video, tr!("settings-show-music-videos"));
+        });
+        divider(ui);
+        ui.add_enabled_ui(!app.show_video, |ui| {
+            setting_row(ui, tr!("settings-songs-not-videos"), Some(tr!("settings-songs-not-videos-desc")), |ui| {
+                toggle(ui, &mut app.play_songs, tr!("settings-songs-not-videos"));
+            });
         });
         divider(ui);
         setting_row(ui, tr!("settings-hide-videos-in-search"), Some(tr!("settings-hide-videos-in-search-desc")), |ui| {

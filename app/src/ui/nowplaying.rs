@@ -21,6 +21,10 @@ pub fn overlay(app: &mut App, ctx: &egui::Context, now: f64) {
     // A spring's overshoot isn't for this: past its place it would leave a gap at the bottom.
     let t = theme::anim_bool_timed(ctx, "np-open", app.np_open && app.current().is_some(), app.look().app.np_open_secs).min(1.0);
     if t <= 0.001 {
+        // Closed: no video decoding for nothing.
+        if app.video.take().is_some() {
+            app.video_frame = None;
+        }
         return;
     }
     let screen = ctx.content_rect();
@@ -1133,7 +1137,13 @@ fn cover_column(app: &mut App, ui: &mut Ui, col: Rect, track: &crate::model::Tra
             p.circle_filled(art.center(), side * 0.022, Color32::from_rgb(10, 10, 12));
         }
     } else {
-        if top_only {
+        if let Some(tex) = video_texture(app, ui.ctx(), track) {
+            // The music video in the cover's place: fitted in, on black.
+            ui.painter().rect_filled(art, cr, Color32::BLACK);
+            let size = tex.size_vec2();
+            let fit = size * (art.width() / size.x).min(art.height() / size.y);
+            egui::Image::from_texture((tex.id(), fit)).corner_radius(cr).paint_at(ui, Rect::from_center_size(art.center(), fit));
+        } else if top_only {
             widgets::paint_cover_corners(ui, art, &track.thumbs, cr, px);
         } else {
             widgets::paint_cover_px(ui, art, &track.thumbs, radius, 1.0, px);
@@ -1789,3 +1799,32 @@ mod tests {
         assert!(!lyrics_panel_wanted(Some(false), true, true));
     }
 }
+
+/// The picture of the music video playing, while Show music videos is on: its player is
+/// started the first time it's wanted, and the newest frame that's due goes in the texture.
+/// None shows the cover (no video, or not one that can be decoded, or none yet).
+pub(super) fn video_texture(app: &mut App, ctx: &egui::Context, track: &crate::model::Track) -> Option<egui::TextureHandle> {
+    if !app.show_video || !track.has_video() || app.playing_id() != Some(track.id.as_str()) {
+        return None;
+    }
+    if app.video.as_ref().is_none_or(|(id, _)| *id != track.id) {
+        app.video = Some((track.id.clone(), None));
+        app.video_frame = None;
+        app.backend.request(crate::backend::Req::VideoStream { video_id: track.id.clone(), max_height: VIDEO_HEIGHT });
+    }
+    if let Some((_, Some(player))) = &app.video {
+        if let Some(frame) = player.take_due() {
+            match &mut app.video_frame {
+                Some(tex) => tex.set(frame.image, egui::TextureOptions::LINEAR),
+                None => app.video_frame = Some(ctx.load_texture("music-video", frame.image, egui::TextureOptions::LINEAR)),
+            }
+        }
+        if !player.failed() {
+            ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        }
+    }
+    app.video_frame.clone()
+}
+
+/// The tallest a music video plays at: rusty_h264 decodes YouTube's 720p and below.
+const VIDEO_HEIGHT: u32 = 720;

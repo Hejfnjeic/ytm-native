@@ -24,6 +24,7 @@ mod lyrics;
 mod media;
 mod model;
 mod mp4;
+mod video;
 mod notify;
 mod opus;
 mod preset;

@@ -288,6 +288,17 @@ impl App {
                 }
             }
             Resp::CommentsPage { token, page } => super::comments::on_page(&token, page),
+            Resp::VideoStream { video_id, stream } => {
+                // Not one asked for before the song changed.
+                if let Some((id, player)) = &mut self.video
+                    && *id == video_id
+                {
+                    match stream {
+                        Some(s) => *player = Some(crate::video::Player::start(s, self.backend.http(), self.audio.status.clone())),
+                        None => log::info!("video: {video_id} has no picture this app can decode; showing the cover"),
+                    }
+                }
+            }
             Resp::Segments { video_id, segments } => {
                 if self.playing_id() == Some(video_id.as_str()) {
                     log::info!("sponsorblock: {} segment(s) for {video_id}", segments.len());

@@ -109,7 +109,7 @@ settings-0-db = 0 dB
 ## Playback speed
 
 settings-playback-speed = Afspeelsnelheid
-settings-playback-speed-desc = Speel nummers sneller of trager af, ook via de spelerbalk. Net als bij een plaat klinkt sneller hoger en trager lager. Songteksten blijven gelijklopen. Bij het openen van ytm-rs wordt de snelheid 1×.
+settings-playback-speed-desc = Speel nummers sneller of trager af, ook via de spelerbalk. Net als bij een plaat klinkt sneller hoger en trager lager. Songteksten blijven gelijklopen. Bij het openen van ytm-native wordt de snelheid 1×.
 settings-speed = Snelheid
 
 ## Music videos
@@ -241,7 +241,7 @@ settings-song-notifications-unavailable = Vereist de geïnstalleerde app. Window
 settings-song-notifications = Nummermeldingen
 settings-close-to-tray-restart-desc = Op Wayland kun je het venster na een herstart verbergen in het systeemvak en weer terughalen. Tot die tijd minimaliseert × het venster.
 settings-title-bar = Titelbalk
-settings-title-bar-desc = Bepaalt wie de titelbalk en knoppen tekent. Automatisch gebruikt die van ytm-rs als de desktop er geen biedt, zoals GNOME op Wayland.
+settings-title-bar-desc = Bepaalt wie de titelbalk en knoppen tekent. Automatisch gebruikt die van ytm-native als de desktop er geen biedt, zoals GNOME op Wayland.
 settings-title-bar-restart-desc = De titelbalk verandert bij de volgende start.
 settings-collapse-sidebar = Zijbalk inklappen
 settings-collapse-sidebar-desc = Toont alleen pictogrammen in de zijbalk voor smalle vensters. De menuknop bovenaan doet hetzelfde.
@@ -257,11 +257,11 @@ settings-open = Openen
 
 settings-network = Netwerk
 settings-proxy = Proxy
-settings-proxy-desc = Stuurt al het verkeer van ytm-rs via een proxy, inclusief nummers, songteksten, inloggen en Samen luisteren.
+settings-proxy-desc = Stuurt al het verkeer van ytm-native via een proxy, inclusief nummers, songteksten, inloggen en Samen luisteren.
 settings-proxy-windows-uses = Windows is ingesteld om { $proxy } te gebruiken.
-settings-proxy-windows-none = Windows heeft geen proxy ingesteld. ytm-rs maakt rechtstreeks verbinding.
+settings-proxy-windows-none = Windows heeft geen proxy ingesteld. ytm-native maakt rechtstreeks verbinding.
 settings-proxy-environment-sets = De omgeving stelt { $proxy } in.
-settings-proxy-environment-none = HTTPS_PROXY en ALL_PROXY zijn niet ingesteld. ytm-rs maakt rechtstreeks verbinding.
+settings-proxy-environment-none = HTTPS_PROXY en ALL_PROXY zijn niet ingesteld. ytm-native maakt rechtstreeks verbinding.
 settings-windows-proxy = Windows-proxy
 settings-system-proxy = Systeemproxy
 settings-proxy-address = Proxyadres
@@ -319,7 +319,7 @@ settings-updates-dev-build = Updates werken alleen in de geïnstalleerde of draa
 settings-checking-for-updates = Zoeken naar updates…
 settings-up-to-date = Je gebruikt de nieuwste versie ({ $version }).
 settings-update-downloading = { $version } downloaden… { $percent }%
-settings-update-ready = Versie { $version } is klaar. De installatie begint als je ytm-rs sluit.
+settings-update-ready = Versie { $version } is klaar. De installatie begint als je ytm-native sluit.
 settings-update-available = Versie { $version } is beschikbaar. { $step }
 settings-update-failed = Controleren op updates is mislukt: { $error }
 settings-version = Versie { $version }.
@@ -334,7 +334,7 @@ settings-restart-to-update = Herstarten om bij te werken
 settings-download = Downloaden
 settings-check-now = Nu controleren
 settings-another-copy = Andere installatie
-settings-another-copy-desc = ytm-rs is ook geïnstalleerd via { $kind }. Verwijderopdracht: { $cmd }
+settings-another-copy-desc = ytm-native is ook geïnstalleerd via { $kind }. Verwijderopdracht: { $cmd }
 settings-whats-new = Nieuw in deze versie
 settings-whats-new-in = Nieuw in { $version }
 

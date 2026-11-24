@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=YT Music native
+Name=ytm-native
 GenericName=Music Player
 Comment=Unofficial native YouTube Music player
 Exec=ytm-native

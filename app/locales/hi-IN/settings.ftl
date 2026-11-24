@@ -109,7 +109,7 @@ settings-0-db = 0 डीबी
 ## Playback speed
 
 settings-playback-speed = प्लेबैक गति
-settings-playback-speed-desc = प्लेयर बार के एक बटन से भी गाने तेज या धीमी गति से चलाएं। तेज़ ध्वनि ऊँची और धीमी धीमी, एक रिकॉर्ड की तरह। गीत समय में रहते हैं. हर बार ytm-rs प्रारंभ होने पर 1× पर वापस जाएँ।
+settings-playback-speed-desc = प्लेयर बार के एक बटन से भी गाने तेज या धीमी गति से चलाएं। तेज़ ध्वनि ऊँची और धीमी धीमी, एक रिकॉर्ड की तरह। गीत समय में रहते हैं. हर बार ytm-native प्रारंभ होने पर 1× पर वापस जाएँ।
 settings-speed = गति
 
 ## Music videos
@@ -241,7 +241,7 @@ settings-song-notifications-unavailable = इंस्टॉल किए गए
 settings-song-notifications = गाने की सूचनाएं
 settings-close-to-tray-restart-desc = Wayland पर विंडो केवल ट्रे में छिप सकती है और पुनरारंभ होने के बाद वापस आ सकती है। तब तक × इसे छोटा कर देता है।
 settings-title-bar = टाइटल बार
-settings-title-bar-desc = विंडो का टाइटल बार और बटन कौन खींचता है। स्वचालित ytm-rs का उपयोग करता है जहां डेस्कटॉप कोई नहीं खींचता (Wayland पर GNOME)।
+settings-title-bar-desc = विंडो का टाइटल बार और बटन कौन खींचता है। स्वचालित ytm-native का उपयोग करता है जहां डेस्कटॉप कोई नहीं खींचता (Wayland पर GNOME)।
 settings-title-bar-restart-desc = अगली शुरुआत से शीर्षक पट्टी बदल जाती है।
 settings-collapse-sidebar = साइडबार को संक्षिप्त करें
 settings-collapse-sidebar-desc = संकीर्ण विंडो के लिए, साइडबार में केवल आइकन दिखाएं। इसके शीर्ष पर स्थित मेनू बटन भी यही कार्य करता है।
@@ -257,11 +257,11 @@ settings-open = खुला
 
 settings-network = नेटवर्क
 settings-proxy = प्रॉक्सी
-settings-proxy-desc = ytm-rs द्वारा प्राप्त सभी चीजें प्रॉक्सी के माध्यम से भेजें: गाने, गीत, साइन-इन और एक साथ सुनें।
+settings-proxy-desc = ytm-native द्वारा प्राप्त सभी चीजें प्रॉक्सी के माध्यम से भेजें: गाने, गीत, साइन-इन और एक साथ सुनें।
 settings-proxy-windows-uses = Windows को { $proxy } का उपयोग करने के लिए सेट किया गया है।
-settings-proxy-windows-none = Windows प्रॉक्सी का उपयोग करने के लिए सेट नहीं है, इसलिए ytm-rs सीधे कनेक्ट होता है।
+settings-proxy-windows-none = Windows प्रॉक्सी का उपयोग करने के लिए सेट नहीं है, इसलिए ytm-native सीधे कनेक्ट होता है।
 settings-proxy-environment-sets = पर्यावरण { $proxy } सेट करता है।
-settings-proxy-environment-none = कोई HTTPS_PROXY या ALL_PROXY सेट नहीं है, इसलिए ytm-rs सीधे कनेक्ट होता है।
+settings-proxy-environment-none = कोई HTTPS_PROXY या ALL_PROXY सेट नहीं है, इसलिए ytm-native सीधे कनेक्ट होता है।
 settings-windows-proxy = Windows प्रॉक्सी
 settings-system-proxy = सिस्टम प्रॉक्सी
 settings-proxy-address = प्रॉक्सी पता
@@ -319,7 +319,7 @@ settings-updates-dev-build = अपडेट केवल इंस्टॉल 
 settings-checking-for-updates = अपडेट की जांच की जा रही है...
 settings-up-to-date = आप नवीनतम संस्करण ({ $version }) पर हैं।
 settings-update-downloading = डाउनलोड हो रहा है { $version }… { $percent }%
-settings-update-ready = संस्करण { $version } तैयार है। जब आप ytm-rs बंद करते हैं तो यह इंस्टॉल हो जाता है।
+settings-update-ready = संस्करण { $version } तैयार है। जब आप ytm-native बंद करते हैं तो यह इंस्टॉल हो जाता है।
 settings-update-available = संस्करण { $version } आ गया है। { $step }
 settings-update-failed = अपडेट की जांच नहीं की जा सकी: { $error }
 settings-version = संस्करण { $version }।
@@ -334,7 +334,7 @@ settings-restart-to-update = अद्यतन करने के लिए �
 settings-download = डाउनलोड करें
 settings-check-now = अभी जांचें
 settings-another-copy = एक और प्रति
-settings-another-copy-desc = { $kind } से ytm-rs भी इंस्टॉल किया गया है। उस प्रतिलिपि को हटाने के लिए, { $cmd } चलाएँ
+settings-another-copy-desc = { $kind } से ytm-native भी इंस्टॉल किया गया है। उस प्रतिलिपि को हटाने के लिए, { $cmd } चलाएँ
 settings-whats-new = नया क्या है
 settings-whats-new-in = { $version } में नया क्या है
 

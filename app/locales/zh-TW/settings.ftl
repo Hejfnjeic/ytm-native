@@ -109,7 +109,7 @@ settings-0-db = 0 分貝
 ## Playback speed
 
 settings-playback-speed = 播放速度
-settings-playback-speed-desc = 也可以透過播放器列中的按鈕更快或更慢地播放歌曲。更快的聲音更高，更慢的聲音更低，就像唱片一樣。歌詞停留在時間。每次ytm-rs啟動時返回1×。
+settings-playback-speed-desc = 也可以透過播放器列中的按鈕更快或更慢地播放歌曲。更快的聲音更高，更慢的聲音更低，就像唱片一樣。歌詞停留在時間。每次ytm-native啟動時返回1×。
 settings-speed = 速度
 
 ## Music videos
@@ -241,7 +241,7 @@ settings-song-notifications-unavailable = 需要安裝的應用程式：Windows 
 settings-song-notifications = 歌曲通知
 settings-close-to-tray-restart-desc = 在Wayland上，視窗只能隱藏在托盤中，並在重新啟動後返回。直到那時×將其最小化。
 settings-title-bar = 標題欄
-settings-title-bar-desc = 誰繪製視窗的標題列和按鈕。自動使用 ytm-rs，桌面不繪製（GNOME 在 Wayland 上）。
+settings-title-bar-desc = 誰繪製視窗的標題列和按鈕。自動使用 ytm-native，桌面不繪製（GNOME 在 Wayland 上）。
 settings-title-bar-restart-desc = 標題列從下次開始時發生變化。
 settings-collapse-sidebar = 折疊側邊欄
 settings-collapse-sidebar-desc = 對於狹窄的窗口，僅在側邊欄中顯示圖示。頂部的選單按鈕具有相同的作用。
@@ -257,11 +257,11 @@ settings-open = 打開
 
 settings-network = 網絡
 settings-proxy = 代理
-settings-proxy-desc = 發送 ytm-rs 透過代理程式取得的所有內容：歌曲、歌詞、登入並一起收聽。
+settings-proxy-desc = 發送 ytm-native 透過代理程式取得的所有內容：歌曲、歌詞、登入並一起收聽。
 settings-proxy-windows-uses = Windows 設定為使用 { $proxy }。
-settings-proxy-windows-none = Windows 未設定為使用代理，因此 ytm-rs 直接連線。
+settings-proxy-windows-none = Windows 未設定為使用代理，因此 ytm-native 直接連線。
 settings-proxy-environment-sets = 環境設定{ $proxy }。
-settings-proxy-environment-none = 沒有設定HTTPS_PROXY或ALL_PROXY，所以ytm-rs直接連接。
+settings-proxy-environment-none = 沒有設定HTTPS_PROXY或ALL_PROXY，所以ytm-native直接連接。
 settings-windows-proxy = Windows代理
 settings-system-proxy = 系統代理
 settings-proxy-address = 代理地址
@@ -319,7 +319,7 @@ settings-updates-dev-build = 更新僅適用於已安裝或可攜式應用程式
 settings-checking-for-updates = 正在檢查更新...
 settings-up-to-date = 您使用的是最新版本 ({ $version })。
 settings-update-downloading = 正在下載{ $version }…{ $percent }%
-settings-update-ready = { $version } 版本已準備就緒。它會在您關閉 ytm-rs 時安裝。
+settings-update-ready = { $version } 版本已準備就緒。它會在您關閉 ytm-native 時安裝。
 settings-update-available = 版本 { $version } 已發布。 { $step }
 settings-update-failed = 無法檢查更新：{ $error }
 settings-version = 版本 { $version }。
@@ -334,7 +334,7 @@ settings-restart-to-update = 重新啟動以更新
 settings-download = 下載
 settings-check-now = 立即檢查
 settings-another-copy = 另一份
-settings-another-copy-desc = ytm-rs 也是從 { $kind } 安裝的。若要刪除該副本，請執行 { $cmd }
+settings-another-copy-desc = ytm-native 也是從 { $kind } 安裝的。若要刪除該副本，請執行 { $cmd }
 settings-whats-new = 最新消息
 settings-whats-new-in = { $version } 的新功能
 

@@ -109,7 +109,7 @@ settings-0-db = 0 dB
 ## Playback speed
 
 settings-playback-speed = 再生速度
-settings-playback-speed-desc = 曲の再生速度を変えます。プレーヤーバーからも操作できます。レコードのように、速くすると音程が上がり、遅くすると下がります。歌詞は同期したままです。ytm-rs の起動時に 1× に戻ります。
+settings-playback-speed-desc = 曲の再生速度を変えます。プレーヤーバーからも操作できます。レコードのように、速くすると音程が上がり、遅くすると下がります。歌詞は同期したままです。ytm-native の起動時に 1× に戻ります。
 settings-speed = 速度
 
 ## Music videos
@@ -241,7 +241,7 @@ settings-song-notifications-unavailable = インストール版が必要です�
 settings-song-notifications = 曲の通知
 settings-close-to-tray-restart-desc = Wayland では再起動後に通知領域への格納と復帰が使えます。それまでは × で最小化します。
 settings-title-bar = タイトルバー
-settings-title-bar-desc = タイトルバーとボタンの描画元を選びます。「自動」では、GNOME の Wayland セッションなど、デスクトップが描画しない場合に ytm-rs のバーを使います。
+settings-title-bar-desc = タイトルバーとボタンの描画元を選びます。「自動」では、GNOME の Wayland セッションなど、デスクトップが描画しない場合に ytm-native のバーを使います。
 settings-title-bar-restart-desc = タイトルバーは次回の起動時に変わります。
 settings-collapse-sidebar = サイドバーを折りたたむ
 settings-collapse-sidebar-desc = 狭いウィンドウ向けにサイドバーをアイコンだけにします。上部のメニュー ボタンでも切り替えられます。
@@ -257,11 +257,11 @@ settings-open = 開く
 
 settings-network = ネットワーク
 settings-proxy = プロキシ
-settings-proxy-desc = 曲、歌詞、ログイン、一緒に聴く機能など、ytm-rs の通信をすべてプロキシ経由にします。
+settings-proxy-desc = 曲、歌詞、ログイン、一緒に聴く機能など、ytm-native の通信をすべてプロキシ経由にします。
 settings-proxy-windows-uses = Windows は { $proxy } を使うように設定されています。
-settings-proxy-windows-none = Windows にプロキシが設定されていないため、ytm-rs は直接接続します。
+settings-proxy-windows-none = Windows にプロキシが設定されていないため、ytm-native は直接接続します。
 settings-proxy-environment-sets = 環境変数で { $proxy } が設定されています。
-settings-proxy-environment-none = HTTPS_PROXY と ALL_PROXY が未設定なので、ytm-rs は直接接続します。
+settings-proxy-environment-none = HTTPS_PROXY と ALL_PROXY が未設定なので、ytm-native は直接接続します。
 settings-windows-proxy = Windows のプロキシ
 settings-system-proxy = システムのプロキシ
 settings-proxy-address = プロキシ アドレス
@@ -319,7 +319,7 @@ settings-updates-dev-build = アップデートはインストール版とポー
 settings-checking-for-updates = アップデートを確認中…
 settings-up-to-date = 最新バージョン（{ $version }）を使用しています。
 settings-update-downloading = { $version } をダウンロード中… { $percent }%
-settings-update-ready = バージョン { $version } の準備ができました。ytm-rs を終了するとインストールされます。
+settings-update-ready = バージョン { $version } の準備ができました。ytm-native を終了するとインストールされます。
 settings-update-available = バージョン { $version } が公開されました。{ $step }
 settings-update-failed = アップデートを確認できませんでした：{ $error }
 settings-version = バージョン { $version }。
@@ -334,7 +334,7 @@ settings-restart-to-update = 再起動してアップデート
 settings-download = ダウンロード
 settings-check-now = 今すぐ確認
 settings-another-copy = 別のインストール
-settings-another-copy-desc = ytm-rs は { $kind } からもインストールされています。削除コマンド：{ $cmd }
+settings-another-copy-desc = ytm-native は { $kind } からもインストールされています。削除コマンド：{ $cmd }
 settings-whats-new = 新機能
 settings-whats-new-in = { $version } の新機能
 

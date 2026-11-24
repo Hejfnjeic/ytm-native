@@ -58,7 +58,7 @@ impl Solver {
         if let Some((p, _)) = cached.as_ref().filter(|(_, at)| at.elapsed() < PLAYER_TTL) {
             return Ok(p.clone());
         }
-        if self.failed.lock().unwrap().is_some_and(|at| at.elapsed() < Duration::from_secs(600)) {
+        if self.failed.lock().unwrap().is_some_and(|at| at.elapsed() < Duration::from_secs(60)) {
             anyhow::bail!("the player couldn't be prepared a moment ago");
         }
         let res = self.prepare(http).await;
@@ -72,7 +72,33 @@ impl Solver {
         res
     }
 
+    /// The player version YouTube names now, or, when that one can't be prepared (YouTube
+    /// tries new player versions on some requests, and the solver may not handle one yet),
+    /// the last one that was: its URLs still solve for a good while.
     async fn prepare(&self, http: &reqwest::Client) -> anyhow::Result<Player> {
+        match self.prepare_current(http).await {
+            Ok(p) => Ok(p),
+            Err(e) => match self.kept_player() {
+                Some(p) => {
+                    log::warn!("jsc: the current player can't be prepared ({e:#}); using the kept player {}", p.id);
+                    Ok(p)
+                }
+                None => Err(e),
+            },
+        }
+    }
+
+    /// The prepared player kept on disk, if any.
+    fn kept_player(&self) -> Option<Player> {
+        std::fs::read_dir(&self.dir).ok()?.flatten().find_map(|f| {
+            let name = f.file_name().into_string().ok()?;
+            let id = name.strip_suffix(".sts")?.to_owned();
+            let sts = std::fs::read_to_string(f.path()).ok()?.trim().parse().ok()?;
+            self.dir.join(format!("{id}.js")).exists().then_some(Player { id, sts })
+        })
+    }
+
+    async fn prepare_current(&self, http: &reqwest::Client) -> anyhow::Result<Player> {
         let iframe = http.get("https://www.youtube.com/iframe_api").send().await?.error_for_status()?.text().await?;
         let id = player_id(&iframe).ok_or_else(|| anyhow::anyhow!("no player version in iframe_api"))?;
         let script = self.dir.join(format!("{id}.js"));

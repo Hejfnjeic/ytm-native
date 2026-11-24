@@ -10,7 +10,7 @@
 > **what happens and what you expected**; fixes come from Claude. Use the app as it is, at your
 > own risk.
 
-# YT Music native (unofficial)
+# ytm-native (unofficial)
 
 A native desktop YouTube Music player for your own account, written in Rust with a
 [Slint](https://slint.dev) UI. No browser, no Electron: about 150 MB of RAM while playing.

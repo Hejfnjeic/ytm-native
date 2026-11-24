@@ -26,22 +26,22 @@ A native desktop YouTube Music player for your own account, written in Rust with
 
 ## Features
 
-- **Playback**: Premium-quality Opus streams that start while the song downloads, the next song
-  fetched ahead of time, playback speed 0.1–3× with pitch preserved.
-- **Radio that doesn't stop**: radios keep refilling, and songs you heard recently are skipped.
-  Albums and playlists continue with a radio when they end.
-- **Your account**: Home feed, Liked Music, your Library (saved playlists, albums, songs and
-  artists), albums, playlists, artist pages (with Shuffle and Radio), likes and dislikes, plays
-  reported to your YouTube history (or not: *Pause watch history*).
-- **Queue**: right-click any song for Play next, Add to queue, Start radio, Go to artist/album;
-  shuffle lists; remove songs.
-- **Synced lyrics**: word-by-word karaoke, line-by-line, or plain, from BetterLyrics, lrc.red,
-  LRCLIB and YouTube Music itself; optional translations; "Wrong lyrics?" to pick another version or search by hand.
-- **Desktop**: media keys and KDE's media controls (MPRIS; on Windows the system media
-  controls), colors, font and icons from your KDE
-  settings (follows changes live), keyboard shortcuts, remembers the queue and position.
-- **Updates itself** with small binary patches (a few MB) checked against SHA-256 sums; a
-  "What's new" window shows the changes, and the app restarts only when you say so.
+- **Playback**: Premium-quality Opus streams, the next song fetched ahead, crossfade and gapless
+  playback, an equalizer, volume normalization and playback speed.
+- **Your account**: Home feed, Explore, search, Library (playlists, albums, songs, artists,
+  history, uploads), album, playlist and artist pages, likes, endless radio.
+- **Synced lyrics**: word-by-word karaoke from Better Lyrics, Musixmatch, LRCLIB, YouTube Music
+  and more, with translations; click a line to jump there.
+- **Lyrics window**: the mini player (Ctrl+M) is a small window of its own with the song's
+  lyrics, kept above other windows.
+- **Music videos** (optional): the music video in Now playing, in time with the song, up to 720p.
+- **Desktop**: media keys and system media controls, tray, system-wide shortcuts, your own title
+  bar with rounded corners or the system's, software rendering for the least memory.
+- **Updates itself** from GitHub releases; a "What's new" window shows the changes, and the app
+  restarts only when you say so.
+
+Not included on purpose: downloads, Discord status, scrobbling, listening together, song
+recognition, AirPlay, and any cache on disk.
 
 ## Install
 
@@ -54,8 +54,9 @@ Downloads are on the [releases page](https://github.com/Hejfnjeic/ytm-native/rel
 | **Windows** (x86_64) | Unpack `ytm-native-<version>-windows-x86_64.7z` anywhere and start `ytm-native.exe`. Portable: everything stays in its folder. Updates itself. |
 | **From source** | See [HACKING.md](HACKING.md): `cargo run --release`, or `scripts/install-linux.sh`. |
 
-Linux needs a Secret Service provider (KWallet or GNOME Keyring) to keep the login's key, and
-`xdg-desktop-portal` for the file picker.
+Linux needs a Secret Service provider (KWallet or GNOME Keyring) to keep the login's key,
+`xdg-desktop-portal` for the file picker, and `webkit2gtk-4.1` (WebKitGTK) for the lyrics.
+On Windows, keep `WebView2Loader.dll` next to `ytm-native.exe`.
 
 ## Signing in
 
@@ -66,7 +67,7 @@ browser:
 2. Export that site's cookies with a "cookies.txt" extension (e.g. *Get cookies.txt LOCALLY*;
    *Export*, not *Export All*).
 3. Close the private window **without logging out** (that would end the login).
-4. In the app, choose the file. It's checked with YouTube, stored encrypted (the key lives in your
+4. In the app (Settings › Account), choose the file. It's checked with YouTube, stored encrypted (the key lives in your
    system keyring, or with Windows' DPAPI), and the original file is deleted.
 
 A login from a private window keeps working; one exported from your everyday browser session
@@ -85,24 +86,25 @@ tends to be logged out within hours, because the browser keeps rotating it.
 
 ## Privacy
 
-- Your YouTube cookies are only sent to YouTube. Lyrics sites (BetterLyrics, lrc.red, LRCLIB) get
-  the song's title, artist and length, nothing else. YouTube Music's own lyrics are fetched
+- Your YouTube cookies are only sent to YouTube. Lyrics services get the song's title, artist
+  and length, nothing else; the Better Lyrics API's Cloudflare check runs in a hidden WebKitGTK
+  (Windows: WebView2) window about once a day. YouTube Music's own lyrics are fetched
   without your login. Update checks ask GitHub for the latest
   release.
-- Stored on your computer: the encrypted login, the queue and position, settings, and the IDs of
-  your last 500 songs (to keep radios fresh). Linux: `~/.local/share/ytm-native`; Windows: the
+- Stored on your computer: the encrypted login, the queue and position, and settings. Nothing
+  is cached on disk. Linux: `~/.local/share/ytm-native`; Windows: the
   app's `data` folder. Sign out deletes the login and its key.
 
 ## Credits
 
+- **[ytm-rs](https://github.com/grapedjuice/ytm-rs) by grapedjuice** (GPL-3.0): a lot of this
+  app is copied from it, including the interface, the lyrics and much of the playback code.
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)'s [EJS](https://github.com/yt-dlp/ejs) solver
-  (Unlicense/MIT/ISC, vendored in `vendor/ejs`) for YouTube's stream challenges.
-- [Breeze icons](https://invent.kde.org/frameworks/breeze-icons) by KDE (LGPL), bundled as a
-  fallback.
-- Lyrics: BetterLyrics, [lrc.red](https://lrc.red), [LRCLIB](https://lrclib.net), YouTube Music.
-- Ideas and protocol knowledge from Metrolist, yt-dlp and
-  [spicy-lyrics](https://github.com/Spikerko/spicy-lyrics).
+  (Unlicense/MIT/ISC) for YouTube's stream challenges.
+- [rusty_h264](https://github.com/remade-with-rust/rusty_h264) (BSD-2) decodes music videos.
+- Lyrics: Better Lyrics, Musixmatch, LRCLIB, YouTube Music and the other Better Lyrics sources.
+- Ideas from Metrolist, yt-dlp and [spicy-lyrics](https://github.com/Spikerko/spicy-lyrics).
 
 ## License
 
-[GPL-3.0-or-later](LICENSE).
+[GPL-3.0-only](LICENSE), as ytm-rs.

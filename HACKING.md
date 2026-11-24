@@ -1,5 +1,11 @@
 # Working on ytm-native
 
+> **Outdated in parts (2026-11-24):** since v0.4.0 the app is egui, and a lot of it is copied
+> from [ytm-rs](https://github.com/grapedjuice/ytm-rs) (see `app/src`: `ui/` is the interface,
+> `backend.rs` the requests, `audio.rs` playback, `lyrics.rs` + `ui/karaoke.rs` the lyrics,
+> `video.rs` music videos, `vault.rs` the login). The Slint sections below describe the old app
+> and are to be rewritten. Build and test commands still apply.
+
 > **Vibecoded:** this whole codebase is written and maintained by Claude (Anthropic's AI) through
 > Claude Code; the owner directs it but doesn't write code. This guide is for whoever (human or AI)
 > works on it next.

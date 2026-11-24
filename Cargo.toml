@@ -2,7 +2,6 @@
 resolver = "3"
 # app: the player. probe: early research tools for YouTube's API. xtask: release helpers.
 members = ["app", "probe", "xtask"]
-exclude = ["legacy-slint"]
 # `cargo run` / `cargo build` / `cargo test` without -p mean the player.
 default-members = ["app"]
 

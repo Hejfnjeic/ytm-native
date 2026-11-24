@@ -9,7 +9,8 @@
 #  5. tags, pushes, and creates the GitHub release with all files and notes from the git log
 #
 # Needs: gh (logged in), the Windows toolchain (see scripts/build-windows.sh), makepkg, 7z.
-# Everything goes to dist/v<version>/ first; nothing is published until step 5. Set
+# Everything goes to dist/v<version>/ first; nothing is published until step 5 (after which
+# dist/v<version>/ is removed: it's all on GitHub). Set
 # DRY_RUN=1 to stop before step 5 (to look at the files), NOTES_FILE=<md> for hand-written notes.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -115,3 +116,10 @@ echo "== 5. publish $tag"
 git tag -a "$tag" -m "ytm-native $version"
 git push origin HEAD --follow-tags
 gh release create "$tag" "${files[@]}" --title "ytm-native $version" --notes-file "$out/notes.md"
+
+# Everything is on GitHub now: the files here and the Arch package's own build (a whole
+# second compile, ~7 GB) would only fill the disk. The notes are kept beside the scratch files.
+mkdir -p target/scratch
+cp "$out/notes.md" "target/scratch/notes-$version.md"
+rm -r "$out" target/arch-build target/arch-pkg
+echo "Published $tag; removed $out and the Arch build folders."

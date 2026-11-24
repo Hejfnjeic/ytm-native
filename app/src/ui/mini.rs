@@ -52,16 +52,15 @@ pub struct Mini {
 
 impl Mini {
     pub fn load(get: impl Fn(&str) -> Option<String>) -> Self {
-        let size = get("lyrics_window_size")
-            .and_then(|v| serde_json::from_str::<[f32; 2]>(&v).ok())
-            .map(|[w, h]| Vec2::splat(w.max(h)).clamp(MIN, MAX))
-            .unwrap_or(SIZE);
+        // Its side as last left. (Saved under a new name when the window got smaller by
+        // default, so a size saved before that is forgotten once.)
+        let size = get("lyrics_window_side").and_then(|v| v.parse::<f32>().ok()).map_or(SIZE, |side| Vec2::splat(side).clamp(MIN, MAX));
         Mini { open: false, wanted: None, pinned: get("mini_pinned").map_or(PINNED_BY_DEFAULT, |v| v == "1"), size, opened_at: f64::NEG_INFINITY, kept_above: None }
     }
 
     pub fn save(&self, storage: &mut dyn eframe::Storage) {
         storage.set_string("mini_pinned", if self.pinned { "1" } else { "0" }.to_owned());
-        storage.set_string("lyrics_window_size", serde_json::to_string(&[self.size.x, self.size.y]).unwrap_or_default());
+        storage.set_string("lyrics_window_side", self.size.x.round().to_string());
     }
 
     pub fn active(&self) -> bool {

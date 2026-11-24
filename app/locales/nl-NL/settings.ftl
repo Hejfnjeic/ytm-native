@@ -195,13 +195,9 @@ settings-looking-for-fonts = Lettertypen zoeken…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Experimenteel. De kleine pil toont de bediening als je hem aanwijst. Dubbelklik voor het volledige venster.
-settings-pill-mini-player-desc-needs-opengl = Experimenteel. De kleine pil toont de bediening als je hem aanwijst. Vereist OpenGL.
 settings-mini-player = Minispeler
-settings-pill-mini-player = Pilvormige minispeler
 settings-keep-on-top = Altijd op de voorgrond
 settings-keep-on-top-desc = De minispeler blijft boven andere vensters.
-settings-pill-mini-player-restart-desc = De stijl van de minispeler verandert bij de volgende start.
 
 ## App icon
 

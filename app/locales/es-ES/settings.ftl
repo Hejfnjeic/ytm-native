@@ -197,13 +197,9 @@ settings-looking-for-fonts = Buscando fuentes…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Experimental. Una pastilla pequeña que muestra sus controles al pasar el cursor por encima. Haz doble clic para la ventana completa.
-settings-pill-mini-player-desc-needs-opengl = Experimental. Una pastilla pequeña que muestra sus controles al pasar el cursor por encima. Necesita OpenGL, no Vulkan.
 settings-mini-player = Mini reproductor
-settings-pill-mini-player = Mini reproductor en pastilla
 settings-keep-on-top = Mantener encima
 settings-keep-on-top-desc = El mini reproductor se queda por encima de otras ventanas.
-settings-pill-mini-player-restart-desc = El mini reproductor cambia de estilo en el próximo inicio.
 
 ## App icon
 

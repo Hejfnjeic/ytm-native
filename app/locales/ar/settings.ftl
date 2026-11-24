@@ -199,13 +199,9 @@ settings-looking-for-fonts = جارٍ البحث عن الخطوط…
 
 ## Mini player
 
-settings-pill-mini-player-desc = تجريبي. شريط صغير دائري الحواف يُظهر عناصر التحكم عند التمرير فوقه بالمؤشر. انقر عليه مرتين للعودة إلى النافذة الكاملة.
-settings-pill-mini-player-desc-needs-opengl = تجريبي. شريط صغير دائري الحواف يُظهر عناصر التحكم عند التمرير فوقه بالمؤشر. يتطلب OpenGL وليس Vulkan.
 settings-mini-player = المشغّل المصغّر
-settings-pill-mini-player = المشغّل المصغّر الكبسولي
 settings-keep-on-top = الإبقاء في المقدمة
 settings-keep-on-top-desc = يبقى المشغّل المصغّر فوق النوافذ الأخرى.
-settings-pill-mini-player-restart-desc = يتغيّر شكل المشغّل المصغّر بدءًا من التشغيل التالي.
 
 ## App icon
 

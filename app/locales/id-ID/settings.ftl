@@ -199,13 +199,9 @@ settings-looking-for-fonts = Lagi nyari font…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Eksperimental. Pil kecil yang menampilkan kontrolnya pas kamu arahkan kursor. Klik dua kali buat buka jendela penuh.
-settings-pill-mini-player-desc-needs-opengl = Eksperimental. Pil kecil yang menampilkan kontrolnya pas kamu arahkan kursor. Butuh OpenGL, bukan Vulkan.
 settings-mini-player = Mini player
-settings-pill-mini-player = Mini player model pil
 settings-keep-on-top = Selalu di atas
 settings-keep-on-top-desc = Mini player tetap di atas jendela lain.
-settings-pill-mini-player-restart-desc = Gaya mini player berubah mulai dari peluncuran berikutnya.
 
 ## App icon
 

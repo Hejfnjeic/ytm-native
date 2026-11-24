@@ -124,7 +124,7 @@ pub(super) fn shortcut(app: &mut App, ctx: &egui::Context) {
     let p = &mut app.palette;
     // The mini player has no room for it, and a dialog or the release notes come first.
     let other_modal = ctx.memory(|m| m.top_modal_layer()).is_some_and(|l| l.id != id());
-    if app.mini.busy() || app.dialog.is_some() || other_modal {
+    if app.dialog.is_some() || other_modal {
         p.open = false;
         return;
     }
@@ -467,7 +467,7 @@ fn run_command(app: &mut App, ctx: &egui::Context, cmd: Command) {
             }
             Act::Lyrics => app.toggle_lyrics(),
             Act::Queue => app.toggle_queue(),
-            Act::Mini => app.actions.push(Action::Mini(!app.mini.target())),
+            Act::Mini => app.actions.push(Action::Mini(!app.mini.active())),
             Act::FullScreen => {
                 app.np_open = true;
                 app.toggle_fullscreen(ctx);

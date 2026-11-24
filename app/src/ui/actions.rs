@@ -419,12 +419,8 @@ impl App {
             self.quit(ctx);
         }
         if mini {
-            self.actions.push(Action::Mini(!self.mini.target()));
+            self.actions.push(Action::Mini(!self.mini.active()));
         }
-        // The mini player has no pages or now playing to go to, nor does a window on
-        // its way back until it's there.
-        let (back, fwd, lyr, full, esc, refresh) =
-            if self.mini.busy() { (false, false, false, false, false, false) } else { (back, fwd, lyr, full, esc, refresh) };
         if refresh {
             self.refresh();
         }
@@ -493,24 +489,6 @@ impl App {
     pub(super) fn nudge_volume(&self, up: bool) {
         let v = (self.audio.volume() + if up { 0.05 } else { -0.05 }).clamp(0.0, 1.0);
         self.audio.set_volume(v);
-    }
-
-    /// Into the mini player or back. Full screen ends first, a frame ahead.
-    pub(super) fn set_mini(&mut self, ctx: &egui::Context, on: bool, now: f64) {
-        if on == self.mini.active() {
-            return;
-        }
-        if on && self.fullscreen {
-            self.set_fullscreen(ctx, false);
-            self.mini.request(true);
-            return;
-        }
-        if on && !self.pending_unlikes().is_empty() {
-            self.toast = None;
-            self.settle();
-        }
-        // The lyrics window, unless Settings › Mini player picked the pill.
-        self.mini.toggle(ctx, now, !super::mini::pill_active());
     }
 
     pub(super) fn set_fullscreen(&mut self, ctx: &egui::Context, on: bool) {

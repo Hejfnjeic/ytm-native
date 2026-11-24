@@ -2488,65 +2488,19 @@ fn settings_window(app: &mut App, ui: &mut Ui) {
     });
 }
 
-/// Settings › Appearance › Window material: Windows 11's Mica, Mica Alt or Acrylic.
+/// Settings › Appearance › Mini player: the lyrics window kept on top or not.
 fn settings_mini(app: &mut App, ui: &mut Ui) {
-    use super::mini;
-    let dir = app.backend.data_dir().to_owned();
-    let opengl = crate::renderer::active() == crate::renderer::Renderer::OpenGl;
-    let desc = if opengl {
-        tr!("settings-pill-mini-player-desc")
-    } else {
-        tr!("settings-pill-mini-player-desc-needs-opengl")
-    };
     settings_section(ui, tr!("settings-mini-player"), None, None, |ui| {
-        ui.add_enabled_ui(opengl, |ui| {
-            setting_row(ui, tr!("settings-pill-mini-player"), Some(desc), |ui| {
-                let mut on = opengl && mini::pill_saved(&dir);
-                if toggle(ui, &mut on, tr!("settings-pill-mini-player")).changed()
-                    && let Err(e) = mini::save_pill(&dir, on)
-                {
-                    log::warn!("mini player: couldn't save the style: {e}");
-                }
-            });
-        });
-        divider(ui);
         setting_row(ui, tr!("settings-keep-on-top"), Some(tr!("settings-keep-on-top-desc")), |ui| {
             let mut on = app.mini.pinned;
             if toggle(ui, &mut on, tr!("settings-keep-on-top")).changed() {
                 app.mini.set_pinned(ui.ctx(), on);
             }
         });
-        // winit can't keep a Wayland window above others; an X11 one (XWayland) can.
-        if crate::wayland_session() {
-            divider(ui);
-            setting_row(ui, tr!("settings-keep-on-top-wayland"), Some(tr!("settings-keep-on-top-wayland-desc")), |ui| {
-                toggle(ui, &mut app.mini_x11, tr!("settings-keep-on-top-wayland"));
-            });
-            // The window type follows from the next start (Close to tray's row covers it on).
-            if app.mini_x11 == crate::wayland_window() && !app.close_to_tray {
-                divider(ui);
-                let mut restart = false;
-                setting_row(ui, tr!("settings-restart-to-apply"), Some(tr!("settings-keep-on-top-wayland-restart-desc")), |ui| {
-                    restart = pill(ui, tr!("settings-restart-now"), None, true).clicked();
-                });
-                if restart {
-                    app.restart(ui.ctx());
-                }
-            }
-        }
-        if opengl && mini::pill_saved(&dir) != mini::pill_active() {
-            divider(ui);
-            let mut restart = false;
-            setting_row(ui, tr!("settings-restart-to-apply"), Some(tr!("settings-pill-mini-player-restart-desc")), |ui| {
-                restart = pill(ui, tr!("settings-restart-now"), None, true).clicked();
-            });
-            if restart {
-                app.restart(ui.ctx());
-            }
-        }
     });
 }
 
+/// Settings › Appearance › Window material: Windows 11's Mica, Mica Alt or Acrylic.
 fn settings_backdrop(app: &mut App, ui: &mut Ui) {
     use crate::backdrop::{self, Backdrop};
     let saved = backdrop::load(app.backend.data_dir());

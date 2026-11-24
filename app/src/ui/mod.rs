@@ -124,7 +124,6 @@ pub enum NpTab {
     Art,
 }
 
-pub use mini::{init_pill, set_hwnd as set_mini_hwnd};
 
 /// Settings › General › Window › Open on: the pages the app can start on, as saved and
 /// as listed.
@@ -614,7 +613,7 @@ pub struct App {
     settings_query: String,
     palette: palette::Palette,
     fullscreen: bool,
-    /// The mini player: the window shrunk to a strip.
+    /// The mini player: a lyrics window of its own.
     mini: mini::Mini,
     /// Every source's lyrics for the current song (by video ID).
     lyrics: Option<(String, LyricsSet)>,
@@ -677,9 +676,6 @@ pub struct App {
     // window
     /// Clicking × hides the window to the tray instead of quitting.
     close_to_tray: bool,
-    /// Linux, Wayland session: an X11 window from the next start, so the mini player can
-    /// stay above other windows.
-    mini_x11: bool,
     /// Settings › Window: draw with wgpu (Vulkan) from the next start (renderer.rs).
     pub(super) wgpu_renderer: bool,
     /// Settings › App icon (`appicon::ALL` id).
@@ -871,7 +867,6 @@ impl App {
                 .filter(|_| !crate::update::flatpak())
                 .map_or_else(|| crate::update::is_nightly(&crate::update::build_version()), |v| v == "nightly"),
             close_to_tray: get("close_to_tray").is_some_and(|v| v == "1"),
-            mini_x11: get("mini_x11").is_some_and(|v| v == "1"),
             wgpu_renderer,
             app_icon,
             tray: None,
@@ -1349,7 +1344,7 @@ fn window_refocused(was_focused: &mut bool, focused: bool) -> bool {
 impl eframe::App for App {
     /// With a window material, nothing under the pages but what they paint.
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        if self.mini.pill_showing() || crate::backdrop::active() != crate::backdrop::Backdrop::None {
+        if crate::backdrop::active() != crate::backdrop::Backdrop::None || (titlebar::custom() && crate::corners::available()) {
             return [0.0; 4];
         }
         // Opaque: a see-through window (made for the pill) mustn't show the desktop here.
@@ -1446,9 +1441,8 @@ impl eframe::App for App {
             }
         }
         if let Some(on) = self.mini.take_request() {
-            self.set_mini(ctx, on, now);
+            self.set_mini(on, now);
         }
-        self.mini.tick(ctx, now);
         self.tray_window(ctx, frame);
         self.sync_title(ctx);
         self.window_hidden = self.in_tray || ctx.input(|i| i.viewport().minimized == Some(true));
@@ -1496,7 +1490,7 @@ impl eframe::App for App {
             if playing || self.buffering {
                 ctx.request_repaint_after(Duration::from_millis(250));
             }
-        } else if self.np_open && playing && !self.mini.busy() {
+        } else if (self.np_open || self.mini.active()) && playing {
             pace::repaint_after(ctx, Duration::from_millis(33));
         } else if playing && widgets::equalizer_shown(ctx) {
             // The playing row's bars need a steady, full rate to read as smooth.
@@ -1540,10 +1534,8 @@ impl eframe::App for App {
         let light = self.light_pages(&ctx) && !self.fullscreen;
         let bar_light = light && np < 0.5;
         theme::set_mode(&ctx, light);
-        // The mini player, or nothing but the background while the window changes size.
-        let layout = self.mini.layout(&ctx);
         // Only the player bar shows the window's material once the pages are covered.
-        crate::backdrop::follow(crate::backdrop::shows() && !self.mini.pill_showing(), light && (np < 1.0 || layout != mini::Layout::Full));
+        crate::backdrop::follow(crate::backdrop::shows(), light && np < 1.0);
         // The installed fonts arrived: the theme's can be loaded now. Not the first frame,
         // which is applying anyway and adds a texture loader.
         if self.chrome_applied.is_some() && theme::fonts_became_ready() {
@@ -1568,36 +1560,9 @@ impl eframe::App for App {
         let covered = !self.fullscreen && np >= 1.0;
         titlebar::set_fullscreen(&ctx, self.fullscreen);
         titlebar::set_classic(&ctx, self.classic_titlebar);
-        // Mid-switch to or from the mini player, the frame stays as it is.
-        titlebar::sync(&ctx, (layout != mini::Layout::Blank).then_some(layout == mini::Layout::Full));
+        titlebar::sync(&ctx, Some(true));
         dev::dev_memory(&ctx, now);
         dev::dev_probe(&ctx);
-        if layout == mini::Layout::Mini && mini::lyrics_active() {
-            mini::lyrics_window(self, ui, now);
-            // Any size in its limits: by every edge and corner, unlike the strip.
-            titlebar::resize_edges(&ctx);
-            shell::toast(self, &ctx, now);
-            self.mini.fade_in(&ctx, now, Color32::BLACK);
-            dev_screenshot(&ctx, now);
-            return;
-        }
-        if layout == mini::Layout::Mini && mini::pill_active() {
-            mini::pill(self, ui, now);
-            dev_screenshot(&ctx, now);
-            return;
-        }
-        if layout != mini::Layout::Full {
-            shell::background(self, ui, screen, now);
-            if layout == mini::Layout::Mini {
-                mini::strip(self, ui, now);
-                titlebar::resize_sides(&ctx);
-                // "Sign in to like songs" and such: shown here too, not timed out unseen.
-                shell::toast(self, &ctx, now);
-                self.mini.fade_in(&ctx, now, shell::base_color(self));
-            }
-            dev_screenshot(&ctx, now);
-            return;
-        }
         // Now playing all the way up paints over all of it, under the player bar too.
         if np >= 1.0 {
             // Not drawn, but now playing's own backdrop runs on the same clock.
@@ -1799,8 +1764,11 @@ impl eframe::App for App {
 
         titlebar::window_buttons(&ctx);
         titlebar::resize_edges(&ctx);
-        // Back from the mini player.
-        self.mini.fade_in(&ctx, now, shell::base_color(self));
+        // The app's own frame: rounded corners, unless the window fills the screen.
+        if titlebar::custom() && !self.fullscreen && !ctx.input(|i| i.viewport().maximized == Some(true)) {
+            crate::corners::cut(&ctx, crate::corners::RADIUS);
+        }
+        self.show_mini(&ctx, now);
 
         dev_screenshot(&ctx, now);
         // Next frame's root starts from the pages' mode.
@@ -1880,14 +1848,8 @@ impl eframe::App for App {
         } else {
             self.good_window = storage.get_string("window");
         }
-        // In the mini player, the full window's place is the one to reopen at.
         self.mini.save(storage);
-        if let Some(w) = self.mini.full_window() {
-            storage.set_string("window", w.clone());
-            self.good_window = Some(w);
-        }
         storage.set_string("close_to_tray", b(self.close_to_tray));
-        storage.set_string("mini_x11", b(self.mini_x11));
         storage.set_string("song_notifications", b(self.song_notifications));
         let start = START_PAGES.iter().find(|(.., p)| *p == self.start_page).map_or("home", |(k, ..)| k);
         storage.set_string("start_page", start.to_owned());
@@ -1992,7 +1954,6 @@ fn frame_pace(raw: &egui::RawInput, full_rate: bool) {
     let geometry_changed = state.geometry.replace(geometry).is_some_and(|g| g != geometry);
     let acting = full_rate
         || geometry_changed
-        || mini::moving()
         || raw.events.iter().any(|e| matches!(e, E::PointerButton { .. } | E::MouseWheel { .. } | E::Key { .. } | E::Text(_) | E::Ime(_) | E::Zoom(_) | E::Touch { .. }));
     if !acting && let Some(wait) = state.last.and_then(|l| Duration::from_millis(16).checked_sub(l.elapsed())) {
         std::thread::sleep(wait);

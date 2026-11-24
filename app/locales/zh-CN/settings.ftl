@@ -195,13 +195,9 @@ settings-looking-for-fonts = 正在寻找字体...
 
 ## Mini player
 
-settings-pill-mini-player-desc = 实验性的。一个小药丸，当您指向它时就会显示其控件。双击它可查看完整窗口。
-settings-pill-mini-player-desc-needs-opengl = 实验性的。一个小药丸，当您指向它时就会显示其控件。需要 OpenGL，而不是 Vulkan。
 settings-mini-player = 迷你播放器
-settings-pill-mini-player = 药丸迷你播放器
 settings-keep-on-top = 保持领先
 settings-keep-on-top-desc = 迷你播放器位于其他窗口之上。
-settings-pill-mini-player-restart-desc = 迷你玩家从下一次开始就会改变风格。
 
 ## App icon
 

@@ -24,7 +24,9 @@ use chacha20poly1305::{
 const MAGIC: &[u8] = b"YTMN1";
 const NONCE: usize = 24;
 /// The keyring entry's service and user, as the Slint version of ytm-native named them.
+#[cfg(target_os = "linux")]
 const SERVICE: &str = "ytm-native";
+#[cfg(target_os = "linux")]
 const KEY_USER: &str = "session-encryption-key";
 
 /// One key operation at a time: two first saves at once would each make a key.
@@ -37,6 +39,7 @@ fn file(name: &str, dir: &Path) -> PathBuf {
 
 /// Whether `dir` is the usual data folder: a `YTM_DATA_DIR` dev profile (or a test's
 /// folder) gets a key of its own, so it never shares or touches the real sign-in's.
+#[cfg(target_os = "linux")]
 fn default_dir(dir: &Path) -> bool {
     crate::default_data_dir().as_deref() == Some(dir)
 }

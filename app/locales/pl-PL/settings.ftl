@@ -195,13 +195,9 @@ settings-looking-for-fonts = Wyszukiwanie czcionek…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Eksperymentalne. Mała kapsuła pokazuje przyciski po najechaniu kursorem. Kliknij dwukrotnie, aby wrócić do pełnego okna.
-settings-pill-mini-player-desc-needs-opengl = Eksperymentalne. Mała kapsuła pokazuje przyciski po najechaniu kursorem. Wymaga OpenGL.
 settings-mini-player = Miniplayer
-settings-pill-mini-player = Miniplayer w kształcie kapsuły
 settings-keep-on-top = Zawsze na wierzchu
 settings-keep-on-top-desc = Miniplayer pozostaje nad innymi oknami.
-settings-pill-mini-player-restart-desc = Styl miniplayera zmieni się przy następnym uruchomieniu.
 
 ## App icon
 

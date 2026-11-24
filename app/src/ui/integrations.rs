@@ -10,15 +10,9 @@ use super::{App, dev_var, notes, updatable};
 impl App {
 
     /// The window's title, which the taskbar and Alt+Tab show: the current song, or the
-    /// app's name with none. One fixed title while the mini player is the lyrics window:
-    /// Wayland lets no app put itself above others, but a KDE window rule for that title
-    /// (and the app, ytm-native) can.
+    /// app's name with none.
     pub(super) fn sync_title(&mut self, ctx: &egui::Context) {
-        let want = if self.mini.active() && super::mini::lyrics_active() {
-            crate::tr!("player-lyrics-window").to_owned()
-        } else {
-            window_title(self.current().map(|t| (t.title.as_str(), t.artist_line())))
-        };
+        let want = window_title(self.current().map(|t| (t.title.as_str(), t.artist_line())));
         if want != self.window_title {
             ctx.send_viewport_cmd(egui::ViewportCommand::Title(want.clone()));
             self.window_title = want;
@@ -39,7 +33,7 @@ impl App {
         let again = self.notified.as_ref().is_some_and(|(_, id)| *id == t.id);
         self.notified = Some((self.generation, t.id.clone()));
         let focused = ctx.input(|i| i.viewport().focused) != Some(false);
-        let seen = !self.window_hidden && (focused || self.mini.showing());
+        let seen = !self.window_hidden && (focused || self.mini.active());
         if again || seen {
             return;
         }

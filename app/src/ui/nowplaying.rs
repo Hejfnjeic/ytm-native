@@ -699,7 +699,7 @@ fn np_content(app: &mut App, ui: &mut Ui, content: Rect, track: &crate::model::T
         rui.set_clip_rect(if inset.is_some() { ui.clip_rect() } else { content.intersect(ui.clip_rect()) });
         rui.multiply_opacity(panel_vis * vis);
         match tab {
-            NpTab::Lyrics => lyrics_panel(app, &mut rui, r, now, centered),
+            NpTab::Lyrics => lyrics_panel(app, &mut rui, r, now, centered, 1.0),
             NpTab::Comments => super::comments::panel(app, &mut rui),
             _ => super::shell::queue_list(app, &mut rui, "np"),
         }
@@ -1362,7 +1362,8 @@ fn seek_line(app: &mut App, ui: &mut Ui, hit: Rect, id: egui::Id, (pos, total): 
 
 // ------------------------------------------------------------------ lyrics
 
-pub(super) fn lyrics_panel(app: &mut App, ui: &mut Ui, rect: Rect, now: f64, centered: bool) {
+/// `scale`: the text's size against Now playing's own (the lyrics window's is smaller).
+pub(super) fn lyrics_panel(app: &mut App, ui: &mut Ui, rect: Rect, now: f64, centered: bool, scale: f32) {
     // Lent out for the frame rather than cloned (the drawing needs `app` mutably).
     let Some((id, set)) = app.lyrics.take() else {
         ui.add_space(rect.height() * 0.35);
@@ -1378,7 +1379,7 @@ pub(super) fn lyrics_panel(app: &mut App, ui: &mut Ui, rect: Rect, now: f64, cen
         if lyrics.sync == Sync::None {
             plain_lyrics(app, ui, panel, lyrics);
         } else {
-            synced(app, ui, panel, &id, lyrics, now, centered);
+            synced(app, ui, panel, &id, lyrics, now, centered, scale);
         }
     } else {
         ui.add_space(rect.height() * 0.4);
@@ -1414,7 +1415,8 @@ fn decorations<'a>(
         .collect()
 }
 
-fn synced(app: &mut App, ui: &mut Ui, rect: Rect, id: &str, lyrics: &Lyrics, now: f64, narrow: bool) {
+#[allow(clippy::too_many_arguments)]
+fn synced(app: &mut App, ui: &mut Ui, rect: Rect, id: &str, lyrics: &Lyrics, now: f64, narrow: bool, scale: f32) {
     let style = &app.look().lyrics;
     let accent = app.accent_color();
     let centered = narrow;
@@ -1433,7 +1435,7 @@ fn synced(app: &mut App, ui: &mut Ui, rect: Rect, id: &str, lyrics: &Lyrics, now
         trans.hash(&mut h);
         h.finish()
     };
-    let own = karaoke::Own { scale: app.lyric_prefs.text_scale, weight: app.lyric_prefs.weight, deco_scale: app.lyric_prefs.deco_scale };
+    let own = karaoke::Own { scale: app.lyric_prefs.text_scale * scale, weight: app.lyric_prefs.weight, deco_scale: app.lyric_prefs.deco_scale };
     let fullscreen = app.fullscreen;
     let glass_chip = app.look().app.glass.instrumental;
     let quick_scroll = app.quick_lyric_scroll;

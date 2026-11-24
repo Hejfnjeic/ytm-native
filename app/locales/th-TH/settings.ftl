@@ -195,13 +195,9 @@ settings-looking-for-fonts = กำลังค้นหาแบบอักษ
 
 ## Mini player
 
-settings-pill-mini-player-desc = การทดลอง ยาเม็ดเล็กๆ ที่แสดงการควบคุมเมื่อคุณชี้ไปที่มัน ดับเบิลคลิกเพื่อดูหน้าต่างแบบเต็ม
-settings-pill-mini-player-desc-needs-opengl = การทดลอง ยาเม็ดเล็กๆ ที่แสดงการควบคุมเมื่อคุณชี้ไปที่มัน ต้องการ OpenGL ไม่ใช่ Vulkan
 settings-mini-player = เครื่องเล่นขนาดเล็ก
-settings-pill-mini-player = เครื่องเล่นพิลมินิ
 settings-keep-on-top = อยู่ด้านบนต่อไป
 settings-keep-on-top-desc = เครื่องเล่นขนาดเล็กอยู่เหนือหน้าต่างอื่นๆ
-settings-pill-mini-player-restart-desc = มินิเพลเยอร์เปลี่ยนสไตล์ตั้งแต่เริ่มครั้งถัดไป
 
 ## App icon
 

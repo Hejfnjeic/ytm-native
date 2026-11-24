@@ -195,13 +195,9 @@ settings-looking-for-fonts = Đang tìm kiếm phông chữ…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Thử nghiệm. Một viên thuốc nhỏ hiển thị các nút điều khiển khi bạn chỉ vào nó. Bấm đúp vào nó để có cửa sổ đầy đủ.
-settings-pill-mini-player-desc-needs-opengl = Thử nghiệm. Một viên thuốc nhỏ hiển thị các nút điều khiển khi bạn chỉ vào nó. Cần OpenGL, không phải Vulkan.
 settings-mini-player = Máy nghe nhạc mini
-settings-pill-mini-player = Máy nghe nhạc mini
 settings-keep-on-top = Luôn dẫn đầu
 settings-keep-on-top-desc = Trình phát mini nằm phía trên các cửa sổ khác.
-settings-pill-mini-player-restart-desc = Trình phát mini thay đổi phong cách từ lần khởi động tiếp theo.
 
 ## App icon
 

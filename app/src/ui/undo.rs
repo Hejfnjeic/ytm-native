@@ -86,7 +86,7 @@ impl App {
             return;
         }
         self.rating(|id| targets.iter().any(|target| target == id));
-        if !self.rating_settings.unlike_notices || self.mini.busy() {
+        if !self.rating_settings.unlike_notices {
             self.set_liked(&tracks, false);
             self.confirm_unliked(&targets);
             self.backend.request(send);

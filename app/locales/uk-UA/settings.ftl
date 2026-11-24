@@ -195,13 +195,9 @@ settings-looking-for-fonts = Пошук шрифтів…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Експериментальна функція. Після наведення на капсулу з’являються кнопки керування. Подвійне клацання повертає повне вікно.
-settings-pill-mini-player-desc-needs-opengl = Експериментальна функція. Після наведення на капсулу з’являються кнопки керування. Потрібен OpenGL.
 settings-mini-player = Мініпрогравач
-settings-pill-mini-player = Мініпрогравач у формі капсули
 settings-keep-on-top = Поверх інших вікон
 settings-keep-on-top-desc = Мініпрогравач лишається поверх інших вікон.
-settings-pill-mini-player-restart-desc = Вигляд мініпрогравача зміниться під час наступного запуску.
 
 ## App icon
 

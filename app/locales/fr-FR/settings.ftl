@@ -195,13 +195,9 @@ settings-looking-for-fonts = Recherche des polices…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Expérimental. Les commandes de la petite pilule apparaissent au survol. Double-cliquez pour retrouver la fenêtre complète.
-settings-pill-mini-player-desc-needs-opengl = Expérimental. Les commandes de la petite pilule apparaissent au survol. Nécessite OpenGL.
 settings-mini-player = Mini-lecteur
-settings-pill-mini-player = Mini-lecteur en pilule
 settings-keep-on-top = Garder au premier plan
 settings-keep-on-top-desc = Le mini-lecteur reste au-dessus des autres fenêtres.
-settings-pill-mini-player-restart-desc = Le style du mini-lecteur changera au prochain démarrage.
 
 ## App icon
 

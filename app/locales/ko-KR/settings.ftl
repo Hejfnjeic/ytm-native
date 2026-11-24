@@ -195,13 +195,9 @@ settings-looking-for-fonts = 글꼴을 찾는 중…
 
 ## Mini player
 
-settings-pill-mini-player-desc = 실험적입니다. 가리키면 컨트롤이 표시되는 작은 알약입니다. 전체 창을 보려면 두 번 클릭하세요.
-settings-pill-mini-player-desc-needs-opengl = 실험적입니다. 가리키면 컨트롤이 표시되는 작은 알약입니다. Vulkan가 아닌 OpenGL가 필요합니다.
 settings-mini-player = 미니 플레이어
-settings-pill-mini-player = 알약 미니 플레이어
 settings-keep-on-top = 상단에 유지
 settings-keep-on-top-desc = 미니 플레이어는 다른 창 위에 위치합니다.
-settings-pill-mini-player-restart-desc = 미니 플레이어는 다음 시작부터 스타일을 변경합니다.
 
 ## App icon
 

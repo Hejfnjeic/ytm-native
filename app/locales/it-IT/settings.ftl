@@ -195,13 +195,9 @@ settings-looking-for-fonts = Ricerca dei caratteri…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Sperimentale. La capsula mostra i comandi al passaggio del puntatore. Fai doppio clic per tornare alla finestra completa.
-settings-pill-mini-player-desc-needs-opengl = Sperimentale. La capsula mostra i comandi al passaggio del puntatore. Richiede OpenGL.
 settings-mini-player = Mini lettore
-settings-pill-mini-player = Mini lettore a capsula
 settings-keep-on-top = Sempre in primo piano
 settings-keep-on-top-desc = Il mini lettore resta in primo piano sulle altre finestre.
-settings-pill-mini-player-restart-desc = Lo stile del mini lettore cambierà al prossimo avvio.
 
 ## App icon
 

@@ -197,13 +197,9 @@ settings-looking-for-fonts = Procurando fontes…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Experimental. Uma pílula pequena que mostra os controles ao apontar. Clique duas vezes para a janela completa.
-settings-pill-mini-player-desc-needs-opengl = Experimental. Uma pílula pequena que mostra os controles ao apontar. Precisa de OpenGL, não Vulkan.
 settings-mini-player = Mini player
-settings-pill-mini-player = Mini player em pílula
 settings-keep-on-top = Manter no topo
 settings-keep-on-top-desc = O mini player fica acima das outras janelas.
-settings-pill-mini-player-restart-desc = O mini player muda de estilo no próximo início.
 
 ## App icon
 

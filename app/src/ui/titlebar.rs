@@ -645,11 +645,6 @@ pub fn resize_edges(ctx: &egui::Context) {
     edges(ctx, false);
 }
 
-/// Resize by the left and right edges only: the mini player is as tall as its contents.
-pub fn resize_sides(ctx: &egui::Context) {
-    edges(ctx, true);
-}
-
 fn edges(ctx: &egui::Context, sides_only: bool) {
     // macOS resizes its own frame.
     if !custom() || !shown(ctx) || maximized(ctx) {

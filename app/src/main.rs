@@ -35,6 +35,8 @@ mod translate;
 mod tray;
 mod turnstile;
 mod ui;
+mod corners;
+mod keep_above;
 mod update;
 mod webmusic;
 mod ytm;
@@ -115,7 +117,9 @@ fn main() -> eframe::Result {
     }
     let renderer = renderer::init(&data_dir());
     // Both, so each settles this run's choice.
-    if backdrop::init(&data_dir(), renderer) | ui::init_pill(&data_dir(), renderer) {
+    // Linux, the app's own frame: see-through, for its rounded corners (corners.rs).
+    let rounded = cfg!(target_os = "linux") && ui::custom_titlebar() && renderer == renderer::Renderer::OpenGl;
+    if backdrop::init(&data_dir(), renderer) || rounded {
         viewport = viewport.with_transparent(true);
     }
     let options = eframe::NativeOptions {
@@ -216,7 +220,6 @@ fn main() -> eframe::Result {
                     fullscreen::set_drag(move || window.upgrade().is_some_and(|w| w.has_focus() && w.drag_window().is_ok()));
                 }
                 ui::set_titlebar_hwnd(h, gl_vendor.as_deref());
-                ui::set_mini_hwnd(h);
                 backdrop::prepare(h);
                 // eframe sets only the small icon; the taskbar button wants the big one.
                 appicon::set_window_icon(appicon::get(appicon::load(backend.data_dir())));
@@ -238,6 +241,9 @@ fn main() -> eframe::Result {
             let shader = std::env::var_os("YTM_NO_SHADER").is_none();
             if let Some(gl) = &cc.gl {
                 shader::install_glass(gl);
+                if rounded {
+                    corners::install(gl);
+                }
             }
             let bg = match (&cc.gl, &cc.wgpu_render_state) {
                 (Some(gl), _) if shader => shader::Background::new(gl).map_err(|e| log::warn!("background shader unavailable: {e:#}")).ok(),
@@ -421,7 +427,7 @@ fn settle_window_system() {
     let set = |k: &str| std::env::var_os(k).is_some_and(|v| !v.is_empty());
     let wayland = set("WAYLAND_DISPLAY") || std::env::var("XDG_SESSION_TYPE").is_ok_and(|v| v == "wayland");
     let saved = std::fs::read_to_string(data_dir().join("app.ron")).unwrap_or_default();
-    let wanted = saved_on(&saved, "close_to_tray") || saved_on(&saved, "mini_x11");
+    let wanted = saved_on(&saved, "close_to_tray");
     let x11 = use_x11(wayland, set("DISPLAY"), wanted, set("YTM_WAYLAND"));
     if x11 {
         log::info!("window: X11 (XWayland), for Close to tray or Keep on top on Wayland");

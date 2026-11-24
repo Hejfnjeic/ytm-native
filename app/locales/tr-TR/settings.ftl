@@ -195,13 +195,9 @@ settings-looking-for-fonts = Yazı tipleri aranıyor…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Deneysel. İşaret ettiğinizde kontrollerini gösteren küçük bir hap. Tam pencere için çift tıklayın.
-settings-pill-mini-player-desc-needs-opengl = Deneysel. İşaret ettiğinizde kontrollerini gösteren küçük bir hap. Vulkan'ye değil, OpenGL'ye ihtiyaç vardır.
 settings-mini-player = Mini oynatıcı
-settings-pill-mini-player = Hap mini oynatıcısı
 settings-keep-on-top = Zirvede kalın
 settings-keep-on-top-desc = Mini oynatıcı diğer pencerelerin üzerinde kalır.
-settings-pill-mini-player-restart-desc = Mini oynatıcı bir sonraki başlangıçtan itibaren stili değiştirir.
 
 ## App icon
 

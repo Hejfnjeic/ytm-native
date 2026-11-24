@@ -228,16 +228,9 @@ settings-looking-for-fonts = Looking for fonts…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Experimental. A small pill that shows its controls when you point at it. Double-click it for the full window.
-settings-pill-mini-player-desc-needs-opengl = Experimental. A small pill that shows its controls when you point at it. Needs OpenGL, not Vulkan.
 settings-mini-player = Mini player
-settings-pill-mini-player = Pill mini player
 settings-keep-on-top = Keep on top
 settings-keep-on-top-desc = The mini player stays above other windows.
-settings-pill-mini-player-restart-desc = The mini player changes style from the next start.
-settings-keep-on-top-wayland = Keep on top on Wayland
-settings-keep-on-top-wayland-desc = Wayland doesn't let apps keep their window above others, so the app opens through XWayland instead. Touchpad scrolling doesn't coast there, and text can look softer with fractional scaling.
-settings-keep-on-top-wayland-restart-desc = The window changes from the next start.
 
 ## App icon
 

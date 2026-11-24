@@ -195,13 +195,9 @@ settings-looking-for-fonts = फ़ॉन्ट खोज रहे हैं…
 
 ## Mini player
 
-settings-pill-mini-player-desc = प्रायोगिक। एक छोटी सी गोली जो आपके इशारा करने पर अपना नियंत्रण दिखाती है। पूरी विंडो के लिए इसे डबल-क्लिक करें।
-settings-pill-mini-player-desc-needs-opengl = प्रायोगिक। एक छोटी सी गोली जो आपके इशारा करने पर अपना नियंत्रण दिखाती है। OpenGL की आवश्यकता है, Vulkan की नहीं।
 settings-mini-player = मिनी प्लेयर
-settings-pill-mini-player = पिल मिनी प्लेयर
 settings-keep-on-top = शीर्ष पर बने रहें
 settings-keep-on-top-desc = मिनी प्लेयर अन्य विंडो के ऊपर रहता है।
-settings-pill-mini-player-restart-desc = मिनी प्लेयर अगली शुरुआत से शैली बदलता है।
 
 ## App icon
 

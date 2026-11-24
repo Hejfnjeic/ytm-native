@@ -26,41 +26,12 @@ pub fn set(on: bool) -> bool {
     }
 }
 
-/// The work area (the monitor less the taskbar) of the monitor the window is on, in
-/// physical pixels. None where the app can't ask (not Windows, no window handle yet).
-pub fn work_area() -> Option<egui::Rect> {
-    #[cfg(windows)]
-    return imp::work_area();
-    #[cfg(not(windows))]
-    None
-}
-
 /// The refresh rate (Hz) of the monitor the window is on. None where the app can't ask.
 pub fn refresh_rate() -> Option<f64> {
     #[cfg(windows)]
     return imp::refresh_rate();
     #[cfg(not(windows))]
     None
-}
-
-/// Clip the window to a rounded rectangle (left, top, right and bottom edges and corner
-/// diameter, in pixels from the window's corner), or back to all of it. Outside the
-/// shape Windows neither draws its frame nor gives the window the mouse. Nothing where
-/// windows have no such frame.
-pub fn set_window_shape(shape: Option<(i32, i32, i32, i32, i32)>) {
-    #[cfg(windows)]
-    imp::set_window_shape(shape);
-    #[cfg(not(windows))]
-    let _ = shape;
-}
-
-/// Move the window's corner to `x`, `y` (pixels) now, not after the frame the way eframe
-/// does: with its shape set in the same frame, what's drawn moves with it.
-pub fn move_window(x: i32, y: i32) {
-    #[cfg(windows)]
-    imp::move_window(x, y);
-    #[cfg(not(windows))]
-    let _ = (x, y);
 }
 
 /// How the window starts the system's move (winit's, which also lets go of the button
@@ -86,25 +57,13 @@ pub fn start_drag(from: (i32, i32)) -> bool {
     }
 }
 
-/// Whether some of `rect` (physical pixels) is on a connected monitor. True where the
-/// app can't ask.
-pub fn on_a_monitor(rect: egui::Rect) -> bool {
-    #[cfg(windows)]
-    return imp::on_a_monitor(rect);
-    #[cfg(not(windows))]
-    {
-        let _ = rect;
-        true
-    }
-}
-
 #[cfg(windows)]
 mod imp {
     use std::sync::{Mutex, OnceLock};
 
     use windows::Win32::Foundation::{HWND, LPARAM, RECT, WPARAM};
     use windows::Win32::Graphics::Gdi::{
-        DEVMODEW, ENUM_CURRENT_SETTINGS, EnumDisplaySettingsW, GetMonitorInfoW, MONITOR_DEFAULTTONEAREST, MONITOR_DEFAULTTONULL, MONITORINFO, MONITORINFOEXW, MonitorFromRect,
+        DEVMODEW, ENUM_CURRENT_SETTINGS, EnumDisplaySettingsW, GetMonitorInfoW, MONITOR_DEFAULTTONEAREST, MONITORINFO, MONITORINFOEXW,
         MonitorFromWindow, RDW_ALLCHILDREN, RDW_ERASE, RDW_FRAME, RDW_INVALIDATE, RedrawWindow,
     };
     use windows::core::PCWSTR;
@@ -134,34 +93,6 @@ mod imp {
     /// don't go through that window surface, so they never did.
     pub fn init(hwnd: usize) {
         let _ = WINDOW.set(hwnd);
-    }
-
-    pub fn work_area() -> Option<egui::Rect> {
-        let &h = WINDOW.get()?;
-        let mut info = MONITORINFO { cbSize: size_of::<MONITORINFO>() as u32, ..Default::default() };
-        // SAFETY: the app's own window; `info` is ours and sized.
-        unsafe { GetMonitorInfoW(MonitorFromWindow(HWND(h as *mut _), MONITOR_DEFAULTTONEAREST), &mut info) }.as_bool().then(|| {
-            let r = info.rcWork;
-            egui::Rect::from_min_max(egui::pos2(r.left as f32, r.top as f32), egui::pos2(r.right as f32, r.bottom as f32))
-        })
-    }
-
-    pub fn set_window_shape(shape: Option<(i32, i32, i32, i32, i32)>) {
-        use windows::Win32::Graphics::Gdi::{CreateRoundRectRgn, SetWindowRgn};
-        let Some(&h) = WINDOW.get() else { return };
-        // SAFETY: the app's own window; once set, the system owns the region.
-        unsafe {
-            let region = shape.map(|(left, top, right, bottom, d)| CreateRoundRectRgn(left, top, right + 1, bottom + 1, d, d));
-            SetWindowRgn(HWND(h as *mut _), region, true);
-        }
-    }
-
-    pub fn move_window(x: i32, y: i32) {
-        let Some(&h) = WINDOW.get() else { return };
-        // SAFETY: the app's own window.
-        unsafe {
-            let _ = SetWindowPos(HWND(h as *mut _), None, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-        }
     }
 
     static DRAG: OnceLock<Box<dyn Fn() -> bool + Send + Sync>> = OnceLock::new();
@@ -206,12 +137,6 @@ mod imp {
         }
         // 0 and 1 mean the hardware's default rate, which says nothing.
         (mode.dmDisplayFrequency > 1).then_some(mode.dmDisplayFrequency as f64)
-    }
-
-    pub fn on_a_monitor(rect: egui::Rect) -> bool {
-        let r = RECT { left: rect.left() as i32, top: rect.top() as i32, right: rect.right() as i32, bottom: rect.bottom() as i32 };
-        // SAFETY: plain query.
-        !unsafe { MonitorFromRect(&r, MONITOR_DEFAULTTONULL) }.is_invalid()
     }
 
     pub fn set(on: bool) -> bool {

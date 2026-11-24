@@ -222,13 +222,9 @@ settings-looking-for-fonts = Schriftarten werden gesucht…
 
 ## Mini player
 
-settings-pill-mini-player-desc = Experimentell. Zeigt die Bedienelemente an, wenn du auf die kleine Kapsel zeigst. Ein Doppelklick öffnet das ganze Fenster.
-settings-pill-mini-player-desc-needs-opengl = Experimentell. Zeigt die Bedienelemente an, wenn du auf die kleine Kapsel zeigst. Benötigt OpenGL.
 settings-mini-player = Miniplayer
-settings-pill-mini-player = Kapselförmiger Miniplayer
 settings-keep-on-top = Immer im Vordergrund
 settings-keep-on-top-desc = Der Miniplayer bleibt vor anderen Fenstern.
-settings-pill-mini-player-restart-desc = Der Stil des Miniplayers ändert sich beim nächsten Start.
 
 ## App icon
 

@@ -195,13 +195,9 @@ settings-looking-for-fonts = フォントを検索中…
 
 ## Mini player
 
-settings-pill-mini-player-desc = 試験機能です。小さなカプセルにポインターを合わせると操作ボタンが表示されます。ダブルクリックで元のウィンドウに戻ります。
-settings-pill-mini-player-desc-needs-opengl = 試験機能です。小さなカプセルにポインターを合わせると操作ボタンが表示されます。OpenGL が必要です。
 settings-mini-player = ミニプレーヤー
-settings-pill-mini-player = カプセル型ミニプレーヤー
 settings-keep-on-top = 常に手前に表示
 settings-keep-on-top-desc = ミニプレーヤーをほかのウィンドウより手前に表示します。
-settings-pill-mini-player-restart-desc = ミニプレーヤーのスタイルは次回の起動時に変わります。
 
 ## App icon
 

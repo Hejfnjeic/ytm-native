@@ -25,7 +25,7 @@ if [[ "${1:-}" == "--uninstall" ]]; then
 else
     if [[ -z "$assets" ]]; then
         (cd "$root" && cargo build --release -p ytm-native)
-        desk_src="$root/packaging/ytm-native.desktop"; icon_src="$root/app/assets/icon.svg"; small_src="$root/app/assets/icon-small.svg"
+        desk_src="$root/packaging/ytm-native.desktop"; icon_src="$root/app/assets/icon/icon.svg"; small_src="$root/app/assets/icon/icon-small.svg"
     else
         desk_src="$assets/ytm-native.desktop"; icon_src="$assets/icon.svg"; small_src="$assets/icon-small.svg"
     fi

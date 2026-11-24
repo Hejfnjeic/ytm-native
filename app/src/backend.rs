@@ -69,6 +69,8 @@ pub enum Req {
     Segments { video_id: String },
     /// A music video's picture stream, for showing it: the tallest at most `max_height`.
     VideoStream { video_id: String, max_height: u32 },
+    /// A song's music video (YouTube's own pair, Premium): to show its picture.
+    SongVideo { song_id: String },
     /// Romanization and translation for the lyric lines of one source.
     LyricsExtras { video_id: String, source: String, lines: Vec<String>, lang: Option<String>, target: String },
     /// Process cover art for the background; `key` is echoed back.
@@ -151,7 +153,7 @@ impl Req {
             Req::Upload(_) => crate::tr!("nav-upload-music"),
             Req::Lyrics(_) => crate::tr!("settings-lyrics"),
             Req::Segments { .. } => "SponsorBlock",
-            Req::VideoStream { .. } => crate::tr!("settings-show-music-videos"),
+            Req::VideoStream { .. } | Req::SongVideo { .. } => crate::tr!("settings-show-music-videos"),
             Req::LyricsExtras { .. } => crate::tr!("settings-translation"),
             Req::Art { .. } => crate::tr!("discord-album-art"),
             Req::Radio { .. } => crate::tr!("ui-radio"),
@@ -388,6 +390,7 @@ pub enum Resp {
     Lyrics { video_id: String, lyrics: LyricsSet },
     Segments { video_id: String, segments: Vec<crate::sponsorblock::Segment> },
     VideoStream { video_id: String, stream: Option<innertube::VideoStream> },
+    SongVideo { song_id: String, video: Option<ytm::MusicVideo> },
     /// Romanization/translation for one source's lines, arriving after them.
     LyricsExtras { video_id: String, source: String, target: String, extras: crate::translate::Extras },
     Art { key: String, art: Art },
@@ -1007,6 +1010,13 @@ impl Backend {
                         log::warn!("comments page: {e:#}");
                     }
                     Resp::CommentsPage { token, page: page.ok() }
+                }
+                Req::SongVideo { song_id } => {
+                    let video = ytm::paired_video(api, &song_id).await.unwrap_or_else(|e| {
+                        log::info!("video: no music video looked up for {song_id}: {e:#}");
+                        None
+                    });
+                    Resp::SongVideo { song_id, video }
                 }
                 Req::VideoStream { video_id, max_height } => {
                     let found = async { innertube::video_stream(&self.http(), &video_id, &api.visitor_data(false).await?, max_height.into()).await }.await;

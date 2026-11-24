@@ -290,14 +290,20 @@ impl App {
             Resp::CommentsPage { token, page } => super::comments::on_page(&token, page),
             Resp::VideoStream { video_id, stream } => {
                 // Not one asked for before the song changed.
-                if let Some((id, player)) = &mut self.video
-                    && *id == video_id
+                if let Some(v) = &mut self.video
+                    && v.video == video_id
                 {
                     match stream {
-                        Some(s) => *player = Some(crate::video::Player::start(s, self.backend.http(), self.audio.status.clone())),
+                        Some(s) => v.player = Some(crate::video::Player::start(s, self.backend.http(), self.audio.status.clone(), v.offset)),
                         None => log::info!("video: {video_id} has no picture this app can decode; showing the cover"),
                     }
                 }
+            }
+            Resp::SongVideo { song_id, video } => {
+                if let Some(v) = &video {
+                    log::info!("video: {song_id} has the music video {} ({} ms in)", v.video.id, v.offset_ms);
+                }
+                self.song_videos.insert(song_id, video.map(|v| (v.video.id, v.offset_ms as f64 / 1000.0)));
             }
             Resp::Segments { video_id, segments } => {
                 if self.playing_id() == Some(video_id.as_str()) {

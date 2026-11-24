@@ -405,27 +405,31 @@ struct Shared {
 pub struct Player {
     shared: Arc<Shared>,
     status: Arc<AudioStatus>,
+    /// Seconds the video is ahead of the audio: a song's music video starts before (or
+    /// after) the song does.
+    offset: f64,
 }
 
 impl Player {
-    pub fn start(stream: VideoStream, http: reqwest::Client, status: Arc<AudioStatus>) -> Self {
+    /// `offset`: seconds into the video where the audio's start is (0 for the video's own).
+    pub fn start(stream: VideoStream, http: reqwest::Client, status: Arc<AudioStatus>, offset: f64) -> Self {
         let shared = Arc::new(Shared::default());
         let (s, clock) = (shared.clone(), status.clone());
         std::thread::Builder::new()
             .name("video".into())
             .spawn(move || {
-                if let Err(e) = run(&stream, &http, &clock, &s) {
+                if let Err(e) = run(&stream, &http, &clock, &s, offset) {
                     log::warn!("video: {e:#}");
                     s.failed.store(true, Ordering::Relaxed);
                 }
             })
             .expect("a thread for the video");
-        Self { shared, status }
+        Self { shared, status, offset }
     }
 
     /// The frame to show now, if a newer one than the last is due.
     pub fn take_due(&self) -> Option<Frame> {
-        let now = self.status.position_smooth().as_secs_f64();
+        let now = self.status.position_smooth().as_secs_f64() + self.offset;
         let mut frames = self.shared.frames.lock().unwrap();
         let mut due = None;
         while frames.front().is_some_and(|f| f.pts <= now) {
@@ -487,7 +491,7 @@ fn to_image(yuv: &YuvFrame, colors: Colors) -> egui::ColorImage {
     egui::ColorImage { size: [w, h], source_size: egui::vec2(w as f32, h as f32), pixels }
 }
 
-fn run(stream: &VideoStream, http: &reqwest::Client, status: &AudioStatus, shared: &Shared) -> anyhow::Result<()> {
+fn run(stream: &VideoStream, http: &reqwest::Client, status: &AudioStatus, shared: &Shared, offset: f64) -> anyhow::Result<()> {
     let rt = tokio::runtime::Builder::new_current_thread().enable_all().build()?;
     let download = |from: u64, to: u64| Download { rt: &rt, http, url: &stream.url, from, to, resp: None, tries: 0 };
     // The header and the index after it, in one request.
@@ -499,7 +503,7 @@ fn run(stream: &VideoStream, http: &reqwest::Client, status: &AudioStatus, share
     log::info!("video: {}x{}, {} fragments", stream.width, stream.height, fragments.len());
 
     let mut decoder = new_decoder(&track)?;
-    let mut next = fragment_at(&fragments, status.position_smooth().as_secs_f64());
+    let mut next = fragment_at(&fragments, status.position_smooth().as_secs_f64() + offset);
     // Decoded pictures waiting to go out in display order.
     let mut pending: BinaryHeap<Pending> = BinaryHeap::new();
     // The last frame out of the decoder: with none waiting to show, where the picture is.
@@ -511,7 +515,7 @@ fn run(stream: &VideoStream, http: &reqwest::Client, status: &AudioStatus, share
     // The earliest frame still to show.
     let showing_from = |last_out: f64| shared.frames.lock().unwrap().front().map_or(last_out, |f| f.pts);
     'play: while !shared.stop.load(Ordering::Relaxed) {
-        let clock = status.position_smooth().as_secs_f64();
+        let clock = status.position_smooth().as_secs_f64() + offset;
         if let Some(at) = restart.take().or_else(|| seek_target(&fragments, next, clock, showing_from(last_out))) {
             next = at;
             last_out = fragments[at].start;
@@ -535,7 +539,7 @@ fn run(stream: &VideoStream, http: &reqwest::Client, status: &AudioStatus, share
             while let Some(sample) = samples.get(done).filter(|s| s.at + s.size <= bytes.len()) {
                 done += 1;
                 let data = &bytes[sample.at..sample.at + sample.size];
-                let clock = status.position_smooth().as_secs_f64();
+                let clock = status.position_smooth().as_secs_f64() + offset;
                 // Skipped through: on from the fragment the clock is in.
                 if let Some(at) = seek_target(&fragments, next - 1, clock, showing_from(last_out)) {
                     restart = Some(at);
@@ -562,7 +566,7 @@ fn run(stream: &VideoStream, http: &reqwest::Client, status: &AudioStatus, share
                     if shared.stop.load(Ordering::Relaxed) {
                         break 'play;
                     }
-                    let now = status.position_smooth().as_secs_f64();
+                    let now = status.position_smooth().as_secs_f64() + offset;
                     if let Some(at) = seek_target(&fragments, next - 1, now, showing_from(pts).min(pts)) {
                         restart = Some(at);
                         continue 'play;

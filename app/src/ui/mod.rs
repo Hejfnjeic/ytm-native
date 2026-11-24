@@ -485,8 +485,11 @@ pub struct App {
     /// Settings › Music videos › Show music videos: the picture in Now playing, with the
     /// video's own audio (it stays in time with that).
     show_video: bool,
-    /// The video on show or on its way, by id, and its last picture.
-    video: Option<(String, Option<crate::video::Player>)>,
+    /// The video on show or on its way, and its last picture.
+    video: Option<nowplaying::VideoOn>,
+    /// Songs' music videos looked up this run (YouTube's pairs): the video's id and how many
+    /// seconds into it the song starts; `None` when there's none, absent while not asked.
+    song_videos: HashMap<String, Option<(String, f64)>>,
     video_frame: Option<egui::TextureHandle>,
     hide_search_videos: bool,
     /// Leave explicit songs out of lists and the queue.
@@ -686,6 +689,8 @@ pub struct App {
     close_to_tray: bool,
     /// Settings › Window: draw with wgpu (Vulkan) from the next start (renderer.rs).
     pub(super) wgpu_renderer: bool,
+    /// Settings › Window › Software rendering (from the next start).
+    pub(super) software_renderer: bool,
     /// Settings › App icon (`appicon::ALL` id).
     app_icon: &'static str,
     /// The tray icon, while "Close to tray" is on.
@@ -751,6 +756,7 @@ impl App {
         theme::set_font_choice(&dev_var("YTM_FONT").map(str::to_owned).or_else(|| get("font")).unwrap_or_default());
         let app_icon = crate::appicon::load(backend.data_dir());
         let wgpu_renderer = crate::renderer::load(backend.data_dir()) == crate::renderer::Renderer::Wgpu;
+        let software_renderer = crate::renderer::load(backend.data_dir()) == crate::renderer::Renderer::Software;
         // Updates reinstall the shortcuts with the classic icon.
         if app_icon != crate::appicon::CLASSIC {
             crate::appicon::sync_shortcuts(app_icon, backend.data_dir());
@@ -859,6 +865,7 @@ impl App {
             play_songs: get("play_songs").is_none_or(|v| v == "1"),
             show_video: get("show_video").is_some_and(|v| v == "1"),
             video: None,
+            song_videos: HashMap::new(),
             video_frame: None,
             hide_search_videos: get("hide_search_videos").is_some_and(|v| v == "1"),
             hide_explicit,
@@ -879,6 +886,7 @@ impl App {
                 .map_or_else(|| crate::update::is_nightly(&crate::update::build_version()), |v| v == "nightly"),
             close_to_tray: get("close_to_tray").is_some_and(|v| v == "1"),
             wgpu_renderer,
+            software_renderer,
             app_icon,
             tray: None,
             window_title: "YT Music".to_owned(),

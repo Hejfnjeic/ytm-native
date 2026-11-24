@@ -1800,19 +1800,47 @@ mod tests {
     }
 }
 
-/// The picture of the music video playing, while Show music videos is on: its player is
-/// started the first time it's wanted, and the newest frame that's due goes in the texture.
-/// None shows the cover (no video, or not one that can be decoded, or none yet).
+/// The music video on show (or on its way) for the song playing.
+pub(super) struct VideoOn {
+    /// The song (or video) playing.
+    track: String,
+    /// The video shown: the track itself, or a song's music video.
+    pub video: String,
+    /// Seconds into the video where the audio's start is.
+    pub offset: f64,
+    pub player: Option<crate::video::Player>,
+}
+
+/// The picture of the music video for what's playing, while Show music videos is on: the
+/// track itself when it's a video (its own sound plays), or for a song, YouTube's paired
+/// music video (Premium), kept in time with the song. Its player starts the first time
+/// it's wanted, and the newest frame that's due goes in the texture. None shows the cover.
 pub(super) fn video_texture(app: &mut App, ctx: &egui::Context, track: &crate::model::Track) -> Option<egui::TextureHandle> {
-    if !app.show_video || !track.has_video() || app.playing_id() != Some(track.id.as_str()) {
+    if !app.show_video || app.playing_id() != Some(track.id.as_str()) {
         return None;
     }
-    if app.video.as_ref().is_none_or(|(id, _)| *id != track.id) {
-        app.video = Some((track.id.clone(), None));
+    let (video, offset) = if track.has_video() {
+        (track.id.clone(), 0.0)
+    } else {
+        match app.song_videos.get(&track.id) {
+            Some(Some((id, offset))) => (id.clone(), *offset),
+            Some(None) => return None,
+            None => {
+                if app.logged_in {
+                    // Asked once; the answer (or `None`) lands in `song_videos`.
+                    app.song_videos.insert(track.id.clone(), None);
+                    app.backend.request(crate::backend::Req::SongVideo { song_id: track.id.clone() });
+                }
+                return None;
+            }
+        }
+    };
+    if app.video.as_ref().is_none_or(|v| v.track != track.id || v.video != video) {
+        app.video = Some(VideoOn { track: track.id.clone(), video: video.clone(), offset, player: None });
         app.video_frame = None;
-        app.backend.request(crate::backend::Req::VideoStream { video_id: track.id.clone(), max_height: VIDEO_HEIGHT });
+        app.backend.request(crate::backend::Req::VideoStream { video_id: video, max_height: VIDEO_HEIGHT });
     }
-    if let Some((_, Some(player))) = &app.video {
+    if let Some(VideoOn { player: Some(player), .. }) = &app.video {
         if let Some(frame) = player.take_due() {
             match &mut app.video_frame {
                 Some(tex) => tex.set(frame.image, egui::TextureOptions::LINEAR),

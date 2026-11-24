@@ -370,6 +370,33 @@ fn parse_other_half(v: &Value, video_id: &str, keep: &HashSet<String>) -> Option
 }
 
 /// The other version itself, in a pair from [`counterparts`].
+/// A song's music video, and where the song's start comes in it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MusicVideo {
+    pub video: Track,
+    /// The video's place at the song's start, in milliseconds: later for an intro before
+    /// the song, earlier for a song that opens with what the video cut. 0 when not known.
+    pub offset_ms: i64,
+}
+
+/// The music video of a song from YouTube's own pair, as [`paired_song`] the other way
+/// round: Premium accounts only, `None` for others.
+pub async fn paired_video(api: &Api, song_id: &str) -> anyhow::Result<Option<MusicVideo>> {
+    let body = json!({"videoId": song_id, "isAudioOnly": true, "enablePersistentPlaylistPanel": true});
+    let v = api.call_signed_in("next", body).await?;
+    Ok(parse_paired_video(&v, song_id))
+}
+
+fn parse_paired_video(v: &Value, song_id: &str) -> Option<MusicVideo> {
+    let c = counterparts(v, song_id).find(|c| music_video(&[&half(c)["navigationEndpoint"]]))?;
+    let video = panel_item(half(c))?;
+    // The pair lines the two up: this far into the song is that far into the video.
+    let seg = &c["segmentMap"]["segment"][0];
+    let ms = |key: &str| seg[key].as_str().and_then(|n| n.parse::<i64>().ok());
+    let offset_ms = ms("counterpartVideoStartTimeMilliseconds").zip(ms("primaryVideoStartTimeMilliseconds")).map_or(0, |(video, song)| video - song);
+    Some(MusicVideo { video, offset_ms })
+}
+
 fn half(counterpart: &Value) -> &Value {
     &counterpart["counterpartRenderer"]["playlistPanelVideoRenderer"]
 }

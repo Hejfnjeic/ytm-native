@@ -42,7 +42,7 @@ rfd = "0.17.2"
 tray-icon = "0.26.1"
 url = "2.5.8"
 # The opt-in renderer: Vulkan, Metal on macOS (renderer.rs).
-wgpu = { version = "30.0.1", default-features = false, features = ["std", "parking_lot", "wgsl", "vulkan", "metal"] }
+wgpu = { version = "30.0.1", default-features = false, features = ["std", "parking_lot", "wgsl", "vulkan", "metal", "dx12"] }
 unicode-normalization = "0.1.26"
 # Music videos (video.rs): pure-Rust H.264, no C or C++; its own allocator left out.
 rusty_h264 = { version = "0.17.4", default-features = false, features = ["std", "asm"] }

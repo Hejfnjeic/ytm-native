@@ -313,7 +313,7 @@ fn nav_bg(ui: &Ui, look: NavLook, rect: Rect, h: f32, s: f32) -> Color32 {
 const PIN_TILT: f32 = 45.0;
 
 /// Sidebar width expanded and collapsed to an icon rail (points).
-pub const SIDEBAR_W: f32 = 236.0;
+pub const SIDEBAR_W: f32 = 260.0;
 
 /// The expanded sidebar's width in this theme.
 pub fn sidebar_w(app: &App) -> f32 {

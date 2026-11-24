@@ -18,8 +18,8 @@ use super::{Action, App, titlebar};
 use crate::theme::{self, icon};
 
 /// The window when first opened, and as small and as big as it goes. Always square.
-const SIZE: Vec2 = vec2(440.0, 440.0);
-const MIN: Vec2 = vec2(300.0, 300.0);
+const SIZE: Vec2 = vec2(330.0, 330.0);
+const MIN: Vec2 = vec2(260.0, 260.0);
 const MAX: Vec2 = vec2(1200.0, 1200.0);
 /// The window's top: the song, and where it's dragged by.
 const HEADER: f32 = 60.0;

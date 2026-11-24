@@ -15,7 +15,6 @@ ui-volume = Cilt
 ui-mute = Sessize al
 ui-unmute = Sesi aç
 ui-song = Şarkı
-ui-video = Video
 ui-artist = Sanatçı
 ui-album = Albüm
 ui-title = Başlık

@@ -1,7 +1,6 @@
 //! The window title, song notifications, the system media controls, the app icon, updates and the tray.
 
 use std::sync::Arc;
-use std::sync::atomic::Ordering;
 use std::time::Duration;
 
 use crate::backend;

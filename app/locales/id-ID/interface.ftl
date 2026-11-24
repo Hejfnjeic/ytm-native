@@ -15,7 +15,6 @@ ui-volume = Volume
 ui-mute = Bisukan
 ui-unmute = Bunyikan
 ui-song = Lagu
-ui-video = Video
 ui-artist = Artis
 ui-album = Album
 ui-title = Judul

@@ -93,12 +93,6 @@ impl Queue {
         self.unshuffled.is_some()
     }
 
-    /// Shuffle off, leaving the songs as they are.
-    pub fn clear_shuffle(&mut self) {
-        self.unshuffled = None;
-        self.mixed.clear();
-    }
-
     pub fn current(&self) -> Option<&Track> {
         self.index.and_then(|i| self.tracks.get(i))
     }

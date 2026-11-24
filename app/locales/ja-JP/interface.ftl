@@ -15,7 +15,6 @@ ui-volume = 音量
 ui-mute = ミュート
 ui-unmute = ミュート解除
 ui-song = 曲
-ui-video = 動画
 ui-artist = アーティスト
 ui-album = アルバム
 ui-title = タイトル

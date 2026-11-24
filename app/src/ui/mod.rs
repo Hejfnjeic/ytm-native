@@ -292,14 +292,6 @@ enum Dialog {
     Collaborate { id: String, info: Option<crate::ytm::Collaboration>, busy: bool, confirm_off: bool },
 }
 
-#[derive(Default, PartialEq, Eq)]
-enum BackupPrompt {
-    #[default]
-    Hidden,
-    Open,
-    Dismissed,
-}
-
 /// Songs picked in a list for a batch action: Ctrl-click toggles one, Shift-click a range,
 /// or the Select button makes every click pick.
 #[derive(Default)]
@@ -402,8 +394,6 @@ pub struct App {
     page_changed: f64,
     /// Room the page leaves at its top and bottom for glass it scrolls under.
     page_insets: [f32; 2],
-    /// When a video's picture last went to the background, and the cover to go back to.
-    video_art_at: f64,
     track_art: Option<crate::art::Art>,
     /// How far the page is scrolled.
     page_scrolled: f32,
@@ -493,10 +483,6 @@ pub struct App {
     /// Songs end where they go silent for good.
     skip_silence: bool,
     high_quality: bool,
-    backup_stream: bool,
-    backup_prompt: BackupPrompt,
-    reveal_backup_setting: bool,
-    backup_setting_highlight_until: f64,
     /// Play an official music video as its song version when one is found.
     play_songs: bool,
     hide_search_videos: bool,
@@ -513,9 +499,6 @@ pub struct App {
     /// The song version playing in place of the current music video, or the music video
     /// playing in place of the current song.
     playing_as: Option<PlayingAs>,
-    /// Songs' music videos, for the Song/Video switch: looked up once each (`None`: it has
-    /// none, or the answer hasn't come yet).
-    music_videos: std::collections::HashMap<String, Option<crate::ytm::MusicVideo>>,
     /// The output device picked in settings (cpal's id and its name, for when it's not
     /// connected), and the devices last listed there.
     output_device: Option<(String, String)>,
@@ -774,8 +757,6 @@ impl App {
         let logged_in = backend.is_logged_in();
         // Before any request: a song started at launch (dev hooks) must see this setting.
         backend.set_high_quality(get("high_quality").is_none_or(|v| v == "1"));
-        let backup_stream = get("backup_stream").is_some_and(|v| v == "1");
-        backend.set_backup_stream(backup_stream);
         let hide_explicit = get("hide_explicit").is_some_and(|v| v == "1");
         let restricted_mode = get("restricted_mode").is_some_and(|v| v == "1");
         backend.set_hide_explicit(hide_explicit, restricted_mode);
@@ -820,7 +801,6 @@ impl App {
             page_changed: 0.0,
             page_insets: [0.0, 0.0],
             page_scrolled: 0.0,
-            video_art_at: 0.0,
             track_art: None,
             loading: false,
             load_failed: false,
@@ -875,10 +855,6 @@ impl App {
             pause_fade: get("pause_fade").is_none_or(|v| v == "1"),
             skip_silence: get("skip_silence").is_some_and(|v| v == "1"),
             high_quality: get("high_quality").is_none_or(|v| v == "1"),
-            backup_stream,
-            backup_prompt: BackupPrompt::default(),
-            reveal_backup_setting: false,
-            backup_setting_highlight_until: 0.0,
             play_songs: get("play_songs").is_none_or(|v| v == "1"),
             hide_search_videos: get("hide_search_videos").is_some_and(|v| v == "1"),
             hide_explicit,
@@ -887,7 +863,6 @@ impl App {
             restricted_mode,
             locale,
             playing_as: None,
-            music_videos: Default::default(),
             output_device: get("output_device").filter(|d| !d.is_empty()).map(|id| (id, get("output_device_name").unwrap_or_default())),
             output_devices: Vec::new(),
             language,
@@ -1340,18 +1315,6 @@ impl App {
     fn sync_look(&self) {
         if crate::preset::active().id != self.theme_id {
             crate::preset::set_active(&self.theme_id);
-        }
-    }
-
-    /// Height of the bottom player area (a floating bar leaves a margin around it).
-    /// Back to the cover after a video had the background.
-    fn restore_art(&mut self) {
-        if self.look().background.video_backdrop
-            && let Some(art) = self.cover_colours().cloned()
-            && let Some(bg) = &self.bg
-        {
-            self.art_brightness = art.brightness;
-            bg.set_live(art);
         }
     }
 
@@ -1928,7 +1891,6 @@ impl eframe::App for App {
         storage.set_string("pause_fade", b(self.pause_fade));
         storage.set_string("skip_silence", b(self.skip_silence));
         storage.set_string("high_quality", b(self.high_quality));
-        storage.set_string("backup_stream", b(self.backup_stream));
         storage.set_string("play_songs", b(self.play_songs));
         storage.set_string("hide_search_videos", b(self.hide_search_videos));
         storage.set_string("hide_explicit", b(self.hide_explicit));

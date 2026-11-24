@@ -148,39 +148,6 @@ fn hls_segments(media: &str) -> (Vec<(f64, String)>, f64) {
     (out, at)
 }
 
-/// A video's H.264 in fragmented MP4, the only video this app decodes.
-#[derive(Clone, Debug, PartialEq)]
-pub struct VideoStream {
-    pub url: String,
-    pub width: u32,
-    pub height: u32,
-    /// Last byte of the header.
-    pub init_end: u64,
-    /// First and last byte of the fragment index.
-    pub index: (u64, u64),
-}
-
-/// The best of `formats` at most `max_height` tall. Of two as tall, the lower frame rate:
-/// a 60 fps video takes twice the decoding, which 720p already can't keep up with.
-fn pick_video(formats: &[Value], max_height: u64) -> Option<VideoStream> {
-    let range = |v: &Value| Some((v["start"].as_str()?.parse().ok()?, v["end"].as_str()?.parse().ok()?));
-    formats
-        .iter()
-        .filter(|f| f["mimeType"].as_str().is_some_and(|m| m.starts_with("video/mp4") && m.contains("avc1")))
-        .filter(|f| f["height"].as_u64().is_some_and(|h| h <= max_height))
-        .max_by_key(|f| (f["height"].as_u64(), std::cmp::Reverse(f["fps"].as_u64())))
-        .and_then(|f| {
-            let (_, init_end) = range(&f["initRange"])?;
-            Some(VideoStream { url: f["url"].as_str()?.to_owned(), width: f["width"].as_u64()? as u32, height: f["height"].as_u64()? as u32, init_end, index: range(&f["indexRange"])? })
-        })
-}
-
-pub async fn video_stream(http: &reqwest::Client, video_id: &str, visitor_data: &str, max_height: u64) -> anyhow::Result<VideoStream> {
-    let resp = player(http, video_id, visitor_data).await?;
-    let formats = resp["streamingData"]["adaptiveFormats"].as_array().map(Vec::as_slice).unwrap_or_default();
-    pick_video(formats, max_height).ok_or_else(|| anyhow::anyhow!("no H.264 video in visionOS player response"))
-}
-
 async fn player(http: &reqwest::Client, video_id: &str, visitor_data: &str) -> anyhow::Result<Value> {
     let body = json!({
         "context": {"client": {
@@ -262,22 +229,4 @@ mod tests {
         assert_eq!(hls_segments(odd), (vec![(0.0, "https://s/0".to_owned()), (7.0, "https://s/1".to_owned()), (7.0, "https://s/2".to_owned())], 12.0));
     }
 
-    #[test]
-    fn video_is_the_tallest_h264_within_the_limit() {
-        let format = |itag: u64, mime: &str, height: u64| json!({"itag": itag, "mimeType": mime, "height": height, "width": height * 16 / 9, "url": format!("u{itag}"), "initRange": {"start": "0", "end": "740"}, "indexRange": {"start": "741", "end": "2000"}});
-        let formats = [format(137, "video/mp4; codecs=\"avc1.640028\"", 1080), format(136, "video/mp4; codecs=\"avc1.4D401F\"", 720), format(135, "video/mp4; codecs=\"avc1.4D401E\"", 480), format(247, "video/webm; codecs=\"vp9\"", 720), format(398, "video/mp4; codecs=\"av01.0.05M.08\"", 720)];
-        let v = pick_video(&formats, 720).unwrap();
-        assert_eq!((v.url.as_str(), v.height, v.init_end, v.index), ("u136", 720, 740, (741, 2000)));
-        assert_eq!(pick_video(&formats, 480).unwrap().url, "u135");
-        assert_eq!(pick_video(&formats, 100), None);
-        assert_eq!(pick_video(&formats[3..], 1080), None);
-        // The 30 fps one of the same height, whichever comes first.
-        let at = |itag: u64, fps: u64| {
-            let mut f = format(itag, "video/mp4; codecs=\"avc1.4D401F\"", 720);
-            f["fps"] = json!(fps);
-            f
-        };
-        assert_eq!(pick_video(&[at(298, 60), at(136, 30)], 720).unwrap().url, "u136");
-        assert_eq!(pick_video(&[at(136, 30), at(298, 60)], 720).unwrap().url, "u136");
-    }
 }

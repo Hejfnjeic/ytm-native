@@ -43,10 +43,6 @@ pub enum AudioCmd {
     Seek(Duration),
     /// A song was asked for: open the device now, while its stream is still on the way.
     Warm,
-    /// Seek to where `pos` will have moved on to by the time the seek lands (`pos` was
-    /// current at `at`): following someone else's playback (listen together).
-    SeekLive { pos: Duration, at: std::time::Instant },
-    Volume(f32),
     /// The output device failed (unplugged, headphones disconnected): sent by the
     /// device's error callback so the audio thread reopens one.
     DeviceLost,
@@ -528,7 +524,7 @@ impl AudioHandle {
 
     pub fn set_volume(&self, v: f32) {
         self.status.volume.store(v.to_bits(), Ordering::Relaxed);
-        self.send(AudioCmd::Volume(v));
+        self.send(AudioCmd::Refresh);
     }
 
     /// Takes effect at once, gliding there. `no_clip` turns everything down by the
@@ -561,8 +557,6 @@ struct SeekJob {
     /// is asked for, so a seek that's replaced before it's built doesn't lose it.
     prepared: Prepared,
     pos: Duration,
-    /// For a live seek (a jam): the host position and when it was, to catch up after the build.
-    live: Option<(Duration, std::time::Instant)>,
     generation: u64,
     seek: u64,
 }
@@ -585,10 +579,8 @@ fn build_seek(mut j: SeekJob, pending: &std::sync::Mutex<Option<SeekJob>>, tx: &
             j = next.take().unwrap();
         }
     }
-    let SeekJob { shared, pos, live, generation, seek, .. } = j;
+    let SeekJob { shared, pos, generation, seek, .. } = j;
     let res = decoder.map_err(|e| e.to_string()).and_then(|mut d| {
-        // Building it may have waited for the download: catch up.
-        let pos = live.map_or(pos, |(p, at)| p + at.elapsed());
         if seekable {
             rodio::Source::try_seek(&mut d, pos).map_err(|e| e.to_string())?;
         }
@@ -1372,12 +1364,7 @@ fn run(
                 status.playing.store(false, Ordering::Relaxed);
                 status.set_position(0);
             }
-            Ok(cmd @ (AudioCmd::Seek(_) | AudioCmd::SeekLive { .. })) => {
-                let (pos, live) = match cmd {
-                    AudioCmd::SeekLive { pos, at } => (pos + at.elapsed(), Some((pos, at))),
-                    AudioCmd::Seek(pos) => (pos, None),
-                    _ => unreachable!(),
-                };
+            Ok(AudioCmd::Seek(pos)) => {
                 seek_seq += 1;
                 if current == 0 {
                     continue;
@@ -1411,7 +1398,7 @@ fn run(
                 if let Some(s) = shared.clone() {
                     // One builder at a time, always for the latest seek: a burst of seeks
                     // (a jam catching up) mustn't pile up threads waiting on the download.
-                    *seek_job.lock().unwrap() = Some(SeekJob { shared: s, prepared: prepared_seek.clone(), pos, live, generation: current, seek: seek_seq });
+                    *seek_job.lock().unwrap() = Some(SeekJob { shared: s, prepared: prepared_seek.clone(), pos, generation: current, seek: seek_seq });
                     if !seek_busy.swap(true, Ordering::AcqRel) {
                         let (job, busy, tx, events) = (seek_job.clone(), seek_busy.clone(), tx.clone(), events.clone());
                         std::thread::spawn(move || {
@@ -1464,7 +1451,7 @@ fn run(
                     output.open(tx.clone(), &status);
                 }
             }
-            Ok(AudioCmd::Volume(_) | AudioCmd::Refresh) => {
+            Ok(AudioCmd::Refresh) => {
                 let v = f32::from_bits(status.volume.load(Ordering::Relaxed));
                 let v = slider_gain(&status, v);
                 player.set_volume(v);

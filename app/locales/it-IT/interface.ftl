@@ -15,7 +15,6 @@ ui-volume = Volume
 ui-mute = Disattiva audio
 ui-unmute = Riattiva audio
 ui-song = Brano
-ui-video = Video
 ui-artist = Artista
 ui-album = Album
 ui-title = Titolo

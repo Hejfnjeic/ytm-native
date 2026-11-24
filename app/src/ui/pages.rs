@@ -2047,7 +2047,6 @@ fn settings_lyrics(app: &mut App, ui: &mut Ui) {
         ui.add_space(8.0);
         let n = app.lyric_prefs.order.len();
         let mut swap: Option<(usize, usize)> = None;
-        let mut changed = false;
         for (i, entry) in app.lyric_prefs.order.iter_mut().enumerate() {
             let (p, on) = *entry;
             let (rect, _) = ui.allocate_exact_size(vec2(ui.available_width(), 34.0), Sense::hover());
@@ -2055,7 +2054,6 @@ fn settings_lyrics(app: &mut App, ui: &mut Ui) {
             let mut enabled = on;
             if toggle(&mut row, &mut enabled, p.name()).changed() {
                 entry.1 = enabled;
-                changed = true;
             }
             row.add_space(10.0);
             let kind = match p.sync() {
@@ -2077,7 +2075,6 @@ fn settings_lyrics(app: &mut App, ui: &mut Ui) {
         }
         if let Some((a, b)) = swap {
             app.lyric_prefs.order.swap(a, b);
-            changed = true;
         }
         ui.add_space(6.0);
     });
@@ -2836,34 +2833,9 @@ fn settings_sign_off(app: &mut App, ui: &mut Ui) {
     ui.painter().text(pos2(rect.center().x, rect.top() + 82.0), Align2::CENTER_CENTER, text, theme::regular(13.0), theme::text_dim());
 }
 
-/// Settings › Network: the stream fallback, proxy, and connection test.
+/// Settings › Network: the proxy and connection test.
 fn network(app: &mut App, ui: &mut Ui) {
     use crate::proxy::{self, Setting};
-    const HIGHLIGHT_SECS: f64 = 3.0;
-    let label = tr!("settings-backup-stream");
-    setting_row(ui, label, Some(tr!("settings-backup-stream-desc")), |ui| {
-        let response = toggle(ui, &mut app.backup_stream, label);
-        let now = ui.input(|input| input.time);
-        if std::mem::take(&mut app.reveal_backup_setting) {
-            response.scroll_to_me(Some(egui::Align::Center));
-            response.request_focus();
-            app.backup_setting_highlight_until = now + HIGHLIGHT_SECS;
-        }
-        let remaining = app.backup_setting_highlight_until - now;
-        if remaining > 0.0 {
-            let elapsed = (HIGHLIGHT_SECS - remaining) as f32;
-            let pulse = 0.5 + 0.5 * (elapsed * std::f32::consts::TAU).cos();
-            let fade = (remaining / 0.25).min(1.0) as f32;
-            let color = theme::with_alpha(app.accent_color(), (0.2 + 0.8 * pulse) * fade);
-            let stroke = egui::Stroke::new(2.0, color);
-            ui.painter().rect_stroke(response.rect.expand(4.0), response.rect.height() / 2.0 + 4.0, stroke, egui::StrokeKind::Outside);
-            ui.ctx().request_repaint();
-        }
-        if response.changed() {
-            app.backend.set_backup_stream(app.backup_stream);
-        }
-    });
-    divider(ui);
     let same = |a: &Setting, b: &Setting| std::mem::discriminant(a) == std::mem::discriminant(b);
     let mut pick = None;
     setting_row(ui, tr!("settings-proxy"), Some(tr!("settings-proxy-desc")), |ui| {

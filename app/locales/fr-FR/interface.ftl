@@ -15,7 +15,6 @@ ui-volume = Volume
 ui-mute = Couper le son
 ui-unmute = Rétablir le son
 ui-song = Titre
-ui-video = Vidéo
 ui-artist = Artiste
 ui-album = Album
 ui-title = Titre

@@ -120,7 +120,6 @@ const LONG_GROUP_CHARS: usize = 20;
 const USER_SCROLL_RESUME: f64 = 25.0;
 const DECO_ENTRY: f64 = 0.35;
 /// Romanization's and translation's size (rem) and alpha (`--blyrics-translated-color`).
-const ROMAN_REM: f32 = 1.6;
 const TRANS_REM: f32 = 2.0;
 const DECO_ALPHA: f32 = 0.6;
 
@@ -469,9 +468,6 @@ impl Cfg {
     fn bg_font(&self, text: &str) -> FontId {
         theme::lyric_font_for(&self.font, self.bg_weight, self.size * self.bg_em, text)
     }
-    fn roman_font(&self, text: &str) -> FontId {
-        theme::lyric_font_for(&self.font, Weight::Semibold, self.deco_rem() * ROMAN_REM, text)
-    }
     fn trans_font(&self, text: &str) -> FontId {
         theme::lyric_font_for(&self.font, Weight::Semibold, self.deco_rem() * TRANS_REM, text)
     }
@@ -512,19 +508,12 @@ struct Group {
 }
 
 #[derive(Clone)]
-enum DecoBody {
-    Timed { words: Vec<Word>, groups: Vec<Group> },
-    Text(String, FontId),
-}
-
-#[derive(Clone)]
 struct Deco {
-    body: DecoBody,
-    /// Box relative to the line's content origin (the pill, or the translation's text box).
+    /// The translation.
+    text: String,
+    font: FontId,
+    /// Box relative to the line's content origin.
     rect: Rect,
-    pill: bool,
-    /// Romanization, not a translation.
-    roman: bool,
     /// Identifies what was shown, so a new decoration can animate in.
     id: u64,
     /// The width its text was measured at: drawn at any other it could wrap differently.
@@ -647,7 +636,6 @@ struct Flow {
     words: Vec<Word>,
     groups: Vec<Group>,
     height: f32,
-    width: f32,
 }
 
 /// Lay out tokens the way inline formatting does it in the extension: groups between
@@ -785,15 +773,8 @@ fn flow(fonts: &mut FontsView<'_>, toks: Vec<Tok>, font: &FontId, max_w: f32, li
             }
         }
     }
-    let width = rows.iter().map(|r| r.1).fold(0.0, f32::max);
     let height = if words.is_empty() { 0.0 } else { (row + 1) as f32 * line_h };
-    Flow { words, groups, height, width }
-}
-
-/// Romanization for a line: timed (from the lyrics) or plain text.
-pub enum Roman<'a> {
-    Timed(&'a [Part], &'a str),
-    Text(&'a str),
+    Flow { words, groups, height }
 }
 
 fn hash<T: std::hash::Hash>(v: T) -> u64 {
@@ -864,7 +845,7 @@ fn align_rows(mut g: Arc<Galley>, align: Align) -> Arc<Galley> {
 }
 
 #[allow(clippy::too_many_arguments)]
-fn build_block(fonts: &mut FontsView<'_>, cfg: &Cfg, l: &Line, index: usize, width: f32, roman: Option<Roman>, trans: Option<&str>, agent: Option<&str>) -> Block {
+fn build_block(fonts: &mut FontsView<'_>, cfg: &Cfg, l: &Line, index: usize, width: f32, trans: Option<&str>, agent: Option<&str>) -> Block {
     let em = cfg.size;
     let rtl = crate::bidi::rtl_base(&l.text);
     let own = if cfg.centered { Align::Center } else { Align::Left };
@@ -929,39 +910,6 @@ fn build_block(fonts: &mut FontsView<'_>, cfg: &Cfg, l: &Line, index: usize, wid
         y += f.height;
     }
     let gap = em / 6.0; // margin-top: 8px at 48 px
-    if let Some(r) = roman {
-        y += gap;
-        let pad = vec2(cfg.deco_rem() * 0.75, cfg.deco_rem() * 0.25);
-        let inner_w = content_w - pad.x * 2.0 - 2.0;
-        let (body, inner, id) = match r {
-            Roman::Timed(parts, text) => {
-                let toks: Vec<Tok> = parts.iter().flat_map(split_part).collect();
-                let font = cfg.roman_font(text);
-                let lh = fonts.row_height(&font);
-                let f = flow(fonts, toks, &font, inner_w, lh, Align::Left, false, 0.0, 0.0);
-                (DecoBody::Timed { words: f.words, groups: f.groups }, vec2(f.width, f.height), hash(("rt", text)))
-            }
-            Roman::Text(t) => {
-                let font = cfg.roman_font(t);
-                let g = deco_galley(fonts, t.to_owned(), font.clone(), inner_w, align);
-                (DecoBody::Text(t.to_owned(), font), g.size(), hash(("r", t)))
-            }
-        };
-        let size = inner + pad * 2.0 + vec2(2.0, 2.0);
-        let x = match align {
-            Align::Left => 0.0,
-            Align::Right => content_w - size.x,
-            Align::Center => (content_w - size.x) * 0.5,
-        };
-        let rect = Rect::from_min_size(pos2(x, y), size);
-        // Timed words sit inside the pill's padding.
-        let body = match body {
-            DecoBody::Timed { words, groups } => DecoBody::Timed { words: words.into_iter().map(|w| Word { pos: w.pos + rect.min.to_vec2() + pad + vec2(1.0, 1.0), ..w }).collect(), groups },
-            b => b,
-        };
-        block.decos.push(Deco { body, rect, pill: true, roman: true, id, wrap: inner_w });
-        y += size.y;
-    }
     if let Some(t) = trans {
         y += gap;
         let font = cfg.trans_font(t);
@@ -971,7 +919,7 @@ fn build_block(fonts: &mut FontsView<'_>, cfg: &Cfg, l: &Line, index: usize, wid
             Align::Right => content_w - g.size().x,
             Align::Center => (content_w - g.size().x) * 0.5,
         };
-        block.decos.push(Deco { body: DecoBody::Text(t.to_owned(), font), rect: Rect::from_min_size(pos2(x, y), g.size()), pill: false, roman: false, id: hash(("t", t)), wrap: content_w });
+        block.decos.push(Deco { text: t.to_owned(), font, rect: Rect::from_min_size(pos2(x, y), g.size()), id: hash(("t", t)), wrap: content_w });
         y += g.size().y;
     }
     block.height = y + cfg.padding;
@@ -1001,11 +949,6 @@ fn build_block(fonts: &mut FontsView<'_>, cfg: &Cfg, l: &Line, index: usize, wid
         }
         for d in &mut block.decos {
             d.rect = d.rect.translate(dx);
-            if let DecoBody::Timed { words, .. } = &mut d.body {
-                for w in words {
-                    w.pos += dx;
-                }
-            }
         }
     }
     block
@@ -1129,7 +1072,6 @@ pub struct Frame<'a> {
     pub lyrics: &'a Lyrics,
     /// Identifies the song, source, decorations and settings the layout depends on.
     pub key: u64,
-    pub roman: Vec<Option<Roman<'a>>>,
     pub trans: Vec<Option<&'a str>>,
     /// Audible song position (s), already corrected for output latency and the
     /// listener's offsets.
@@ -1199,7 +1141,7 @@ impl View {
         let ppp = ctx.pixels_per_point();
         // Cached per position, so a moved or resized view re-renders it.
         let key = (hash(("text-glow", at.x.round() as i32, at.y.round() as i32, g.job.text.as_str())), usize::MAX);
-        self.glow.blurred_line(ctx, key, blur / 2.0, &[], &[(g, at, 1.0)], &[], 1.0, atlas, ppp)
+        self.glow.blurred_line(ctx, key, blur / 2.0, &[], &[(g, at, 1.0)], 1.0, atlas, ppp)
     }
 
     pub fn show(&mut self, ui: &mut egui::Ui, f: Frame) -> Out {
@@ -1640,7 +1582,7 @@ impl View {
                     // The line's words are only gathered when its image has to be made.
                     let made = self.glow.cached_line(&ctx, key, r, scale).or_else(|| {
                         let words: Vec<(&Word, f32)> = b.words.iter().map(|w| (w, 1.0)).collect();
-                        self.glow.blurred_line(&ctx, key, r, &words, &[], &[], scale, atlas, ppp)
+                        self.glow.blurred_line(&ctx, key, r, &words, &[], scale, atlas, ppp)
                     });
                     if let Some((tex, rr, uv)) = made {
                         let to = xf.rect(rr);
@@ -1704,30 +1646,13 @@ impl View {
                     let line_key = hash((image_key, ((dim * 64.0).round() / 64.0).to_bits(), ppp.to_bits()));
                     // What goes in the image is only gathered when it has to be made.
                     let made = self.glow.cached_line(&ctx, (line_key, i), r, scale).or_else(|| {
-                        let deco_words: Vec<(&Word, f32)> = b
-                            .decos
-                            .iter()
-                            .flat_map(|d| match &d.body {
-                                DecoBody::Timed { words, .. } => words.iter().map(|w| (w, dim)).collect::<Vec<_>>(),
-                                DecoBody::Text(..) => vec![],
-                            })
-                            .collect();
                         let texts: Vec<(Arc<Galley>, Pos2, f32)> = b
                             .decos
                             .iter()
-                            .filter_map(|d| match &d.body {
-                                DecoBody::Text(text, font) => {
-                                    let g = ctx.fonts_mut(|fv| deco_galley(fv, text.clone(), font.clone(), d.wrap, b.align));
-                                    let pad = if d.roman { vec2(cfg.deco_rem() * 0.75 + 1.0, cfg.deco_rem() * 0.25 + 1.0) } else { Vec2::ZERO };
-                                    Some((g, d.rect.min + pad, DECO_ALPHA))
-                                }
-                                DecoBody::Timed { .. } => None,
-                            })
+                            .map(|d| (ctx.fonts_mut(|fv| deco_galley(fv, d.text.clone(), d.font.clone(), d.wrap, b.align)), d.rect.min, DECO_ALPHA))
                             .collect();
-                        let words: Vec<(&Word, f32)> = b.words.iter().map(|w| (w, if w.bg { dim * cfg.bg_alpha } else { dim })).chain(deco_words).collect();
-                        // The romanization pill is part of the line, so it's blurred with it.
-                        let pills: Vec<(Rect, f32)> = b.decos.iter().filter(|d| d.pill).map(|d| (d.rect, cfg.deco_rem())).collect();
-                        self.glow.blurred_line(&ctx, (line_key, i), r, &words, &texts, &pills, scale, atlas, ppp)
+                        let words: Vec<(&Word, f32)> = b.words.iter().map(|w| (w, if w.bg { dim * cfg.bg_alpha } else { dim })).collect();
+                        self.glow.blurred_line(&ctx, (line_key, i), r, &words, &texts, scale, atlas, ppp)
                     });
                     if let Some((tex, rr, uv)) = made {
                         // Rendered at the line's scale; snapped so it lands 1:1 on screen pixels.
@@ -1745,7 +1670,7 @@ impl View {
                     }
                     let tints = (b.colors.0, dim_tint);
                     paint_words(&painter, &ctx, &cfg, &b.words, &b.groups, &xf, &lit, dim, opacity, tints, atlas, &mut glow_work, (f.key, i, 0));
-                    for (k, d) in b.decos.iter().enumerate() {
+                    for d in &b.decos {
                         let born = *self.deco_born.entry(d.id).or_insert(f.now);
                         let enter = ((f.now - born) / DECO_ENTRY).clamp(0.0, 1.0) as f32;
                         let e = DECO_EASE.at(enter);
@@ -1753,30 +1678,14 @@ impl View {
                             animating = true;
                         }
                         // `blyrics-decoration-in`: fades in from 0.4em above.
-                        let font_size = match &d.body {
-                            DecoBody::Text(_, f) => f.size,
-                            DecoBody::Timed { words, .. } => words.first().map_or(cfg.deco_rem() * 1.6, |w| w.font.size),
-                        };
+                        let font_size = d.font.size;
                         let dxf = Xf { content: xf.content + vec2(0.0, -0.4 * font_size * (1.0 - e)), ..xf };
                         // Unsung words' alpha hides a decoration only on lines not being sung.
                         let a = e * opacity * if on { 1.0 } else { (dim / 0.05).min(1.0) };
-                        if d.pill {
-                            let r = dxf.rect(d.rect);
-                            let radius = (cfg.deco_rem() * scale).min(255.0) as u8;
-                            painter.rect(r, radius, theme::with_alpha(Color32::WHITE, 0.05 * a), egui::Stroke::new(1.0, theme::with_alpha(Color32::WHITE, 0.1 * a)), egui::StrokeKind::Inside);
-                        }
-                        match &d.body {
-                            DecoBody::Timed { words, groups } => {
-                                paint_words(&painter, &ctx, &cfg, words, groups, &dxf, &lit, dim, a, tints, atlas, &mut glow_work, (f.key, i, k as u32 + 1));
-                            }
-                            DecoBody::Text(text, font) => {
-                                let g = ctx.fonts_mut(|fv| deco_galley(fv, text.clone(), font.clone(), d.wrap, b.align));
-                                let pad = if d.roman { vec2(cfg.deco_rem() * 0.75 + 1.0, cfg.deco_rem() * 0.25 + 1.0) } else { Vec2::ZERO };
-                                // `--blyrics-translated-color`. Drawn through the line's transform
-                                // at the one laid-out size.
-                                paint_galley(&painter, &g, d.rect.min + pad, &dxf, theme::with_alpha(Color32::WHITE, DECO_ALPHA * a), atlas);
-                            }
-                        }
+                        let g = ctx.fonts_mut(|fv| deco_galley(fv, d.text.clone(), d.font.clone(), d.wrap, b.align));
+                        // `--blyrics-translated-color`. Drawn through the line's transform
+                        // at the one laid-out size.
+                        paint_galley(&painter, &g, d.rect.min, &dxf, theme::with_alpha(Color32::WHITE, DECO_ALPHA * a), atlas);
                     }
                     animating |= lit.animating(b, t) && (f.playing || lit.exit.is_some());
                 }
@@ -1811,12 +1720,8 @@ impl View {
                 .enumerate()
                 .map(|(i, l)| {
                     let agent = if l.instrumental { nearest_agent(lyrics, i) } else { l.agent.clone() };
-                    let roman = f.roman.get(i).and_then(|r| r.as_ref()).map(|r| match r {
-                        Roman::Timed(p, t) => Roman::Timed(p, t),
-                        Roman::Text(t) => Roman::Text(t),
-                    });
                     let trans = f.trans.get(i).copied().flatten();
-                    build_block(fonts, cfg, l, i, width, roman, trans, agent.as_deref())
+                    build_block(fonts, cfg, l, i, width, trans, agent.as_deref())
                 })
                 .collect()
         });
@@ -2529,7 +2434,6 @@ fn paint_words(
                 rtl: w.rtl,
                 // In steps, so a fading glow's image can be kept between them.
                 radius: ((look.glow * xf.scale * 4.0).round() / 4.0).max(0.25),
-                pills: Vec::new(),
                 color: theme::with_alpha(lit.glow, look.glow_alpha * look.opacity * opacity),
                 look,
                 layer: painter.add(Shape::Noop),
@@ -2619,9 +2523,6 @@ pub struct GlowJob {
     rtl: bool,
     /// Blur radius in points (CSS: std deviation = radius / 2).
     radius: f32,
-    /// Romanization pills under the text (box, corner radius): `rgba(255,255,255,.05)` with
-    /// a 1px `rgba(255,255,255,.1)` border.
-    pills: Vec<(Rect, f32)>,
     color: Color32,
     /// Placeholder in the paint list, under the word's lit text.
     layer: ShapeIdx,
@@ -2796,7 +2697,7 @@ impl Glow {
     }
 
     /// A whole line blurred (`filter: blur()`): its words, each at its own alpha, its text
-    /// decorations and pills, in content coordinates, rendered at the line's `scale` so the
+    /// decorations, in content coordinates, rendered at the line's `scale` so the
     /// image isn't resampled on screen. Cached per line at its latest radius and scale.
     #[allow(clippy::too_many_arguments)]
     fn blurred_line(
@@ -2806,7 +2707,6 @@ impl Glow {
         radius: f32,
         words: &[(&Word, f32)],
         texts: &[(Arc<Galley>, Pos2, f32)],
-        pills: &[(Rect, f32)],
         scale: f32,
         atlas_size: [usize; 2],
         ppp: f32,
@@ -2863,7 +2763,6 @@ impl Glow {
             rtl: false,
             // CSS `blur(r)` is a Gaussian with σ = r.
             radius: radius * 2.0,
-            pills: pills.to_vec(),
             color: Color32::WHITE,
             layer: ShapeIdx(0),
         };
@@ -2930,7 +2829,7 @@ fn glyph_blank(a: &Coverage, uv: Rect) -> bool {
 fn rasterize_glow(atlas: &Coverage, j: &GlowJob, ppp: f32, scratch: &mut Vec<f32>) -> Option<(ColorImage, Rect)> {
     let sigma = (j.radius * 0.5 * ppp).max(0.3);
     let pad = (sigma * 3.0).ceil() + 2.0;
-    let bounds = j.quads.iter().map(|q| q.0).chain(j.pills.iter().map(|p| p.0)).fold(Rect::NOTHING, |a, r| a.union(r));
+    let bounds = j.quads.iter().map(|q| q.0).fold(Rect::NOTHING, |a, r| a.union(r));
     if !bounds.is_positive() {
         return None;
     }
@@ -2942,9 +2841,6 @@ fn rasterize_glow(atlas: &Coverage, j: &GlowJob, ppp: f32, scratch: &mut Vec<f32
     }
     scratch.clear();
     scratch.resize(w * h, 0.0);
-    for &(r, radius) in &j.pills {
-        paint_pill(scratch, w, h, (r.min - origin) * ppp, r.size() * ppp, radius * ppp, ppp);
-    }
     let (aw, ah) = (atlas.size[0] as f32, atlas.size[1] as f32);
     for &(r, uv, letter, letters, weight) in &j.quads {
         let (alpha, _) = lit_gradient(&r, letter, letters, j.word, &j.look, j.by_letter, j.rtl);
@@ -3070,30 +2966,6 @@ fn convolve(src: &[f32], dst: &mut [f32], w: usize, h: usize, k: &[f32], horizon
                 }
             }
             dst[at(line, i)] = acc;
-        }
-    }
-}
-
-/// A romanization pill into an alpha bitmap, anti-aliased like egui's rect: the 5% fill
-/// with its 1-point 10% border inside (`min`/`size`/`radius` in bitmap pixels).
-fn paint_pill(buf: &mut [f32], w: usize, h: usize, min: Vec2, size: Vec2, radius: f32, ppp: f32) {
-    let radius = radius.min(size.x * 0.5).min(size.y * 0.5);
-    let half = size * 0.5;
-    let centre = min + half;
-    let (x0, y0) = (min.x.floor().max(0.0) as usize, min.y.floor().max(0.0) as usize);
-    let (x1, y1) = (((min.x + size.x).ceil() as usize).min(w), ((min.y + size.y).ceil() as usize).min(h));
-    let over = |d: &mut f32, a: f32| *d = (*d + a - *d * a).min(1.0);
-    for y in y0..y1 {
-        for x in x0..x1 {
-            // Signed distance to the rounded box, negative inside.
-            let p = vec2(x as f32 + 0.5, y as f32 + 0.5) - centre;
-            let q = vec2(p.x.abs(), p.y.abs()) - half + Vec2::splat(radius);
-            let d = vec2(q.x.max(0.0), q.y.max(0.0)).length() + q.x.max(q.y).min(0.0) - radius;
-            let inside = (0.5 - d).clamp(0.0, 1.0);
-            let border = inside - (0.5 - (d + ppp)).clamp(0.0, 1.0);
-            let px = &mut buf[y * w + x];
-            over(px, 0.05 * inside);
-            over(px, 0.1 * border);
         }
     }
 }
@@ -3538,7 +3410,7 @@ mod tests {
             let mut animating = false;
             let mut out = ctx.run_ui(input, |ui| {
                 let n = lyrics.lines.len();
-                let f = Frame { lyrics: &lyrics, key: 1, roman: (0..n).map(|_| None).collect(), trans: vec![None; n], t, playing, now, rect: Rect::from_min_size(pos2(0.0, 0.0), vec2(600.0, 500.0)), style, accent: Color32::RED, centered: false, own: Own::default(), fullscreen: false, glass_chip: None, quick_scroll: false };
+                let f = Frame { lyrics: &lyrics, key: 1, trans: vec![None; n], t, playing, now, rect: Rect::from_min_size(pos2(0.0, 0.0), vec2(600.0, 500.0)), style, accent: Color32::RED, centered: false, own: Own::default(), fullscreen: false, glass_chip: None, quick_scroll: false };
                 animating = view.show(ui, f).animating;
             });
             out.textures_delta.clear();
@@ -3584,7 +3456,7 @@ mod tests {
             let mut seek = None;
             let mut out = ctx.run_ui(input, |ui| {
                 let n = lyrics.lines.len();
-                let f = Frame { lyrics: &lyrics, key: 1, roman: (0..n).map(|_| None).collect(), trans: vec![None; n], t: 0.5, playing: false, now, rect: Rect::from_min_size(pos2(0.0, 0.0), vec2(600.0, 500.0)), style, accent: Color32::RED, centered: false, own: Own::default(), fullscreen: false, glass_chip: None, quick_scroll: false };
+                let f = Frame { lyrics: &lyrics, key: 1, trans: vec![None; n], t: 0.5, playing: false, now, rect: Rect::from_min_size(pos2(0.0, 0.0), vec2(600.0, 500.0)), style, accent: Color32::RED, centered: false, own: Own::default(), fullscreen: false, glass_chip: None, quick_scroll: false };
                 seek = view.show(ui, f).seek;
             });
             out.textures_delta.clear();

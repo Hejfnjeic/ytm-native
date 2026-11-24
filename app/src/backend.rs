@@ -91,8 +91,6 @@ pub enum Req {
     /// `song`: the song version already playing for the music video `video_id` (picked up
     /// mid-song): played without a lookup, and the video if it won't.
     Play { video_id: String, generation: u64, at: std::time::Duration, report: bool, song_of: Option<Track>, song: Option<Track> },
-    /// A song's music video, for Now playing's Song/Video switch.
-    MusicVideo(Track),
     /// Resolve and download a track ahead of time so skipping to it is instant.
     Prefetch { video_id: String, song_of: Option<Track> },
     /// Open and queue the next track's decoder ahead of the current song's end for gapless playback.
@@ -158,7 +156,6 @@ impl Req {
             Req::PlayCollection { .. } => crate::tr!("settings-playback"),
             Req::Play { .. } => crate::tr!("settings-playback"),
             Req::Prefetch { .. } | Req::StageNext { .. } | Req::GaplessStarted { .. } => crate::tr!("settings-playback"),
-            Req::MusicVideo(_) => crate::tr!("ui-video"),
             Req::Like { .. } | Req::LikeMany { .. } | Req::UnlikeBoth { .. } => crate::tr!("ui-like"),
             Req::Dislike { .. } => crate::tr!("ui-dislike-song"),
             Req::RemoveRating { .. } => crate::tr!("backend-rating"),
@@ -181,7 +178,7 @@ impl Req {
 
     /// Background requests fail quietly (logged, no toast).
     fn quiet(&self) -> bool {
-        matches!(self, Req::Suggest { .. } | Req::Account | Req::Channels | Req::ServerQueue | Req::SongRating { .. } | Req::Art { .. } | Req::Radio { smart: true, .. } | Req::Prefetch { .. } | Req::StageNext { .. } | Req::GaplessStarted { .. } | Req::HomeMore(_) | Req::Lyrics(_) | Req::Segments { .. } | Req::MusicVideo(_) | Req::LyricsExtras { .. } | Req::Comments { .. } | Req::CommentsPage { .. } | Req::CommentAction { .. })
+        matches!(self, Req::Suggest { .. } | Req::Account | Req::Channels | Req::ServerQueue | Req::SongRating { .. } | Req::Art { .. } | Req::Radio { smart: true, .. } | Req::Prefetch { .. } | Req::StageNext { .. } | Req::GaplessStarted { .. } | Req::HomeMore(_) | Req::Lyrics(_) | Req::Segments { .. } | Req::LyricsExtras { .. } | Req::Comments { .. } | Req::CommentsPage { .. } | Req::CommentAction { .. })
     }
 }
 
@@ -418,14 +415,12 @@ pub enum Resp {
     PlaylistMoved { id: String, move_id: u64, ok: bool },
     Collaboration(ytm::Collaboration),
     /// Playback for `generation` failed before reaching the audio engine.
-    PlayError { generation: u64, msg: String, offer_backup_at: Option<std::time::Duration> },
+    PlayError { generation: u64, msg: String },
     /// Play `generation` is the song version of the music video that was asked for
     /// (`None`: that song wouldn't start, and the music video plays after all).
     PlayingAs { generation: u64, listed: String, song: Option<Track> },
     /// A staged gapless track resolved to its song version before transitioning.
     StagedSong { generation: u64, listed: String, song: Track },
-    /// The song `song`'s music video (`None`: it has none, or none was sure).
-    MusicVideo { song: String, video: Option<ytm::MusicVideo> },
     LoggedIn(bool),
     /// A past search left the account's history; the list already shows it gone.
     SearchForgotten,
@@ -679,7 +674,6 @@ pub struct Backend {
     /// High quality: with Premium, every song goes through the signed-in web player
     /// for its 256 kbps stream instead of the anonymous 128 kbps one.
     hq: Arc<std::sync::atomic::AtomicBool>,
-    backup_stream: Arc<std::sync::atomic::AtomicBool>,
     /// Explicit songs are hidden: a music video's song version has to be clean.
     clean: Arc<std::sync::atomic::AtomicBool>,
     /// The visionOS player's file URLs were refused past 1 MiB this session (YouTube
@@ -715,7 +709,7 @@ impl Backend {
         {
             log::warn!("proxy relay: {e:#}");
         }
-        let backend = Self { rt: Arc::new(rt), api, tx, audio, wake, prefetched: Default::default(), staged: Default::default(), current: Default::default(), data_dir, lyrics, translate, jsc, premium: Arc::new(tokio::sync::Mutex::new(Err(None))), hq: Default::default(), backup_stream: Default::default(), clean: Default::default(), visionos_hls: Default::default(), songs: Default::default() };
+        let backend = Self { rt: Arc::new(rt), api, tx, audio, wake, prefetched: Default::default(), staged: Default::default(), current: Default::default(), data_dir, lyrics, translate, jsc, premium: Arc::new(tokio::sync::Mutex::new(Err(None))), hq: Default::default(), clean: Default::default(), visionos_hls: Default::default(), songs: Default::default() };
         backend.keep_signed_in();
         backend.carry_over_login();
         Ok(backend)
@@ -878,7 +872,7 @@ impl Backend {
                 Err(e) if e.is_panic() => {
                     log::error!("{what}: request panicked");
                     match (play_gen, subscribe) {
-                        (Some(generation), _) => Some(Resp::PlayError { generation, msg: crate::tr!("backend-unexpected-reply").to_owned(), offer_backup_at: None }),
+                        (Some(generation), _) => Some(Resp::PlayError { generation, msg: crate::tr!("backend-unexpected-reply").to_owned() }),
                         (_, Some((channel_id, on))) => Some(Resp::Subscribed { channel_id, on, ok: false }),
                         _ => (!quiet).then(|| Resp::Error(crate::tr!("backend-error", operation = what, error = crate::tr!("backend-unexpected-reply")))),
                     }
@@ -1062,10 +1056,9 @@ impl Backend {
                     Ok(()) => return Ok(None),
                     Err(e) => {
                         log::warn!("play {video_id}: {e:#}");
-                        Resp::PlayError { generation, msg: format!("{e:#}"), offer_backup_at: None }
+                        Resp::PlayError { generation, msg: format!("{e:#}") }
                     }
                 },
-                Req::MusicVideo(song) => Resp::MusicVideo { video: self.music_video(&song).await?, song: song.id },
                 Req::Prefetch { video_id, song_of } => {
                     self.prefetch(video_id, song_of).await?;
                     return Ok(None);
@@ -1368,7 +1361,6 @@ impl Backend {
         }
         // The URL is looked up meanwhile, but the playing song finishes downloading
         // first: it gets the whole bandwidth.
-        let backup_stream = self.backup_stream.load(Ordering::Relaxed);
         let playing = self.current.lock().unwrap().as_ref().map(|(_, s)| s.clone());
         let (found, ()) = tokio::join!(self.find_stream(&video_id), async {
             if let Some(s) = playing {
@@ -1379,9 +1371,6 @@ impl Backend {
             return Ok(());
         }
         let mut prefetched = self.prefetched.lock().unwrap();
-        if self.backup_stream.load(Ordering::Relaxed) != backup_stream {
-            return Ok(());
-        }
         log::debug!("prefetch {video_id}");
         let shared = self.start_stream(&video_id, found?, true);
         if let Some((_, old)) = prefetched.replace((video_id, shared)) {
@@ -1595,11 +1584,11 @@ impl Backend {
                     wake();
                 }
                 None => {
-                    let (msg, offer_backup_at) = match shared2.failure() {
-                        Some(failure) => (failure.reason, failure.offer_backup.then_some(at)),
-                        None => (format!("decode: {e}"), None),
+                    let msg = match shared2.failure() {
+                        Some(failure) => failure.reason,
+                        None => format!("decode: {e}"),
                     };
-                    let _ = tx.send(Resp::PlayError { generation, msg, offer_backup_at });
+                    let _ = tx.send(Resp::PlayError { generation, msg });
                     wake();
                 }
             },
@@ -1879,28 +1868,6 @@ impl Backend {
         ytm::searched_song(&self.api, video, clean).await
     }
 
-    /// A song's music video: YouTube's own pair (Premium), or a sure signed-out search
-    /// match, which doesn't know how the two line up.
-    async fn music_video(&self, song: &Track) -> anyhow::Result<Option<ytm::MusicVideo>> {
-        let premium = match self.api.account() {
-            Some(session) => self.is_premium(&session).await,
-            None => false,
-        };
-        if premium {
-            match ytm::paired_video(&self.api, &song.id).await {
-                // YouTube pairs every song that has a music video; trust it when it says none.
-                Ok(found) => return Ok(found),
-                Err(e) => log::debug!("video pair of {}: {e:#}; searching instead", song.id),
-            }
-        }
-        let found = ytm::searched_video(&self.api, song).await?;
-        match &found {
-            Some(v) => log::info!("music video of {} \"{}\": {} \"{}\"", song.id, song.title, v.id, v.title),
-            None => log::info!("music video of {} \"{}\": none found", song.id, song.title),
-        }
-        Ok(found.map(|video| ytm::MusicVideo { video, offset_ms: 0 }))
-    }
-
     async fn open_stream(&self, video_id: &str, prefetch: bool) -> anyhow::Result<Arc<Shared>> {
         let found = self.find_stream(video_id).await?;
         Ok(self.start_stream(video_id, found, prefetch))
@@ -2175,19 +2142,6 @@ impl Backend {
         self.hq.store(on, Ordering::Relaxed);
     }
 
-    pub fn set_backup_stream(&self, on: bool) {
-        let mut prefetched = self.prefetched.lock().unwrap();
-        if self.backup_stream.swap(on, Ordering::Relaxed) != on {
-            if let Some((_, stream)) = prefetched.take() {
-                stream.cancel();
-            }
-            drop(prefetched);
-            self.audio.status.staged_gen.store(0, Ordering::Release);
-            self.audio.send(AudioCmd::ClearNext);
-            self.clear_staged();
-        }
-    }
-
     /// Explicit songs hidden, and whether YouTube's Restricted Mode is asked for as well.
     pub fn set_hide_explicit(&self, on: bool, restricted: bool) {
         self.clean.store(on, Ordering::Relaxed);
@@ -2298,12 +2252,6 @@ fn needs_account(e: &anyhow::Error) -> bool {
     msg.contains("LOGIN_REQUIRED") || msg.contains("Premium")
 }
 
-fn bot_check(e: &anyhow::Error) -> bool {
-    e.downcast_ref::<innertube::Refused>().is_some_and(|r| {
-        r.status == "LOGIN_REQUIRED" && r.reason.to_ascii_lowercase().contains("not a bot")
-    })
-}
-
 /// The anonymous visionOS player says the video isn't there ("ERROR: This video is not
 /// available"), which is also its answer for an episode of a podcast added by RSS.
 /// Nothing in that answer tells the two apart.
@@ -2400,8 +2348,6 @@ mod resolve_tests {
         // Those that need an account keep their own route.
         assert!(!not_available(&refused("LOGIN_REQUIRED", "Sign in to confirm your age")));
         assert!(needs_account(&refused("LOGIN_REQUIRED", "Sign in to confirm your age")));
-        assert!(!bot_check(&refused("LOGIN_REQUIRED", "Sign in to confirm your age")));
-        assert!(bot_check(&refused("LOGIN_REQUIRED", "Sign in to confirm you’re not a bot")));
         assert!(!needs_account(&refused("ERROR", "This video is not available")));
         // Only the player's own answer, not an error that reads like one.
         assert!(!not_available(&anyhow::anyhow!("ERROR: This video is not available")));

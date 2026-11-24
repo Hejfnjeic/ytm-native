@@ -15,7 +15,6 @@ ui-volume = Volumen
 ui-mute = Silenciar
 ui-unmute = Activar sonido
 ui-song = Canción
-ui-video = Vídeo
 ui-artist = Artista
 ui-album = Álbum
 ui-title = Título

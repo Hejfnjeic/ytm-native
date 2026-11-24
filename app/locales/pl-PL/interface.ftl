@@ -15,7 +15,6 @@ ui-volume = Głośność
 ui-mute = Wycisz
 ui-unmute = Włącz dźwięk
 ui-song = Utwór
-ui-video = Wideo
 ui-artist = Wykonawca
 ui-album = Album
 ui-title = Tytuł

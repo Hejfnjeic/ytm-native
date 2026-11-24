@@ -268,13 +268,6 @@ settings-open = Buka
 ## Network
 
 settings-network = Jaringan
-settings-backup-stream = Stream cadangan saat lagu berhenti
-settings-backup-stream-desc = Saat sudah masuk, kalau YouTube menghentikan lagu karena cek bot (bisa terjadi kalau pakai VPN), lagu diputar dari stream bawaan videonya. Pakai lebih banyak data.
-settings-backup-stream-prompt-title = Pemutaran berhenti
-settings-backup-stream-prompt-body = YouTube menghentikan lagu ini karena cek bot, yang bisa terjadi kalau pakai VPN. Stream cadangan bisa memutarnya sebagai gantinya. Stream ini bawaan videonya, jadi pakai lebih banyak data.
-settings-backup-stream-prompt-enable = Aktifkan dan coba lagi
-settings-backup-stream-prompt-settings = Pengaturan
-settings-backup-stream-prompt-dismiss = Nanti aja
 settings-proxy = Proxy
 settings-proxy-desc = Kirim semua yang diambil ytm-rs lewat proxy: lagu, lirik, proses masuk, dan Dengar bareng.
 settings-proxy-windows-uses = Windows diatur buat memakai { $proxy }.

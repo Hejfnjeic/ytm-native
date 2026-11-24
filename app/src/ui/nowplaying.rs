@@ -1390,19 +1390,17 @@ pub(super) fn lyrics_panel(app: &mut App, ui: &mut Ui, rect: Rect, now: f64, cen
 }
 
 /// The translation for each line, the way the extension picks it: what the lyrics ship
-/// (Apple-style TTML) first, then Unison/Google. No romanization: ytm-native leaves it out
-/// (its listeners read the script), so that slot is always empty.
+/// (Apple-style TTML) first, then Unison/Google. No romanization: ytm-native leaves it out.
 fn decorations<'a>(
     show_trans: bool,
     target: &'a str,
     extras: Option<&'a (String, String, String, crate::translate::Extras)>,
     id: &str,
     lyrics: &'a Lyrics,
-) -> (Vec<Option<karaoke::Roman<'a>>>, Vec<Option<&'a str>>) {
+) -> Vec<Option<&'a str>> {
     let extras = extras.filter(|(v, s, t, _)| v == id && s == lyrics.provider.key() && t == target).map(|(_, _, _, e)| e);
     let same = |a: &str, b: &str| a.trim().eq_ignore_ascii_case(b.trim());
-    let roman = lyrics.lines.iter().map(|_| None).collect();
-    let trans = lyrics
+    lyrics
         .lines
         .iter()
         .enumerate()
@@ -1413,8 +1411,7 @@ fn decorations<'a>(
             let t = super::lyric_prefs::shipped_translation(l, target).or_else(|| extras?.trans.get(i)?.as_deref())?;
             (!same(t, &l.text)).then_some(t)
         })
-        .collect();
-    (roman, trans)
+        .collect()
 }
 
 fn synced(app: &mut App, ui: &mut Ui, rect: Rect, id: &str, lyrics: &Lyrics, now: f64, narrow: bool) {
@@ -1426,19 +1423,13 @@ fn synced(app: &mut App, ui: &mut Ui, rect: Rect, id: &str, lyrics: &Lyrics, now
     let pos = app.audio.status.position_smooth().as_secs_f64() - app.audio.status.latency().as_secs_f64();
     let pos = app.lyric_clock.tick(pos, playing, now, app.audio.status.speed() as f64);
     let t = pos - app.lyric_prefs.offset(id, lyrics.provider, lyrics.sync == Sync::Word);
-    let (roman, trans) = decorations(app.show_trans, &app.lyric_prefs.target, app.lyrics_extras.as_ref(), id, lyrics);
+    let trans = decorations(app.show_trans, &app.lyric_prefs.target, app.lyrics_extras.as_ref(), id, lyrics);
     let key = {
         use std::hash::{Hash, Hasher};
         let mut h = std::collections::hash_map::DefaultHasher::new();
         id.hash(&mut h);
         lyrics.provider.key().hash(&mut h);
         app.theme_id.hash(&mut h);
-                for r in &roman {
-            match r {
-                Some(karaoke::Roman::Timed(_, s)) | Some(karaoke::Roman::Text(s)) => s.hash(&mut h),
-                None => 0u8.hash(&mut h),
-            }
-        }
         trans.hash(&mut h);
         h.finish()
     };
@@ -1446,7 +1437,7 @@ fn synced(app: &mut App, ui: &mut Ui, rect: Rect, id: &str, lyrics: &Lyrics, now
     let fullscreen = app.fullscreen;
     let glass_chip = app.look().app.glass.instrumental;
     let quick_scroll = app.quick_lyric_scroll;
-    let frame = karaoke::Frame { lyrics, key, roman, trans, t, playing, now, rect, style, accent, centered, own, fullscreen, glass_chip, quick_scroll };
+    let frame = karaoke::Frame { lyrics, key, trans, t, playing, now, rect, style, accent, centered, own, fullscreen, glass_chip, quick_scroll };
     // The view lives in `app`; the frame borrows `app` for decorations, so swap it out.
     let mut view = std::mem::take(&mut app.lyric_view);
     let out = if karaoke::dev_off("view") { karaoke::Out { seek: None, animating: true, user_scrolling: false } } else { view.show(ui, frame) };
@@ -1563,7 +1554,7 @@ fn sync_label(k: SyncKind) -> &'static str {
 }
 
 /// Now playing's one options button, right of the chips: the song's actions, and with
-/// lyrics showing, the source picker, translation and romanization toggles, and this
+/// lyrics showing, the source picker, the translation toggle, and this
 /// song's timing offset among them, so the header stays clean until you want them. A
 /// round button, or one that fits the window buttons' notch (`compact`). Whether it's open.
 fn options_menu(app: &mut App, ui: &mut Ui, track: &crate::model::Track, lyrics: bool, compact: bool) -> bool {
@@ -1702,11 +1693,6 @@ fn submenu_row(ui: &mut Ui, label: &str, value: &str, dot: Option<Color32>, open
         widgets::icon_at(ui, pos2(row.right() - 18.0, row.center().y), icon::CHEVRON_RIGHT, 14.0, theme::text_dim());
         egui::containers::menu::SubMenu::new().show(ui, &resp, contents);
     }
-}
-
-fn menu_caption(ui: &mut Ui, text: &str) {
-    let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 26.0), Sense::hover());
-    ui.painter().text(pos2(r.left() + 12.0, r.center().y + 2.0), egui::Align2::LEFT_CENTER, text.to_uppercase(), theme::semibold(11.0), theme::text_faint());
 }
 
 /// A lyrics source on one line: its sync type's dot, name and sync type, with a check

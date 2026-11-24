@@ -189,20 +189,6 @@ pub async fn search_videos(api: &Api, query: &str, auth: bool) -> anyhow::Result
     Ok(search_as(api, query, Filter::Videos, auth).await?.iter().filter_map(|i| list_item(&i["musicResponsiveListItemRenderer"])).collect())
 }
 
-/// A song's plays as YouTube Music counts them, which some lists (album pages) leave
-/// out: from a song search for it, signed out so it stays out of the account's search
-/// history. `None` when the song isn't among the results.
-pub async fn song_plays(api: &Api, t: &Track) -> anyhow::Result<Option<u64>> {
-    let query = format!("{} {}", t.artist_line(), t.title);
-    Ok(search_songs(api, query.trim(), false).await?.into_iter().find(|s| s.id == t.id).and_then(|s| s.plays))
-}
-
-/// Song or video rows, searched as the signed-in account: signed-out searches miss
-/// some major-label releases entirely (the Spotify transfer needs those).
-pub async fn search_tracks_signed_in(api: &Api, query: &str, filter: Filter) -> anyhow::Result<Vec<Track>> {
-    Ok(search_as(api, query, filter, true).await?.iter().filter_map(|i| list_item(&i["musicResponsiveListItemRenderer"])).collect())
-}
-
 /// Podcast episodes for a search.
 pub async fn search_episodes(api: &Api, query: &str, auth: bool) -> anyhow::Result<Vec<Track>> {
     Ok(search_as(api, query, Filter::Episodes, auth).await?.iter().filter_map(|i| episode_row(&i["musicResponsiveListItemRenderer"])).collect())
@@ -375,33 +361,6 @@ fn parse_paired_song(v: &Value, video_id: &str) -> Option<Track> {
     counterparts(v, video_id).map(half).find(|r| video_type(&[&r["navigationEndpoint"]]) == Some("MUSIC_VIDEO_TYPE_ATV")).and_then(panel_item)
 }
 
-/// A song's music video, and where the song's start comes in it.
-#[derive(Clone, Debug, PartialEq)]
-pub struct MusicVideo {
-    pub video: Track,
-    /// The video's place at the song's start, in milliseconds: later for an intro before
-    /// the song, earlier for a song that opens with what the video cut. 0 when not known.
-    pub offset_ms: i64,
-}
-
-/// The music video of a song from YouTube's own pair, as [`paired_song`] the other way
-/// round: Premium accounts only, `None` for others.
-pub async fn paired_video(api: &Api, song_id: &str) -> anyhow::Result<Option<MusicVideo>> {
-    let body = json!({"videoId": song_id, "isAudioOnly": true, "enablePersistentPlaylistPanel": true});
-    let v = api.call_signed_in("next", body).await?;
-    Ok(parse_paired_video(&v, song_id))
-}
-
-fn parse_paired_video(v: &Value, song_id: &str) -> Option<MusicVideo> {
-    let c = counterparts(v, song_id).find(|c| music_video(&[&half(c)["navigationEndpoint"]]))?;
-    let video = panel_item(half(c))?;
-    // The pair lines the two up: this far into the song is that far into the video.
-    let seg = &c["segmentMap"]["segment"][0];
-    let ms = |key: &str| seg[key].as_str().and_then(|n| n.parse::<i64>().ok());
-    let offset_ms = ms("counterpartVideoStartTimeMilliseconds").zip(ms("primaryVideoStartTimeMilliseconds")).map_or(0, |(video, song)| video - song);
-    Some(MusicVideo { video, offset_ms })
-}
-
 /// The paired upload's ID if the pending unlike may touch it.
 fn parse_other_half(v: &Value, video_id: &str, keep: &HashSet<String>) -> Option<String> {
     counterparts(v, video_id)
@@ -439,46 +398,6 @@ pub async fn searched_song(api: &Api, video: &Track, clean: bool) -> anyhow::Res
     };
     let hits = search_songs_in_english(api, &query, false).await?;
     Ok(hits.into_iter().take(5).find(|h| same_song(video, h) && !(clean && h.explicit)))
-}
-
-/// The song Shazam heard (its title, and its artists in one line), by a signed-out search in
-/// English: Shazam's titles aren't translated. A sure match ([`heard_as`]) if there is one,
-/// else the top hit (`Err`), if any.
-pub async fn recognized_song(api: &Api, title: &str, artist: &str) -> anyhow::Result<Result<Track, Option<Track>>> {
-    let mut hits = search_songs_in_english(api, &format!("{title} {artist}"), false).await?;
-    Ok(match hits.iter().take(5).position(|h| heard_as(title, artist, h)) {
-        Some(i) => Ok(hits.swap_remove(i)),
-        None => Err(hits.into_iter().next()),
-    })
-}
-
-/// Whether `hit` is the song Shazam calls `title` by `artist`: [`same_song`]'s checks on the
-/// title, and the song's lead artist credited in Shazam's line ("Calvin Harris feat.
-/// Rihanna"): a guest alone could be on another song of that name. Not its length check:
-/// Shazam doesn't say how long the song is.
-fn heard_as(title: &str, artist: &str, hit: &Track) -> bool {
-    let base = base_title(title);
-    let credit = Link { name: artist.to_owned(), id: None };
-    !hit.music_video
-        && !base.is_empty()
-        && base == base_title(&hit.title)
-        && variants(title) == variants(&hit.title)
-        && qualifiers_agree(title, &hit.title)
-        && hit.artists.first().is_some_and(|a| same_artist(a, &credit))
-}
-
-/// The music video of a song, by a signed-out videos search (signed in, it would land in
-/// the account's search history). Only an official music video that's a sure match
-/// counts: [`same_song`], the other way round.
-pub async fn searched_video(api: &Api, song: &Track) -> anyhow::Result<Option<Track>> {
-    let Some(artist) = song.artists.first().filter(|_| song.duration.is_some() && !song.has_video()) else { return Ok(None) };
-    let hits = search_videos(api, &format!("{} {}", song.title, artist.name), false).await?;
-    Ok(sure_video(song, hits))
-}
-
-/// Among the first few hits only: further down, a match is more likely another recording.
-fn sure_video(song: &Track, hits: Vec<Track>) -> Option<Track> {
-    hits.into_iter().take(5).find(|h| h.music_video && same_song(h, song))
 }
 
 /// Whether `hit` (a song from a search) is the song of the music video `video`: the same
@@ -3184,21 +3103,6 @@ mod tests {
         assert!(!qualifiers_agree("Song (Part 2)", "Song") && !qualifiers_agree("Song (Part 1)", "Song (Part 2)"));
     }
 
-    /// Looks up the plays of a real song an album page lists without them. Run alone:
-    /// `cargo test --bin ytm-native -- --ignored ytm::tests::song_plays_live --exact --nocapture`
-    #[tokio::test]
-    #[ignore]
-    async fn song_plays_live() {
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-song-plays-test"));
-        let artist = |name: &str| vec![Link { name: name.into(), id: None }];
-        let song = |id: &str, title: &str, by: &str| Track { id: id.into(), title: title.into(), artists: artist(by), ..Default::default() };
-        for t in [song("L3XPdkm2F9Q", "独り言 - Hitori Goto", "Asagaya Romantics")] {
-            let plays = song_plays(&api, &t).await.unwrap();
-            println!("{} {}: {plays:?}", t.id, t.title);
-            assert!(plays.is_some_and(|n| n > 0), "{} should have plays", t.title);
-        }
-    }
-
     /// A song's Lyrics tab, signed out. Run alone:
     /// `cargo test --bin ytm-native -- --ignored ytm::tests::lyrics_live --exact`
     #[tokio::test]
@@ -3499,27 +3403,6 @@ mod tests {
     }
 
     #[test]
-    fn a_recognized_song_is_found_by_a_sure_match_only() {
-        // What Shazam answered for downloaded songs (November 2026).
-        assert!(heard_as("Glue Song", "beabadoobee", &song("Glue Song", &["beabadoobee"], 135)));
-        assert!(heard_as("Hit #2", "125 Rue Montmartre", &song("Hit #2", &["125 Rue Montmartre"], 200)));
-        assert!(heard_as("This Is What You Came For (feat. Rihanna)", "Calvin Harris", &song("This Is What You Came For", &["Calvin Harris", "Rihanna"], 222)));
-        assert!(heard_as("We Found Love", "Rihanna Feat. Calvin Harris", &song("We Found Love (feat. Calvin Harris)", &["Rihanna"], 215)));
-        // An artist named with a separator, credited alone.
-        assert!(heard_as("The Boxer", "Simon & Garfunkel", &song("The Boxer", &["Simon & Garfunkel"], 308)));
-        for (hit, why) in [
-            (song("Take On Me (Live)", &["a-ha"], 240), "a live recording"),
-            (song("Take On Me", &["Weezer"], 244), "a cover"),
-            (song("Take On Me (Acoustic Version)", &["a-ha"], 244), "an acoustic version"),
-            (video("Take On Me", &["a-ha"], 244), "a music video"),
-            (song("Take", &["a-ha"], 244), "a shorter title"),
-            (song("Take On Me", &["Weezer", "a-ha"], 244), "another lead artist's"),
-        ] {
-            assert!(!heard_as("Take On Me", "a-ha", &hit), "{why} isn't the song");
-        }
-    }
-
-    #[test]
     fn a_music_video_title_loses_its_video_markings() {
         assert_eq!(song_title("Ghostbusters (Official HD Video)"), "Ghostbusters");
         assert_eq!(song_title("Take On Me (Official Video) [4K]"), "Take On Me");
@@ -3622,36 +3505,6 @@ mod tests {
         assert_eq!(parse_paired_song(&v, "raBobo3GZYA"), None);
         // Not in the queue (or a free account's queue, which has no pairs).
         assert_eq!(parse_paired_song(&v, "BeyEGebJ1l4"), None);
-        // A song's music video, lined up with it: the song's start is 0.927 s into the video.
-        let found = parse_paired_video(&v, "raBobo3GZYA").unwrap();
-        assert_eq!((found.video.id.as_str(), found.video.music_video, found.offset_ms), ("BeyEGebJ1l4", true, 927));
-        // A music video's counterpart is its song: no music video of a music video.
-        assert_eq!(parse_paired_video(&v, "dQw4w9WgXcQ"), None);
-        assert_eq!(parse_paired_video(&v, "not-in-the-queue"), None);
-        // Without the map, the two start together.
-        let mut bare = v.clone();
-        let pair = &mut bare["contents"]["singleColumnMusicWatchNextResultsRenderer"]["tabbedRenderer"]["watchNextTabbedResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]
-            ["musicQueueRenderer"]["content"]["playlistPanelRenderer"]["contents"][0]["playlistPanelVideoWrapperRenderer"]["counterpart"][0];
-        pair.as_object_mut().unwrap().remove("segmentMap");
-        assert_eq!(parse_paired_video(&bare, "raBobo3GZYA").map(|m| m.offset_ms), Some(0));
-    }
-
-    #[test]
-    fn the_music_video_of_a_song_is_found_by_a_sure_match_only() {
-        let song_of = song("Take On Me", &["a-ha"], 226);
-        let official = video("a-ha - Take On Me (Official Video) [4K]", &["a-ha"], 244);
-        let not_official = Track { music_video: false, video: true, ..official.clone() };
-        assert_eq!(sure_video(&song_of, vec![not_official.clone(), official.clone()]).map(|v| v.id), Some(official.id.clone()));
-        // A fan's upload of the same song isn't its music video.
-        assert_eq!(sure_video(&song_of, vec![not_official]), None);
-        // Nor is a live video, another song's, or one past the first few hits.
-        assert_eq!(sure_video(&song_of, vec![video("Take On Me (Live From MTV Unplugged)", &["a-ha"], 240)]), None);
-        assert_eq!(sure_video(&song_of, vec![video("The Sun Always Shines on T.V.", &["a-ha"], 300)]), None);
-        let others = (0..5).map(|i| video(&format!("Other {i}"), &["a-ha"], 244));
-        assert_eq!(sure_video(&song_of, others.chain([official]).collect()), None);
-        // Everyone on the video is on the song too.
-        assert_eq!(sure_video(&song("Duet", &["Singer A"], 200), vec![video("Duet", &["Singer A", "Singer B"], 200)]), None);
-        assert!(sure_video(&song("Duet", &["Singer A", "Singer B"], 200), vec![video("Duet", &["Singer A"], 200)]).is_some());
     }
 
     #[test]
@@ -3717,22 +3570,6 @@ mod tests {
         }
     }
 
-    /// A signed-out search for the music videos of a few songs. Run alone:
-    /// `cargo test --bin ytm-native -- --ignored ytm::tests::searched_video_live --exact --nocapture`
-    #[tokio::test]
-    #[ignore]
-    async fn searched_video_live() {
-        let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-album-songs-test"));
-        for s in [
-            song("Never Gonna Give You Up", &["Rick Astley"], 214),
-            song("Take On Me", &["a-ha"], 226),
-            song("bad guy", &["Billie Eilish"], 195),
-            song("Bohemian Rhapsody", &["Queen"], 355),
-        ] {
-            let found = searched_video(&api, &s).await.unwrap();
-            println!("{} -> {:?}", s.title, found.as_ref().map(|v| (&v.id, &v.title, v.artist_line(), v.duration)));
-        }
-    }
 }
 
 #[cfg(test)]

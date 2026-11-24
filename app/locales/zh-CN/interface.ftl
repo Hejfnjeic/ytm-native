@@ -15,7 +15,6 @@ ui-volume = 音量
 ui-mute = 静音
 ui-unmute = 取消静音
 ui-song = 歌
-ui-video = 视频
 ui-artist = 艺术家
 ui-album = 相册
 ui-title = 标题

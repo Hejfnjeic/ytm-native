@@ -7,7 +7,7 @@ use crate::model::{Target, Thumb};
 use crate::theme::{self, icon};
 
 use super::pages::SettingsTab;
-use super::{Action, App, LibTab, Page, Repeat, START_PAGES, notes, start_page, widgets};
+use super::{Action, App, Page, Repeat, START_PAGES, notes, start_page, widgets};
 
 /// How many commands run lately rank higher.
 const RECENT: usize = 8;

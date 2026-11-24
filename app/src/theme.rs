@@ -904,7 +904,6 @@ pub mod icon {
     pub const LIST_MUSIC: char = '\u{e2e0}';
     /// Lucide 0.460's, added to the subset with `airplay` (the font's own codepoints).
     pub const MONITOR_SPEAKER: char = '\u{e210}';
-    pub const AIRPLAY: char = '\u{e039}';
     pub const MIC_VOCAL: char = '\u{e349}';
     pub const X: char = '\u{e1b2}';
     pub const HISTORY: char = '\u{e1f5}';
@@ -926,12 +925,7 @@ pub mod icon {
     pub const SHRINK: char = '\u{e220}';
     pub const UPLOAD: char = '\u{e19e}';
     pub const USERS: char = '\u{e1a4}';
-    pub const COPY: char = '\u{e09e}';
     pub const LINK: char = '\u{e102}';
-    pub const CROWN: char = '\u{e1d6}';
-    pub const HEADPHONES: char = '\u{e0f1}';
-    pub const DOWNLOAD: char = '\u{e0b2}';
-    pub const FOLDER_OPEN: char = '\u{e247}';
     pub const PIN: char = '\u{e259}';
     pub const PIN_OFF: char = '\u{e2b6}';
     pub const PICTURE_IN_PICTURE: char = '\u{e3af}';

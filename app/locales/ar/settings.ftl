@@ -269,13 +269,6 @@ settings-open = فتح
 ## Network
 
 settings-network = الشبكة
-settings-backup-stream = بث احتياطي عند توقف الأغاني
-settings-backup-stream-desc = عند تسجيل الدخول وإيقاف YouTube للأغنية بسبب التحقق من الروبوت (قد يحدث ذلك عند استخدام VPN)، يتم تشغيلها من بث مصاحب للفيديو. يستهلك بيانات أكثر.
-settings-backup-stream-prompt-title = توقف التشغيل
-settings-backup-stream-prompt-body = أوقف YouTube هذه الأغنية بسبب التحقق من الروبوت، وهو أمر قد يحدث عند استخدام VPN. يمكن تشغيلها عبر بث احتياطي بدلًا من ذلك، وبما أنه يأتي مع الفيديو فهو يستهلك بيانات أكثر.
-settings-backup-stream-prompt-enable = تشغيل وإعادة المحاولة
-settings-backup-stream-prompt-settings = الإعدادات
-settings-backup-stream-prompt-dismiss = ليس الآن
 settings-proxy = الوكيل
 settings-proxy-desc = إرسال كل ما يجلبه ytm-rs عبر وكيل: الأغاني، الكلمات، تسجيل الدخول، والاستماع معًا.
 settings-proxy-windows-uses = نظام Windows مضبوط لاستخدام { $proxy }.

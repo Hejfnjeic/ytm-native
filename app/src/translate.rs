@@ -157,36 +157,6 @@ fn same_lang(a: &str, b: &str) -> bool {
     base(a) == base(b)
 }
 
-/// `detectNonLatinLanguage`: the language a script points to, in the same order.
-#[allow(clippy::single_range_in_vec_init)]
-pub fn script_language(s: &str) -> Option<&'static str> {
-    let has = |r: &[std::ops::RangeInclusive<u32>]| s.chars().any(|c| r.iter().any(|r| r.contains(&(c as u32))));
-    let table: &[(&[std::ops::RangeInclusive<u32>], &str)] = &[
-        (&[0x3040..=0x309F, 0x30A0..=0x30FF, 0x31F0..=0x31FF, 0xFF66..=0xFF9F], "ja"),
-        (&[0xAC00..=0xD7AF, 0x1100..=0x11FF, 0x3130..=0x318F], "ko"),
-        (&[0x4E00..=0x9FFF, 0x3400..=0x4DBF, 0xF900..=0xFAFF, 0x20000..=0x2A6DF], "zh"),
-        (&[0x0400..=0x04FF, 0x0500..=0x052F], "ru"),
-        (&[0x0900..=0x097F], "hi"),
-        (&[0x0600..=0x06FF, 0x0750..=0x077F], "ar"),
-        (&[0x0E00..=0x0E7F], "th"),
-        (&[0x0370..=0x03FF], "el"),
-        (&[0x0590..=0x05FF], "he"),
-        (&[0x0980..=0x09FF], "bn"),
-        (&[0x0B80..=0x0BFF], "ta"),
-        (&[0x0C00..=0x0C7F], "te"),
-        (&[0x0D00..=0x0D7F], "ml"),
-        (&[0x0C80..=0x0CFF], "kn"),
-        (&[0x0A80..=0x0AFF], "gu"),
-        (&[0x0A00..=0x0A7F], "pa"),
-        (&[0x0D80..=0x0DFF], "si"),
-        (&[0x1000..=0x109F], "my"),
-        (&[0x10A0..=0x10FF], "ka"),
-        (&[0x1780..=0x17FF], "km"),
-        (&[0x0E80..=0x0EFF], "lo"),
-    ];
-    table.iter().find(|(r, _)| has(r)).map(|(_, l)| *l)
-}
-
 /// Whether a line has letters outside the Latin script (kana, hangul, Cyrillic, ...).
 pub fn non_latin(s: &str) -> bool {
     s.chars().any(|c| c.is_alphabetic() && !matches!(c as u32, 0..=0x024F | 0x1E00..=0x1EFF | 0x2C60..=0x2C7F | 0xA720..=0xA7FF | 0xFF21..=0xFF5A))

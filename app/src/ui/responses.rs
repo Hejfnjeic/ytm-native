@@ -10,7 +10,7 @@ use crate::backend::{PlaylistChange, Req, Resp};
 use crate::model::{ShelfKind, Target, Track};
 use crate::ytm::HomePage;
 
-use super::{Action, App, Dialog, HomeState, LibTab, Page, PlayingAs, Repeat, Sleep, dev_var};
+use super::{Action, App, Dialog, HomeState, LibTab, Page, PlayingAs, Sleep, dev_var};
 
 impl App {
     pub(super) fn pump(&mut self, ctx: &egui::Context, now: f64) {
@@ -544,10 +544,7 @@ impl App {
                     staged.song = Some(song);
                 }
             }
-            Resp::MusicVideo { song, video } => {
-                self.music_videos.insert(song, video);
-            }
-            Resp::PlayError { generation, msg, offer_backup_at } => self.on_play_error(generation, msg, offer_backup_at),
+            Resp::PlayError { generation, msg } => self.on_play_error(generation, msg),
             Resp::ServerQueue(q) => self.adopt_server_queue(q),
             Resp::Account { name, photo } => {
                 self.account_name = name.or(self.account_name.take());
@@ -689,11 +686,8 @@ impl App {
     }
 
     /// A song couldn't play: skip it, or stop when skipping can't help.
-    fn on_play_error(&mut self, generation: u64, msg: String, offer_backup_at: Option<Duration>) {
+    fn on_play_error(&mut self, generation: u64, msg: String) {
         if generation == self.generation {
-            if offer_backup_at.is_some_and(|at| self.offer_backup_stream(at)) {
-                return;
-            }
             self.buffering = false;
             let title = self.current().map(|t| t.title.clone()).unwrap_or_default();
             let has_next = !self.queue.at_end() && self.queue.index.is_some();

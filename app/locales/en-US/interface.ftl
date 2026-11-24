@@ -15,7 +15,6 @@ ui-volume = Volume
 ui-mute = Mute
 ui-unmute = Unmute
 ui-song = Song
-ui-video = Video
 ui-artist = Artist
 ui-album = Album
 ui-title = Title

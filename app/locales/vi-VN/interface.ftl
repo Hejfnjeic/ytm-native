@@ -15,7 +15,6 @@ ui-volume = Tập
 ui-mute = Tắt tiếng
 ui-unmute = Bật tiếng
 ui-song = Bài hát
-ui-video = Video
 ui-artist = Nghệ sĩ
 ui-album = Album
 ui-title = Tiêu đề

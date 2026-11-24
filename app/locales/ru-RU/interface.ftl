@@ -15,7 +15,6 @@ ui-volume = Громкость
 ui-mute = Выключить звук
 ui-unmute = Включить звук
 ui-song = Трек
-ui-video = Видео
 ui-artist = Исполнитель
 ui-album = Альбом
 ui-title = Название

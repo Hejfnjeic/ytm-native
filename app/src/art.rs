@@ -35,20 +35,6 @@ fn process_small(small: &image::RgbImage) -> Art {
     backdrop(small.pixels().map(|p| [p[0] as f32, p[1] as f32, p[2] as f32]).collect(), accent)
 }
 
-/// A frame of an animated cover as the cover art, as a still cover's would be (accent,
-/// tint and blur), sampled nearest-neighbour like [`from_frame`].
-pub fn from_cover_frame(frame: &egui::ColorImage) -> Option<Art> {
-    let ([w, h], n) = (frame.size, SIZE as usize);
-    if w == 0 || h == 0 {
-        return None;
-    }
-    let small = image::RgbImage::from_fn(SIZE, SIZE, |x, y| {
-        let c = frame.pixels[(y as usize * h / n) * w + x as usize * w / n];
-        image::Rgb([c.r(), c.g(), c.b()])
-    });
-    Some(process_small(&small))
-}
-
 /// SIZE×SIZE pixels (0–255) made into the backdrop, tinted toward `accent`.
 fn backdrop(mut px: Vec<[f32; 3]>, accent: Color32) -> Art {
     let brightness = px.iter().map(|p| (0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2]) / 255.0).sum::<f32>() / px.len().max(1) as f32;
@@ -82,27 +68,6 @@ pub fn soften(art: &mut Art, passes: u32) {
         px = box_blur(&px, n, 3);
     }
     art.rgba = px.iter().flat_map(|p| [p[0] as u8, p[1] as u8, p[2] as u8, 255]).collect();
-}
-
-/// A video frame as background art: sampled small and blurred, cheap enough a few times a second.
-pub fn from_frame(frame: &egui::ColorImage) -> Option<Art> {
-    let ([w, h], n) = (frame.size, SIZE as usize);
-    if w == 0 || h == 0 {
-        return None;
-    }
-    let mut px = Vec::with_capacity(n * n);
-    for y in 0..n {
-        for x in 0..n {
-            let c = frame.pixels[(y * h / n) * w + x * w / n];
-            px.push([c.r() as f32, c.g() as f32, c.b() as f32]);
-        }
-    }
-    let brightness = px.iter().map(|p| (0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2]) / 255.0).sum::<f32>() / px.len() as f32;
-    for _ in 0..2 {
-        px = box_blur(&px, n, 4);
-    }
-    let rgba = px.iter().flat_map(|p| [p[0] as u8, p[1] as u8, p[2] as u8, 255]).collect();
-    Some(Art { rgba, accent: Color32::WHITE, brightness })
 }
 
 fn smoothstep(a: f32, b: f32, x: f32) -> f32 {
@@ -208,17 +173,7 @@ pub fn readable_dim(shown: f32) -> f32 {
 
 #[cfg(test)]
 mod tests {
-    use super::{READABLE_CAP, READABLE_KNEE, from_cover_frame, process_rgb, readable_dim};
-
-    #[test]
-    fn a_cover_frame_gives_a_still_covers_colours() {
-        // Flat colour: sampling it small can't tell nearest from Triangle.
-        let frame = egui::ColorImage::new([300, 300], vec![egui::Color32::from_rgb(180, 60, 120); 300 * 300]);
-        let still = process_rgb(&image::RgbImage::from_pixel(300, 300, image::Rgb([180, 60, 120])));
-        let art = from_cover_frame(&frame).unwrap();
-        assert_eq!((art.accent, art.rgba), (still.accent, still.rgba));
-        assert!(from_cover_frame(&egui::ColorImage::new([0, 0], vec![])).is_none());
-    }
+    use super::{READABLE_CAP, READABLE_KNEE, readable_dim};
 
 
     #[test]

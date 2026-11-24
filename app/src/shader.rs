@@ -435,11 +435,6 @@ impl Background {
         *self.pending.lock().unwrap() = Some(art);
     }
 
-    /// Show this in place of the current art right away (a video's picture).
-    pub fn set_live(&self, art: Art) {
-        *self.live.lock().unwrap() = Some(art);
-    }
-
     pub fn paint(&self, painter: &egui::Painter, rect: egui::Rect, p: Params) {
         if self.wgpu {
             painter.add(eframe::egui_wgpu::Callback::new_paint_callback(rect, WgpuPaint { pending: self.pending.clone(), live: self.live.clone(), rect, p, draw: Default::default() }));

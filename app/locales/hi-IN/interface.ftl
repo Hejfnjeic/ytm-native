@@ -15,7 +15,6 @@ ui-volume = वॉल्यूम
 ui-mute = म्यूट
 ui-unmute = अनम्यूट
 ui-song = गाना
-ui-video = वीडियो
 ui-artist = कलाकार
 ui-album = एल्बम
 ui-title = शीर्षक

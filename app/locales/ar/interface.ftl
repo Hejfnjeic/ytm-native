@@ -15,7 +15,6 @@ ui-volume = مستوى الصوت
 ui-mute = كتم الصوت
 ui-unmute = إلغاء كتم الصوت
 ui-song = أغنية
-ui-video = فيديو
 ui-artist = فنان
 ui-album = ألبوم
 ui-title = العنوان

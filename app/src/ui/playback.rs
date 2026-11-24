@@ -89,28 +89,6 @@ impl App {
         self.playing_track().map(|t| t.id.as_str())
     }
 
-    /// The song of what's playing, for scrobbles: the song version standing in for a
-    /// music video, or the song a music video stands in for.
-    pub(super) fn heard_song(&self) -> Option<&Track> {
-        self.playing_as().filter(|t| !t.has_video()).or(self.current())
-    }
-
-    /// Play the current track as itself again, from where its stand-in is now: a music
-    /// video rather than its song (a jam plays everyone the host's exact upload), or a
-    /// song rather than its music video.
-    pub(super) fn play_listed_upload(&mut self) {
-        if self.playing_as().is_none() {
-            return;
-        }
-        let at = shifted(self.current_at(), -self.video_offset());
-        self.playing_as = None;
-        if self.playing() || self.buffering {
-            self.play_current_at(at, false);
-        } else {
-            self.resume_at = Some(at);
-        }
-    }
-
     fn wants_song_version(&self, t: &Track) -> bool {
         self.play_songs && t.music_video
     }
@@ -322,10 +300,6 @@ impl App {
     pub(super) fn recover(&mut self, at: Duration, failure: crate::stream::DownloadFailure) {
         const MAX_RECOVERIES: u32 = 3;
         let reason = failure.reason;
-        if failure.offer_backup && self.offer_backup_stream(at) {
-            log::warn!("playback interrupted at {at:?} ({reason}); offering the backup stream");
-            return;
-        }
         if self.recoveries < MAX_RECOVERIES {
             self.recoveries += 1;
             log::warn!("playback interrupted at {at:?} ({reason}); reopening (try {})", self.recoveries);
@@ -336,19 +310,6 @@ impl App {
         self.hold_interrupted_track(at);
         let title = self.current().map(|t| t.title.clone()).unwrap_or_default();
         self.toast(crate::tr!("status-track-disconnected", title = title.as_str()));
-    }
-
-    pub(super) fn offer_backup_stream(&mut self, at: Duration) -> bool {
-        use super::BackupPrompt;
-        if self.backup_stream || self.backup_prompt == BackupPrompt::Dismissed || self.current().is_none() {
-            return false;
-        }
-        self.backup_prompt = BackupPrompt::Open;
-        self.skip_streak = 0;
-        self.recoveries = 0;
-        self.audio.send(AudioCmd::Pause);
-        self.hold_interrupted_track(at);
-        true
     }
 
     fn hold_interrupted_track(&mut self, at: Duration) {
@@ -369,29 +330,6 @@ impl App {
         self.start_current(at, report, false);
     }
 
-    /// Where the current track is: where it's to start from when it's waiting to (a
-    /// switch made while paused), or the player's position.
-    fn current_at(&self) -> Duration {
-        self.resume_at.unwrap_or_else(|| self.audio.status.position())
-    }
-
-    /// How far the music video playing for the current song runs ahead of the song.
-    fn video_offset(&self) -> i64 {
-        let (Some(song), Some(video)) = (self.current(), self.playing_as()) else { return 0 };
-        self.music_videos.get(&song.id).and_then(Option::as_ref).filter(|m| m.video.id == video.id).map_or(0, |m| m.offset_ms)
-    }
-
-    /// From its video to its song version, at about the same place.
-    pub(super) fn play_song_version(&mut self) {
-        let at = self.audio.status.position();
-        if self.playing() || self.buffering {
-            self.start_current(at, false, true);
-        } else {
-            self.resume_at = Some(at);
-            self.resume_as_song = true;
-        }
-    }
-
     /// `swap`: the same play going on as its song version or its music video, from `at`.
     fn start_current(&mut self, at: Duration, report: bool, swap: bool) {
         let swap = std::mem::take(&mut self.resume_as_song) || swap;
@@ -405,7 +343,6 @@ impl App {
         self.resume_at = None;
         self.resume_counts = false;
         self.ended = false;
-        let before = self.generation;
         self.generation = self.alloc_generation();
         self.audio.status.wanted_gen.store(self.generation, Ordering::Relaxed);
         let shown = carried.clone().unwrap_or_else(|| track.clone());
@@ -812,7 +749,3 @@ impl App {
     }
 }
 
-/// `at` moved by `ms`, not before the start.
-fn shifted(at: Duration, ms: i64) -> Duration {
-    Duration::from_millis((at.as_millis() as i64).saturating_add(ms).max(0) as u64)
-}

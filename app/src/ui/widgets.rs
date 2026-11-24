@@ -554,12 +554,6 @@ pub fn icon_turned(ui: &Ui, center: Pos2, glyph: char, size: f32, color: Color32
     ui.painter().add(egui::epaint::TextShape::new(pos, g, color).with_angle(angle));
 }
 
-/// Dark or light text, whichever reads on `bg`.
-pub fn contrast(bg: Color32) -> Color32 {
-    let l = 0.299 * bg.r() as f32 + 0.587 * bg.g() as f32 + 0.114 * bg.b() as f32;
-    if l > 150.0 { Color32::from_gray(20) } else { Color32::WHITE }
-}
-
 /// Rounded pill button. `primary` = white with dark text (YouTube Music's Play button).
 pub fn pill(ui: &mut Ui, label: &str, glyph: Option<char>, primary: bool) -> Response {
     pill_button(ui, label, glyph, primary, true, None).0

@@ -75,7 +75,6 @@ pub type Refresh = Arc<dyn Fn() -> Pin<Box<dyn Future<Output = anyhow::Result<Me
 
 pub struct DownloadFailure {
     pub reason: String,
-    pub offer_backup: bool,
 }
 
 struct Inner {
@@ -86,7 +85,6 @@ struct Inner {
     error: Option<String>,
     /// The download stopped on HTTP 403s that fresh URLs didn't get past.
     refused: bool,
-    after_bot_check: bool,
     readers: usize,
     /// Set once a reader existed and all were dropped.
     cancelled: bool,
@@ -178,7 +176,6 @@ impl Shared {
                 want: 0,
                 error: None,
                 refused: false,
-                after_bot_check: false,
                 readers: 0,
                 cancelled: false,
                 limit,
@@ -198,35 +195,6 @@ impl Shared {
             changed: tokio::sync::Notify::new(),
             failed: Arc::new(std::sync::atomic::AtomicBool::new(false)),
         })
-    }
-
-    /// A buffer that already holds the whole file (a downloaded song).
-    pub fn from_bytes(data: Vec<u8>, duration_ms: u64, loudness_db: Option<f32>) -> Arc<Self> {
-        let total = data.len() as u64;
-        let data = Bytes::from(data);
-        // Saved songs are AAC (downloads take that stream).
-        let shared = Self::new(total, duration_ms, loudness_db, false, false);
-        let n = shared.inner.lock().unwrap().blocks.len();
-        let blocks: Vec<Option<Bytes>> = (0..n).map(|i| Some(data.slice(block_start(i) as usize..block_start(i + 1).min(total) as usize))).collect();
-        {
-            let mut inner = shared.inner.lock().unwrap();
-            inner.blocks = blocks;
-            inner.windowed = false;
-            inner.ever = vec![true; n];
-            inner.fetched = n;
-        }
-        shared.done.send_replace(true);
-        shared
-    }
-
-    /// The whole file, once every block has arrived (a download nobody's reading).
-    pub fn bytes(&self) -> Option<Vec<u8>> {
-        let inner = self.inner.lock().unwrap();
-        let mut out = Vec::with_capacity(self.total as usize);
-        for b in &inner.blocks {
-            out.extend_from_slice(b.as_ref()?);
-        }
-        Some(out)
     }
 
     /// Every block is in memory: readers never wait and the buffer can be replayed.
@@ -268,15 +236,10 @@ impl Shared {
         self.inner.lock().unwrap().refused
     }
 
-    pub fn mark_after_bot_check(&self) {
-        self.inner.lock().unwrap().after_bot_check = true;
-    }
-
     pub fn failure(&self) -> Option<DownloadFailure> {
         let inner = self.inner.lock().unwrap();
         Some(DownloadFailure {
             reason: inner.error.as_ref()?.clone(),
-            offer_backup: inner.after_bot_check && inner.refused,
         })
     }
 
@@ -1129,25 +1092,6 @@ mod tests {
         drop(reader);
         tokio::time::timeout(Duration::from_secs(1), download).await.expect("the windowed download stayed alive").unwrap();
         assert!(shared.error().is_none());
-    }
-
-    #[test]
-    fn backup_offer_requires_both_a_bot_check_and_a_refused_stream() {
-        let shared = || super::Shared::new(1, 0, None, false, false);
-        let ordinary = shared();
-        ordinary.fail("403".into(), true);
-        assert!(!ordinary.failure().unwrap().offer_backup);
-
-        let interrupted = shared();
-        interrupted.mark_after_bot_check();
-        assert!(interrupted.failure().is_none());
-        interrupted.fail("connection lost".into(), false);
-        assert!(!interrupted.failure().unwrap().offer_backup);
-
-        let refused = shared();
-        refused.mark_after_bot_check();
-        refused.fail("403".into(), true);
-        assert!(refused.failure().unwrap().offer_backup);
     }
 
     #[test]

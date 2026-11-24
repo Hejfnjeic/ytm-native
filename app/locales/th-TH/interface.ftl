@@ -15,7 +15,6 @@ ui-volume = ระดับเสียง
 ui-mute = ปิดเสียง
 ui-unmute = เปิดเสียง
 ui-song = เพลง
-ui-video = วีดีโอ
 ui-artist = ศิลปิน
 ui-album = อัลบั้ม
 ui-title = ชื่อเรื่อง

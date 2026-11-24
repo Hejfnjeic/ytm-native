@@ -15,7 +15,6 @@ ui-volume = 볼륨
 ui-mute = 음소거
 ui-unmute = 음소거 해제
 ui-song = 노래
-ui-video = 영상
 ui-artist = 아티스트
 ui-album = 앨범
 ui-title = 제목

@@ -15,7 +15,6 @@ ui-volume = Volume
 ui-mute = Dempen
 ui-unmute = Dempen opheffen
 ui-song = Nummer
-ui-video = Video
 ui-artist = Artiest
 ui-album = Album
 ui-title = Titel

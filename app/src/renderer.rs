@@ -13,6 +13,40 @@ pub enum Renderer {
     Wgpu,
 }
 
+/// Linux: on a PC whose graphics cards are all NVIDIA, OpenGL loads only NVIDIA's driver.
+/// The system's OpenGL loader (libglvnd) otherwise opens every installed one, and Mesa,
+/// installed alongside on most systems, brings its LLVM: ~100 MB the app never uses
+/// (measured: 369 MB → 269 MB). Left alone where any other card is present (a laptop's
+/// Intel or AMD chip may be the one showing the window) or the user chose a driver.
+/// Must run before any thread starts (it sets the environment) and before EGL loads.
+pub fn only_used_gl_driver() {
+    if !cfg!(target_os = "linux") || ["__EGL_VENDOR_LIBRARY_FILENAMES", "__EGL_VENDOR_LIBRARY_DIRS"].iter().any(|v| std::env::var_os(v).is_some()) {
+        return;
+    }
+    let drivers: Vec<String> = std::fs::read_dir("/sys/class/drm")
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|e| is_card(&e.file_name().to_string_lossy()))
+        .filter_map(|e| std::fs::read_link(e.path().join("device/driver")).ok())
+        .filter_map(|d| d.file_name().map(|n| n.to_string_lossy().into_owned()))
+        .collect();
+    if drivers.is_empty() || drivers.iter().any(|d| d != "nvidia") {
+        return;
+    }
+    let Some(json) = ["/etc/glvnd/egl_vendor.d/10_nvidia.json", "/usr/share/glvnd/egl_vendor.d/10_nvidia.json"].into_iter().find(|p| Path::new(p).exists()) else {
+        return;
+    };
+    log::info!("renderer: NVIDIA only; OpenGL loads only its driver ({json})");
+    // SAFETY: called first thing in `main`, before any other thread exists.
+    unsafe { std::env::set_var("__EGL_VENDOR_LIBRARY_FILENAMES", json) };
+}
+
+/// `card0`, `card1`…, not the connectors (`card0-DP-1`) or render nodes.
+fn is_card(name: &str) -> bool {
+    name.strip_prefix("card").is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit()))
+}
+
 static ACTIVE: OnceLock<Renderer> = OnceLock::new();
 
 /// The saved choice; wgpu falls back to OpenGL when no adapter for it answers, since a
@@ -76,4 +110,16 @@ fn available() -> bool {
     let Ok(rt) = tokio::runtime::Builder::new_current_thread().build() else { return false };
     let adapter = rt.block_on(instance.request_adapter(&wgpu::RequestAdapterOptions::default()));
     adapter.is_ok()
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn cards_not_connectors() {
+        assert!(super::is_card("card0"));
+        assert!(super::is_card("card12"));
+        assert!(!super::is_card("card0-DP-1"));
+        assert!(!super::is_card("renderD128"));
+        assert!(!super::is_card("card"));
+    }
 }

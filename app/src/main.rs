@@ -89,6 +89,7 @@ fn main() -> eframe::Result {
         }
     }
     init_logging();
+    renderer::only_used_gl_driver();
     settle_window_system();
     trim_heap_periodically();
     update::clean_portable();

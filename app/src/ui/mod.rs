@@ -1456,6 +1456,8 @@ impl eframe::App for App {
         self.tray_window(ctx, frame);
         self.sync_title(ctx);
         self.window_hidden = self.in_tray || ctx.input(|i| i.viewport().minimized == Some(true));
+        let playing_now = self.playing() || self.buffering;
+        self.mini.follow_playback(ctx, playing_now);
         self.sync_tempo();
         self.sync_song_notification(ctx);
         self.sync_server_queue(refocused, now);

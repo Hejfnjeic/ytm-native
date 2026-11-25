@@ -2347,9 +2347,13 @@ fn count_and_rest(s: &str) -> Option<(u64, &str)> {
         _ => match word {
             // Spanish billions: "3,4 mil M".
             "mil" if words.next() == Some("M") => 1e9,
-            "K" | "k" | "Tsd" | "mil" | "mila" | "tys" | "тыс" => 1e3,
-            "M" | "Mio" | "mi" | "Mln" | "mln" | "млн" => 1e6,
-            "B" | "Mrd" | "Md" | "bi" | "Mld" | "mld" | "млрд" => 1e9,
+            "K" | "k" | "Tsd" | "mil" | "mila" | "tys" | "тыс" | "тис" => 1e3,
+            // Indian English: "12 lakh views", "1.2 crore views".
+            "lakh" | "lac" => 1e5,
+            "crore" | "cr" => 1e7,
+            // British English writes "69m plays", "1.2bn".
+            "M" | "m" | "Mio" | "mi" | "Mln" | "mln" | "млн" => 1e6,
+            "B" | "bn" | "Mrd" | "Md" | "bi" | "Mld" | "mld" | "млрд" => 1e9,
             _ if fraction => return None,
             _ => 1.0,
         },
@@ -3290,6 +3294,14 @@ mod tests {
         assert_eq!(count("3,4 Md lectures"), Some(3_400_000_000));
         assert_eq!(count("Tocou 13 mi vezes"), Some(13_000_000));
         assert_eq!(count("3,82 тыс."), Some(3_820));
+        assert_eq!(count("3,82 тис."), Some(3_820));
+        // British English, lower case: "69m plays" isn't 69.
+        assert_eq!(count("69m plays"), Some(69_000_000));
+        assert_eq!(count("4.64m monthly audience"), Some(4_640_000));
+        assert_eq!(count("937k views"), Some(937_000));
+        assert_eq!(count("1.2bn plays"), Some(1_200_000_000));
+        assert_eq!(count("12 lakh views"), Some(1_200_000));
+        assert_eq!(count("1.2 crore views"), Some(12_000_000));
         assert_eq!(count("2,5 mil M reproducciones"), Some(2_500_000_000));
         assert_eq!(count("12 mil reproducciones"), Some(12_000));
         // A fraction with no unit is no count.

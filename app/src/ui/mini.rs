@@ -48,6 +48,8 @@ pub struct Mini {
     opened_at: f64,
     /// Whether KWin was last asked to keep it above (on Wayland).
     kept_above: Option<bool>,
+    /// Playing (or starting a song) when the main window last looked.
+    was_playing: bool,
 }
 
 impl Mini {
@@ -55,7 +57,7 @@ impl Mini {
         // Its side as last left. (Saved under a new name when the window got smaller by
         // default, so a size saved before that is forgotten once.)
         let size = get("lyrics_window_side").and_then(|v| v.parse::<f32>().ok()).map_or(SIZE, |side| Vec2::splat(side).clamp(MIN, MAX));
-        Mini { open: false, wanted: None, pinned: get("mini_pinned").map_or(PINNED_BY_DEFAULT, |v| v == "1"), size, opened_at: f64::NEG_INFINITY, kept_above: None }
+        Mini { open: false, wanted: None, pinned: get("mini_pinned").map_or(PINNED_BY_DEFAULT, |v| v == "1"), size, opened_at: f64::NEG_INFINITY, kept_above: None, was_playing: false }
     }
 
     pub fn save(&self, storage: &mut dyn eframe::Storage) {
@@ -73,6 +75,23 @@ impl Mini {
 
     pub fn take_request(&mut self) -> Option<bool> {
         self.wanted.take()
+    }
+
+    /// From the main window, every pass (minimized too): the lyrics window asks for its own
+    /// frames only while music plays, so once paused it draws nothing more. Playing again
+    /// (from the main window, a media key or the tray) must wake it, and pausing must show
+    /// once; otherwise it stayed frozen until the pointer came over it.
+    pub fn follow_playback(&mut self, ctx: &egui::Context, playing: bool) {
+        if !self.open {
+            return;
+        }
+        if playing != self.was_playing {
+            self.was_playing = playing;
+            ctx.request_repaint_of(viewport_id());
+        }
+        if playing {
+            ctx.request_repaint_after_for(Duration::from_millis(33), viewport_id());
+        }
     }
 
     pub fn set_pinned(&mut self, ctx: &egui::Context, on: bool) {

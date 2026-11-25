@@ -184,7 +184,6 @@ settings-font-desc = Uygulamanın tamamı ve şarkı sözleri için. Bu bilgisay
 settings-zoom = Yakınlaştır
 settings-zoom-desc = Her şeyi büyütür veya küçültür. Ctrl + artı ve Ctrl + eksi aynısını yapar ve Ctrl + 0 %100'e geri döner.
 settings-window-material-desc = Temanın arka planı yerine sayfaların arkasında Windows 11'in materyali.
-settings-window-material-desc-needs-opengl = Windows 11'in sayfaların arkasındaki materyaller. Vulkan'ye değil, OpenGL'ye ihtiyaç vardır.
 settings-window-material = Pencere malzemesi
 settings-window-material-restart-desc = Pencere yeni malzemesini bir sonraki başlangıçtan alır.
 settings-themes-font = Temanın yazı tipi
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = Mini oynatıcı diğer pencerelerin üzerinde kalır
 
 ## App icon
 
-settings-app-icon-note-linux = Uygulama menüsündeki, penceredeki ve tepsideki simgeyi değiştirir
-settings-app-icon-note = Pencere, görev çubuğu, tepsi ve Başlat menüsündeki simgeyi değiştirir
-settings-app-icon = Uygulama simgesi
-settings-preview = Önizleme
-settings-preview-desc = Görev çubuğunda ve tepside nasıl göründüğü.
-settings-app-icon-named = Uygulama simgesi: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = Pencerenin başlık çubuğunu ve düğmelerini kim ç
 settings-title-bar-restart-desc = Başlık çubuğu bir sonraki başlangıçtan itibaren değişir.
 settings-collapse-sidebar = Kenar çubuğunu daralt
 settings-collapse-sidebar-desc = Dar pencereler için yalnızca kenar çubuğundaki simgeleri göster. Üstteki menü düğmesi de aynısını yapar.
-settings-draw-with = { $api } ile çizim yapın
-settings-renderer-restart-desc = Uygulama, bir sonraki başlangıçtan itibaren yeni oluşturucuyla çizim yapıyor.
 
 ## Downloads
 

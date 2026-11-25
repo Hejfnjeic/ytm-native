@@ -89,8 +89,7 @@ mod imp {
 
     /// The window keeps winit's class without a background brush. With one, Windows
     /// erased the whole window to it at every repaint, over the OpenGL frame the app had
-    /// just shown and until the next: it flashed while resized (#100). Vulkan's frames
-    /// don't go through that window surface, so they never did.
+    /// just shown and until the next: it flashed while resized (#100).
     pub fn init(hwnd: usize) {
         let _ = WINDOW.set(hwnd);
     }

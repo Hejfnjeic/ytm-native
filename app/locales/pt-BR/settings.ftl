@@ -186,7 +186,6 @@ settings-font-desc = Para o app inteiro e as letras. Qualquer fonte instalada ne
 settings-zoom = Zoom
 settings-zoom-desc = Deixa tudo maior ou menor. Ctrl + mais e Ctrl + menos fazem o mesmo, e Ctrl + 0 volta a 100%.
 settings-window-material-desc = O material do Windows 11 atrás das páginas, no lugar do fundo do tema.
-settings-window-material-desc-needs-opengl = O material do Windows 11 atrás das páginas. Precisa de OpenGL, não Vulkan.
 settings-window-material = Material da janela
 settings-window-material-restart-desc = A janela recebe o novo material no próximo início.
 settings-themes-font = Fonte do tema
@@ -201,12 +200,6 @@ settings-keep-on-top-desc = O mini player fica acima das outras janelas.
 
 ## App icon
 
-settings-app-icon-note-linux = Altera o ícone no menu de apps, na janela e na bandeja
-settings-app-icon-note = Altera o ícone na janela, na barra de tarefas, na bandeja e no menu Iniciar
-settings-app-icon = Ícone do app
-settings-preview = Prévia
-settings-preview-desc = Como fica na barra de tarefas e na bandeja.
-settings-app-icon-named = Ícone do app: { $name }
 
 ## Connections
 
@@ -239,8 +232,6 @@ settings-title-bar-desc = Quem desenha a barra de título e os botões da janela
 settings-title-bar-restart-desc = A barra de título muda no próximo início.
 settings-collapse-sidebar = Recolher barra lateral
 settings-collapse-sidebar-desc = Mostra só ícones na barra lateral, para janelas estreitas. O botão de menu no topo faz o mesmo.
-settings-draw-with = Desenhar com { $api }
-settings-renderer-restart-desc = O app desenha com o novo renderizador no próximo início.
 
 ## Downloads
 

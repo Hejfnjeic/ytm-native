@@ -188,7 +188,6 @@ settings-font-desc = Untuk seluruh aplikasi dan lirik. Font apa pun yang terpasa
 settings-zoom = Zoom
 settings-zoom-desc = Bikin semuanya lebih besar atau lebih kecil. Ctrl + plus dan Ctrl + minus fungsinya sama, dan Ctrl + 0 balik ke 100%.
 settings-window-material-desc = Material Windows 11 di belakang halaman, menggantikan latar belakang tema.
-settings-window-material-desc-needs-opengl = Material Windows 11 di belakang halaman. Butuh OpenGL, bukan Vulkan.
 settings-window-material = Material jendela
 settings-window-material-restart-desc = Jendela dapat material barunya mulai dari peluncuran berikutnya.
 settings-themes-font = Font tema
@@ -203,12 +202,6 @@ settings-keep-on-top-desc = Mini player tetap di atas jendela lain.
 
 ## App icon
 
-settings-app-icon-note-linux = Mengubah ikon di menu aplikasi, di jendela, dan di tray
-settings-app-icon-note = Mengubah ikon di jendela, taskbar, tray, dan menu Start
-settings-app-icon = Ikon aplikasi
-settings-preview = Pratinjau
-settings-preview-desc = Tampilannya di taskbar dan di tray.
-settings-app-icon-named = Ikon aplikasi: { $name }
 
 ## Connections
 
@@ -249,8 +242,6 @@ settings-title-bar-desc = Siapa yang menggambar bilah judul dan tombol jendela. 
 settings-title-bar-restart-desc = Bilah judul berubah mulai dari peluncuran berikutnya.
 settings-collapse-sidebar = Ciutkan bilah samping
 settings-collapse-sidebar-desc = Cuma tampilkan ikon di bilah samping, cocok buat layar sempit. Tombol menu di bagian atasnya juga bisa.
-settings-draw-with = Gambar pakai { $api }
-settings-renderer-restart-desc = Aplikasi menggambar pakai renderer baru mulai dari peluncuran berikutnya.
 
 ## Downloads
 

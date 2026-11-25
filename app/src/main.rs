@@ -113,23 +113,20 @@ fn main() -> eframe::Result {
         .with_fullsize_content_view(ui::titlebar_inset())
         .with_titlebar_shown(!ui::titlebar_inset())
         .with_title_shown(!ui::titlebar_inset())
-        .with_icon(appicon::get(appicon::load(&data_dir())).icon_data().expect("bundled icons are valid PNGs"));
+        .with_icon(appicon::icon().icon_data().expect("bundled icons are valid PNGs"));
     if background {
         viewport = viewport.with_position([-4000.0, 0.0]).with_inner_size([1920.0, 1057.0]).with_active(false).with_taskbar(false);
     }
-    let renderer = renderer::init(&data_dir());
+    renderer::forget_old_choice(&data_dir());
     // Both, so each settles this run's choice.
     // Linux, the app's own frame: see-through, for its rounded corners (corners.rs).
-    let rounded = cfg!(target_os = "linux") && ui::custom_titlebar() && renderer == renderer::Renderer::OpenGl;
-    if backdrop::init(&data_dir(), renderer) || rounded {
+    let rounded = cfg!(target_os = "linux") && ui::custom_titlebar();
+    if backdrop::init(&data_dir()) || rounded {
         viewport = viewport.with_transparent(true);
     }
     let options = eframe::NativeOptions {
         viewport,
-        renderer: match renderer {
-            renderer::Renderer::OpenGl => eframe::Renderer::Glow,
-            renderer::Renderer::Wgpu => eframe::Renderer::Wgpu,
-        },
+        renderer: eframe::Renderer::Glow,
         persist_window: !background,
         // Settings live with the rest of the data: beside the portable exe, or a
         // YTM_DATA_DIR profile (e.g. a clean signed-out one for screenshots).
@@ -144,7 +141,6 @@ fn main() -> eframe::Result {
             vsync: std::env::var_os("YTM_FPS").is_none() && std::env::var_os("YTM_NO_VSYNC").is_none(),
             ..Default::default()
         },
-        wgpu_options: renderer::wgpu_options(),
         ..Default::default()
     };
 
@@ -224,7 +220,7 @@ fn main() -> eframe::Result {
                 ui::set_titlebar_hwnd(h, gl_vendor.as_deref());
                 backdrop::prepare(h);
                 // eframe sets only the small icon; the taskbar button wants the big one.
-                appicon::set_window_icon(appicon::get(appicon::load(backend.data_dir())));
+                appicon::set_window_icon(appicon::icon());
             }
             #[cfg(target_os = "macos")]
             if let Ok(h) = raw_window_handle::HasWindowHandle::window_handle(cc)
@@ -234,10 +230,6 @@ fn main() -> eframe::Result {
             }
             let media = media::Media::new(hwnd(cc), media_tx, media::Direct::new(audio.clone()), wake);
 
-            if let Some(rs) = &cc.wgpu_render_state {
-                let info = rs.adapter.get_info();
-                log::info!("wgpu: {} ({:?}, driver {} {})", info.name, info.backend, info.driver, info.driver_info);
-            }
             // The animated background needs the GPU context; without it the UI falls back
             // to a flat gradient.
             let shader = std::env::var_os("YTM_NO_SHADER").is_none();
@@ -247,11 +239,7 @@ fn main() -> eframe::Result {
                     corners::install(gl);
                 }
             }
-            let bg = match (&cc.gl, &cc.wgpu_render_state) {
-                (Some(gl), _) if shader => shader::Background::new(gl).map_err(|e| log::warn!("background shader unavailable: {e:#}")).ok(),
-                (_, Some(rs)) if shader => Some(shader::Background::new_wgpu(rs)),
-                _ => None,
-            };
+            let bg = cc.gl.as_ref().filter(|_| shader).and_then(|gl| shader::Background::new(gl).map_err(|e| log::warn!("background shader unavailable: {e:#}")).ok());
 
             Ok(Box::new(ui::Host::new(ui::App::new(
                 backend,
@@ -264,12 +252,6 @@ fn main() -> eframe::Result {
             ))))
         }),
     );
-    // A wgpu window that won't open would fail the same way at every launch: go back
-    // to OpenGL for the next one.
-    if run.is_err() && renderer == renderer::Renderer::Wgpu {
-        log::error!("renderer: {} failed to start; switching back to OpenGL", renderer::api_name());
-        let _ = renderer::save(&data_dir(), renderer::Renderer::OpenGl);
-    }
     run
 }
 

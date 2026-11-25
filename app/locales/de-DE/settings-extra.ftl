@@ -1,6 +1,5 @@
 ### Options and descriptions used in Settings.
 
-extra-renderer-desc = Verwendet { $api } (wgpu) statt OpenGL. Benötigt etwa dreimal so viel Speicher. Probiere es bei Darstellungsfehlern mit OpenGL. Startet { $api } nicht, nutzt die App wieder OpenGL.
 extra-channel-release-desc = Stabile Versionen sind für den Alltag. Nightly-Builds sind experimentell und können Fehler haben.
 extra-system-shortcuts = Globale Tastenkürzel
 extra-system-shortcuts-desc = Funktionieren bei anderen Apps im Vordergrund und bei minimiertem Fenster oder im Infobereich.

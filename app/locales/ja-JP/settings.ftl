@@ -184,7 +184,6 @@ settings-font-desc = アプリ全体と歌詞に適用します。お使いの�
 settings-zoom = 拡大率
 settings-zoom-desc = 全体を拡大・縮小します。Ctrl + プラス、Ctrl + マイナスでも操作できます。Ctrl + 0 で 100% に戻ります。
 settings-window-material-desc = テーマの背景を Windows 11 のマテリアルに置き換えます。
-settings-window-material-desc-needs-opengl = ページの背景に Windows 11 のマテリアルを使います。OpenGL が必要です。
 settings-window-material = ウィンドウのマテリアル
 settings-window-material-restart-desc = ウィンドウのマテリアルは次回の起動時に変わります。
 settings-themes-font = テーマのフォント
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = ミニプレーヤーをほかのウィンドウよ�
 
 ## App icon
 
-settings-app-icon-note-linux = アプリ メニュー、ウィンドウ、通知領域のアイコンを変えます。
-settings-app-icon-note = ウィンドウ、タスクバー、通知領域、スタート メニューのアイコンを変えます。
-settings-app-icon = アプリアイコン
-settings-preview = プレビュー
-settings-preview-desc = タスクバーと通知領域での表示です。
-settings-app-icon-named = アプリアイコン：{ $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = タイトルバーとボタンの描画元を選びま
 settings-title-bar-restart-desc = タイトルバーは次回の起動時に変わります。
 settings-collapse-sidebar = サイドバーを折りたたむ
 settings-collapse-sidebar-desc = 狭いウィンドウ向けにサイドバーをアイコンだけにします。上部のメニュー ボタンでも切り替えられます。
-settings-draw-with = { $api } で描画
-settings-renderer-restart-desc = 次回の起動時から新しい描画方式を使います。
 
 ## Downloads
 

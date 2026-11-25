@@ -184,7 +184,6 @@ settings-font-desc = Dành cho toàn bộ ứng dụng và lời bài hát. Mọ
 settings-zoom = Thu phóng
 settings-zoom-desc = Làm cho mọi thứ lớn hơn hoặc nhỏ hơn. Ctrl + plus và Ctrl + trừ làm tương tự và Ctrl + 0 quay lại 100%.
 settings-window-material-desc = Tài liệu của Windows 11 phía sau các trang, thay cho nền của chủ đề.
-settings-window-material-desc-needs-opengl = Tài liệu phía sau các trang của Windows 11. Cần OpenGL, không phải Vulkan.
 settings-window-material = Chất liệu cửa sổ
 settings-window-material-restart-desc = Cửa sổ sẽ nhận được vật liệu mới từ lần khởi động tiếp theo.
 settings-themes-font = Phông chữ của chủ đề
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = Trình phát mini nằm phía trên các cửa sổ 
 
 ## App icon
 
-settings-app-icon-note-linux = Thay đổi biểu tượng trong menu ứng dụng, trên cửa sổ và trong khay
-settings-app-icon-note = Thay đổi biểu tượng trên cửa sổ, thanh tác vụ, khay và menu Bắt đầu
-settings-app-icon = Biểu tượng ứng dụng
-settings-preview = Xem trước
-settings-preview-desc = Nó trông như thế nào trên thanh tác vụ và trong khay.
-settings-app-icon-named = Biểu tượng ứng dụng: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = Ai vẽ thanh tiêu đề và các nút của cửa s�
 settings-title-bar-restart-desc = Thanh tiêu đề thay đổi kể từ lần bắt đầu tiếp theo.
 settings-collapse-sidebar = Thu gọn thanh bên
 settings-collapse-sidebar-desc = Chỉ hiển thị các biểu tượng trong thanh bên, dành cho các cửa sổ hẹp. Nút menu ở trên cùng của nó cũng làm như vậy.
-settings-draw-with = Vẽ bằng { $api }
-settings-renderer-restart-desc = Ứng dụng vẽ bằng trình kết xuất mới từ lần khởi động tiếp theo.
 
 ## Downloads
 

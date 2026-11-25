@@ -689,10 +689,6 @@ pub struct App {
     // window
     /// Clicking × hides the window to the tray instead of quitting.
     close_to_tray: bool,
-    /// Settings › Window: draw with wgpu (Vulkan) from the next start (renderer.rs).
-    pub(super) wgpu_renderer: bool,
-    /// Settings › App icon (`appicon::ALL` id).
-    app_icon: &'static str,
     /// The tray icon, while "Close to tray" is on.
     tray: Option<crate::tray::Tray>,
     /// The window's title as last set (`sync_title`).
@@ -754,12 +750,7 @@ impl App {
         let get = |k: &str| storage.and_then(|s| s.get_string(k));
         // Dev hook: YTM_FONT=<font name> tries a font without saving it.
         theme::set_font_choice(&dev_var("YTM_FONT").map(str::to_owned).or_else(|| get("font")).unwrap_or_default());
-        let app_icon = crate::appicon::load(backend.data_dir());
-        let wgpu_renderer = crate::renderer::load(backend.data_dir()) == crate::renderer::Renderer::Wgpu;
-        // Updates reinstall the shortcuts with the classic icon.
-        if app_icon != crate::appicon::CLASSIC {
-            crate::appicon::sync_shortcuts(app_icon, backend.data_dir());
-        }
+        crate::appicon::reset_old_choice(backend.data_dir());
         let logged_in = backend.is_logged_in();
         // Before any request: a song started at launch (dev hooks) must see this setting.
         backend.set_high_quality(get("high_quality").is_none_or(|v| v == "1"));
@@ -884,8 +875,6 @@ impl App {
                 .filter(|_| !crate::update::flatpak())
                 .map_or_else(|| crate::update::is_nightly(&crate::update::build_version()), |v| v == "nightly"),
             close_to_tray: get("close_to_tray").is_some_and(|v| v == "1"),
-            wgpu_renderer,
-            app_icon,
             tray: None,
             window_title: "YT Music".to_owned(),
             song_notifications: get("song_notifications").is_some_and(|v| v == "1"),

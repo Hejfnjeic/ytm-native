@@ -188,7 +188,6 @@ settings-font-desc = للتطبيق بأكمله والكلمات. يعمل أي
 settings-zoom = التكبير
 settings-zoom-desc = يجعل كل شيء أكبر أو أصغر. يؤدي الاختصار Ctrl + plus و Ctrl + minus إلى النتيجة نفسها، ويعيد الاختصار Ctrl + 0 الحجم إلى 100%.
 settings-window-material-desc = خامة Windows 11 خلف الصفحات بدلًا من خلفية السمة.
-settings-window-material-desc-needs-opengl = خامة Windows 11 خلف الصفحات. يتطلب OpenGL وليس Vulkan.
 settings-window-material = خامة النافذة
 settings-window-material-restart-desc = تحصل النافذة على خامتها الجديدة بدءًا من التشغيل التالي.
 settings-themes-font = خط السمة
@@ -203,12 +202,6 @@ settings-keep-on-top-desc = يبقى المشغّل المصغّر فوق الن
 
 ## App icon
 
-settings-app-icon-note-linux = يغيّر الأيقونة في قائمة التطبيقات وعلى النافذة وفي شريط النظام
-settings-app-icon-note = يغيّر الأيقونة على النافذة وشريط المهام وشريط النظام وقائمة ابدأ
-settings-app-icon = أيقونة التطبيق
-settings-preview = معاينة
-settings-preview-desc = شكلها على شريط المهام وفي شريط النظام.
-settings-app-icon-named = أيقونة التطبيق: { $name }
 
 ## Connections
 
@@ -250,8 +243,6 @@ settings-title-bar-desc = الجهة التي ترسم شريط عنوان ال�
 settings-title-bar-restart-desc = يتغيّر شريط العنوان بدءًا من التشغيل التالي.
 settings-collapse-sidebar = طيّ الشريط الجانبي
 settings-collapse-sidebar-desc = عرض الأيقونات فقط في الشريط الجانبي للنوافذ الضيقة. يقوم زر القائمة في أعلاه بالدور نفسه.
-settings-draw-with = الرسم باستخدام { $api }
-settings-renderer-restart-desc = سيستخدم التطبيق محرّك العرض الجديد بدءًا من التشغيل التالي.
 
 ## Downloads
 

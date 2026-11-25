@@ -1573,7 +1573,6 @@ fn settings_tab(app: &mut App, ui: &mut Ui, tab: SettingsTab) {
         SettingsTab::Appearance => {
             settings_appearance(app, ui);
             settings_mini(app, ui);
-            settings_app_icon(app, ui);
         }
         SettingsTab::Account => settings_account(app, ui),
         SettingsTab::General => {
@@ -2485,29 +2484,6 @@ fn settings_window(app: &mut App, ui: &mut Ui) {
                 app.sidebar_collapsed = !app.sidebar_collapsed;
             }
         });
-        divider(ui);
-        let api = crate::renderer::api_name();
-        let title = tr!("settings-draw-with", api = api);
-        let desc = tr!("extra-renderer-desc", api = api);
-        setting_row(ui, &title, Some(&desc), |ui| {
-            if toggle(ui, &mut app.wgpu_renderer, &title).changed() {
-                use crate::renderer::Renderer;
-                let r = if app.wgpu_renderer { Renderer::Wgpu } else { Renderer::OpenGl };
-                if let Err(e) = crate::renderer::save(app.backend.data_dir(), r) {
-                    log::warn!("renderer: couldn't save the setting: {e}");
-                }
-            }
-        });
-        if app.wgpu_renderer != (crate::renderer::active() == crate::renderer::Renderer::Wgpu) {
-            divider(ui);
-            let mut restart = false;
-            setting_row(ui, tr!("settings-restart-to-apply"), Some(tr!("settings-renderer-restart-desc")), |ui| {
-                restart = pill(ui, tr!("settings-restart-now"), None, true).clicked();
-            });
-            if restart {
-                app.restart(ui.ctx());
-            }
-        }
     });
 }
 
@@ -2527,10 +2503,9 @@ fn settings_mini(app: &mut App, ui: &mut Ui) {
 fn settings_backdrop(app: &mut App, ui: &mut Ui) {
     use crate::backdrop::{self, Backdrop};
     let saved = backdrop::load(app.backend.data_dir());
-    let opengl = crate::renderer::active() == crate::renderer::Renderer::OpenGl;
-    let desc = if opengl { tr!("settings-window-material-desc") } else { tr!("settings-window-material-desc-needs-opengl") };
+    let desc = tr!("settings-window-material-desc");
     let mut pick = None;
-    ui.add_enabled_ui(opengl, |ui| {
+    ui.scope(|ui| {
         setting_row(ui, tr!("settings-window-material"), Some(desc), |ui| {
             let btn = dropdown_button(ui, saved.label(), 160.0, tr!("settings-window-material"));
             widgets::menu_popup(&btn).show(|ui| {
@@ -2549,7 +2524,7 @@ fn settings_backdrop(app: &mut App, ui: &mut Ui) {
     {
         log::warn!("backdrop: couldn't save the setting: {e}");
     }
-    if opengl && backdrop::load(app.backend.data_dir()) != backdrop::active() {
+    if backdrop::load(app.backend.data_dir()) != backdrop::active() {
         divider(ui);
         let mut restart = false;
         setting_row(ui, tr!("settings-restart-to-apply"), Some(tr!("settings-window-material-restart-desc")), |ui| {
@@ -2559,27 +2534,6 @@ fn settings_backdrop(app: &mut App, ui: &mut Ui) {
             app.restart(ui.ctx());
         }
     }
-}
-
-/// Settings › App icon.
-fn settings_app_icon(app: &mut App, ui: &mut Ui) {
-    // Linux desktops take the icon from the app's menu entry.
-    let (what, more) = if cfg!(target_os = "linux") {
-        (tr!("settings-app-icon-note-linux"), "")
-    } else {
-        (tr!("settings-app-icon-note"), " A pinned taskbar icon can take a moment to catch up.")
-    };
-    settings_section(ui, tr!("settings-app-icon"), Some(crate::appicon::get(app.app_icon).name), Some(&format!("{what}.{more}")), |ui| {
-        if filter_show(ui, what) {
-            ui.add_space(14.0);
-            app_icons(app, ui);
-            ui.add_space(14.0);
-        }
-        divider(ui);
-        setting_row(ui, tr!("settings-preview"), Some(tr!("settings-preview-desc")), |ui| {
-            icon_preview(ui, crate::appicon::get(app.app_icon));
-        });
-    });
 }
 
 /// Settings › Updates.
@@ -2768,7 +2722,7 @@ fn settings_sign_off(app: &mut App, ui: &mut Ui) {
     };
     ui.add_space(40.0);
     let (rect, _) = ui.allocate_exact_size(vec2(ui.available_width(), 96.0), Sense::hover());
-    icon_at(ui, crate::appicon::get(app.app_icon), Rect::from_center_size(pos2(rect.center().x, rect.top() + 22.0), vec2(44.0, 44.0)));
+    icon_at(ui, crate::appicon::icon(), Rect::from_center_size(pos2(rect.center().x, rect.top() + 22.0), vec2(44.0, 44.0)));
     ui.painter().text(pos2(rect.center().x, rect.top() + 58.0), Align2::CENTER_CENTER, "YT Music native", theme::bold(17.0), theme::text());
     ui.painter().text(pos2(rect.center().x, rect.top() + 82.0), Align2::CENTER_CENTER, text, theme::regular(13.0), theme::text_dim());
 }
@@ -2892,69 +2846,6 @@ fn network(app: &mut App, ui: &mut Ui) {
             app.restart(ui.ctx());
         }
     }
-}
-
-/// The icon picker: a tile per icon in even rows, five across (two when that's too tight).
-fn app_icons(app: &mut App, ui: &mut Ui) {
-    let gap = 12.0;
-    let avail = ui.available_width();
-    let cols = if avail + gap >= 5.0 * (92.0 + gap) { 5.0 } else { 2.0 };
-    let w = ((avail + gap) / cols - gap).floor();
-    let mut picked = None;
-    ui.scope(|ui| {
-        ui.spacing_mut().item_spacing = vec2(gap, gap);
-        ui.horizontal_wrapped(|ui| {
-            for v in crate::appicon::ALL {
-                if app_icon_tile(ui, v, w, app.app_icon == v.id, app.accent_color()).clicked() {
-                    picked = Some(v.id);
-                }
-            }
-        });
-    });
-    if let Some(id) = picked {
-        app.set_app_icon(ui.ctx(), id);
-    }
-}
-
-fn app_icon_tile(ui: &mut Ui, v: &crate::appicon::Variant, w: f32, selected: bool, accent: Color32) -> egui::Response {
-    let (rect, resp) = ui.allocate_exact_size(vec2(w, 112.0), Sense::click());
-    let resp = named(resp, &tr!("settings-app-icon-named", name = v.name)).on_hover_cursor(egui::CursorIcon::PointingHand);
-    if !ui.is_rect_visible(rect) {
-        return resp;
-    }
-    let h = theme::anim_bool(ui.ctx(), resp.id.with("h"), resp.hovered(), 0.15);
-    let s = theme::anim_bool(ui.ctx(), resp.id.with("s"), selected, 0.2);
-    let painter = ui.painter();
-    painter.rect_filled(rect, 12.0, theme::glass(0.03 + 0.04 * h).lerp_to_gamma(theme::with_alpha(accent, 0.14), s));
-    let ring = theme::glass(0.06).lerp_to_gamma(accent, s);
-    painter.rect_stroke(rect, 12.0, egui::Stroke::new(2.0, ring), egui::StrokeKind::Inside);
-    icon_at(ui, v, Rect::from_center_size(pos2(rect.center().x, rect.top() + 46.0), Vec2::splat(56.0)));
-    // Narrow tiles get a smaller label so "YouTube Music" still fits.
-    let font = theme::semibold(if w >= 108.0 { 13.0 } else { 12.0 });
-    let label = widgets::galley(ui, v.name, font.clone(), theme::text(), w - 8.0);
-    widgets::text_at(ui, pos2(rect.center().x - label.size().x / 2.0, rect.top() + 84.0), v.name, font, theme::text(), w - 8.0);
-    resp
-}
-
-/// The chosen icon on a dark taskbar, as a running app (24 px) and in the tray (16 px).
-fn icon_preview(ui: &mut Ui, v: &crate::appicon::Variant) {
-    let (rect, _) = ui.allocate_exact_size(vec2(236.0, 48.0), Sense::hover());
-    let rect = Rect::from_min_size(pos2(ui.max_rect().right() - 236.0, rect.top()), rect.size());
-    let painter = ui.painter();
-    painter.rect(rect, 10.0, Color32::from_rgb(28, 28, 28), egui::Stroke::new(1.0, Color32::from_white_alpha(18)), egui::StrokeKind::Inside);
-    let mut x = rect.left() + 12.0;
-    for c in [Color32::from_rgb(58, 123, 213), Color32::from_rgb(242, 179, 61)] {
-        painter.rect_filled(Rect::from_center_size(pos2(x + 18.0, rect.center().y), Vec2::splat(20.0)), 4.0, c);
-        x += 42.0;
-    }
-    let app = Rect::from_center_size(pos2(x + 20.0, rect.center().y), Vec2::splat(40.0));
-    painter.rect_filled(app, 6.0, Color32::from_white_alpha(18));
-    icon_at(ui, v, Rect::from_center_size(app.center() - vec2(0.0, 3.0), Vec2::splat(24.0)));
-    painter.rect_filled(Rect::from_center_size(pos2(app.center().x, app.bottom() - 5.0), vec2(14.0, 3.0)), 2.0, Color32::from_rgb(108, 180, 255));
-    x = app.right() + 10.0;
-    painter.vline(x, Rect::from_center_size(rect.center(), vec2(1.0, 24.0)).y_range(), egui::Stroke::new(1.0, Color32::from_white_alpha(30)));
-    icon_at(ui, v, Rect::from_center_size(pos2(x + 20.0, rect.center().y), Vec2::splat(16.0)));
-    painter.text(pos2(x + 38.0, rect.center().y), Align2::LEFT_CENTER, "9:41 PM", theme::regular(12.0), Color32::from_gray(230));
 }
 
 /// Paint `v` into `rect`, from the ICO entry that fits its size in physical pixels.

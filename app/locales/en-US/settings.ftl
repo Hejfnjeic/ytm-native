@@ -226,7 +226,6 @@ settings-font-desc = For the whole app and the lyrics. Any font installed on thi
 settings-zoom = Zoom
 settings-zoom-desc = Makes everything bigger or smaller. Ctrl + plus and Ctrl + minus do the same, and Ctrl + 0 goes back to 100%.
 settings-window-material-desc = Windows 11's material behind the pages, in place of the theme's background.
-settings-window-material-desc-needs-opengl = Windows 11's material behind the pages. Needs OpenGL, not Vulkan.
 settings-window-material = Window material
 settings-window-material-restart-desc = The window gets its new material from the next start.
 settings-themes-font = Theme's font
@@ -241,12 +240,6 @@ settings-keep-on-top-desc = The mini player stays above other windows.
 
 ## App icon
 
-settings-app-icon-note-linux = Changes the icon in the app menu, on the window and in the tray
-settings-app-icon-note = Changes the icon on the window, taskbar, tray and Start menu
-settings-app-icon = App icon
-settings-preview = Preview
-settings-preview-desc = How it looks on the taskbar and in the tray.
-settings-app-icon-named = App icon: { $name }
 
 ## Connections
 
@@ -287,8 +280,6 @@ settings-title-bar-desc = Who draws the window's title bar and buttons. Automati
 settings-title-bar-restart-desc = The title bar changes from the next start.
 settings-collapse-sidebar = Collapse sidebar
 settings-collapse-sidebar-desc = Show only icons in the sidebar, for narrow windows. The menu button at its top does the same.
-settings-draw-with = Draw with { $api }
-settings-renderer-restart-desc = The app draws with the new renderer from the next start.
 
 ## Downloads
 

@@ -184,7 +184,6 @@ settings-font-desc = Шрифт усього застосунку й текст�
 settings-zoom = Масштаб
 settings-zoom-desc = Змінює масштаб інтерфейсу. Ctrl + плюс і Ctrl + мінус роблять те саме. Ctrl + 0 повертає 100%.
 settings-window-material-desc = Використовує матеріал Windows 11 замість тла теми за сторінками.
-settings-window-material-desc-needs-opengl = Використовує матеріал Windows 11 за сторінками. Потрібен OpenGL.
 settings-window-material = Матеріал вікна
 settings-window-material-restart-desc = Матеріал вікна зміниться під час наступного запуску.
 settings-themes-font = Шрифт теми
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = Мініпрогравач лишається пов
 
 ## App icon
 
-settings-app-icon-note-linux = Змінює піктограму в меню застосунків, вікні та області сповіщень.
-settings-app-icon-note = Змінює піктограму у вікні, на панелі завдань, в області сповіщень і меню «Пуск».
-settings-app-icon = Піктограма застосунку
-settings-preview = Попередній перегляд
-settings-preview-desc = Вигляд піктограми на панелі завдань і в області сповіщень.
-settings-app-icon-named = Піктограма застосунку: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = Вибирає, хто малює рядок заго�
 settings-title-bar-restart-desc = Рядок заголовка зміниться під час наступного запуску.
 settings-collapse-sidebar = Згорнути бічну панель
 settings-collapse-sidebar-desc = Залишає на бічній панелі лише піктограми, щоб звільнити місце у вузьких вікнах. Кнопка меню вгорі робить те саме.
-settings-draw-with = Відображення через { $api }
-settings-renderer-restart-desc = Застосунок перейде на новий рушій рендерингу під час наступного запуску.
 
 ## Downloads
 

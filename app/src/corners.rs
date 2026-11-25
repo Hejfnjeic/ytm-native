@@ -1,7 +1,6 @@
 //! Rounded window corners where the app draws its own frame on Linux: the window is
 //! see-through, and once everything is drawn its four corners are cut away, so the desktop
-//! shows past a rounded edge (Windows 11 rounds the app's windows itself). OpenGL only:
-//! the wgpu renderer leaves them square.
+//! shows past a rounded edge (Windows 11 rounds the app's windows itself).
 //!
 //! The cut is a last draw over the window that keeps what's inside the rounded rectangle
 //! and clears what's outside it (`dst *= coverage`), anti-aliased over a pixel.

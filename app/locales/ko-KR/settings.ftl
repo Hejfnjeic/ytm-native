@@ -184,7 +184,6 @@ settings-font-desc = 전체 앱과 가사에 사용됩니다. 이 PC에 설치�
 settings-zoom = 줌
 settings-zoom-desc = 모든 것을 더 크게 또는 더 작게 만듭니다. Ctrl + 더하기와 Ctrl + 빼기는 동일한 작업을 수행하며 Ctrl + 0은 100%로 돌아갑니다.
 settings-window-material-desc = Windows 11의 자료는 테마 배경 대신 페이지 뒤에 있습니다.
-settings-window-material-desc-needs-opengl = Windows 11의 페이지 뒤에 있는 자료입니다. Vulkan가 아닌 OpenGL가 필요합니다.
 settings-window-material = 창 재료
 settings-window-material-restart-desc = 창은 다음 시작부터 새로운 재료를 가져옵니다.
 settings-themes-font = 테마의 글꼴
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = 미니 플레이어는 다른 창 위에 위치합�
 
 ## App icon
 
-settings-app-icon-note-linux = 앱 메뉴, 창, 트레이의 아이콘을 변경합니다.
-settings-app-icon-note = 창, 작업 표시줄, 트레이 및 시작 메뉴의 아이콘을 변경합니다.
-settings-app-icon = 앱 아이콘
-settings-preview = 시사
-settings-preview-desc = 작업 표시줄과 트레이에 표시되는 모습입니다.
-settings-app-icon-named = 앱 아이콘: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = 창의 제목 표시줄과 버튼을 그리는 사람.
 settings-title-bar-restart-desc = 다음 시작부터 제목 표시줄이 변경됩니다.
 settings-collapse-sidebar = 사이드바 접기
 settings-collapse-sidebar-desc = 좁은 창의 경우 사이드바에 아이콘만 표시합니다. 상단의 메뉴 버튼도 동일합니다.
-settings-draw-with = { $api }로 그리기
-settings-renderer-restart-desc = 앱은 다음 시작부터 새 렌더러를 사용하여 그립니다.
 
 ## Downloads
 

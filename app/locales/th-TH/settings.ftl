@@ -184,7 +184,6 @@ settings-font-desc = สำหรับทั้งแอพและเนื�
 settings-zoom = ซูม
 settings-zoom-desc = ทำให้ทุกสิ่งใหญ่ขึ้นหรือเล็กลง Ctrl + plus และ Ctrl + ลบทำเช่นเดียวกัน และ Ctrl + 0 กลับไปเป็น 100%
 settings-window-material-desc = เนื้อหาของ Windows 11 อยู่ด้านหลังหน้า แทนที่พื้นหลังของธีม
-settings-window-material-desc-needs-opengl = เนื้อหาของ Windows 11 อยู่ด้านหลังหน้า ต้องการ OpenGL ไม่ใช่ Vulkan
 settings-window-material = วัสดุหน้าต่าง
 settings-window-material-restart-desc = หน้าต่างได้รับเนื้อหาใหม่จากการเริ่มต้นครั้งถัดไป
 settings-themes-font = แบบอักษรของธีม
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = เครื่องเล่นขนาดเล�
 
 ## App icon
 
-settings-app-icon-note-linux = เปลี่ยนไอคอนในเมนูแอพ บนหน้าต่าง และในถาด
-settings-app-icon-note = เปลี่ยนไอคอนบนหน้าต่าง แถบงาน ถาด และเมนู Start
-settings-app-icon = ไอคอนแอป
-settings-preview = ดูตัวอย่าง
-settings-preview-desc = ลักษณะที่ปรากฏบนทาสก์บาร์และในถาด
-settings-app-icon-named = ไอคอนแอป: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = ใครเป็นคนวาดแถบหัว
 settings-title-bar-restart-desc = แถบหัวเรื่องเปลี่ยนจากจุดเริ่มต้นครั้งถัดไป
 settings-collapse-sidebar = ยุบแถบด้านข้าง
 settings-collapse-sidebar-desc = แสดงเฉพาะไอคอนในแถบด้านข้างสำหรับหน้าต่างแคบ ปุ่มเมนูที่ด้านบนก็ทำเช่นเดียวกัน
-settings-draw-with = วาดด้วย { $api }
-settings-renderer-restart-desc = แอปจะวาดด้วยตัวเรนเดอร์ใหม่ตั้งแต่การเริ่มต้นครั้งถัดไป
 
 ## Downloads
 

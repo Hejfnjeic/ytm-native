@@ -184,7 +184,6 @@ settings-font-desc = Шрифт всего приложения и тексто�
 settings-zoom = Масштаб
 settings-zoom-desc = Меняет масштаб интерфейса. Ctrl + плюс и Ctrl + минус делают то же. Ctrl + 0 возвращает 100%.
 settings-window-material-desc = Использует материал Windows 11 вместо фона темы за страницами.
-settings-window-material-desc-needs-opengl = Использует материал Windows 11 за страницами. Требуется OpenGL.
 settings-window-material = Материал окна
 settings-window-material-restart-desc = Материал окна изменится при следующем запуске.
 settings-themes-font = Шрифт темы
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = Мини-плеер остаётся поверх о
 
 ## App icon
 
-settings-app-icon-note-linux = Меняет значок в меню приложений, окне и области уведомлений.
-settings-app-icon-note = Меняет значок в окне, на панели задач, в области уведомлений и меню «Пуск».
-settings-app-icon = Значок приложения
-settings-preview = Предпросмотр
-settings-preview-desc = Как значок выглядит на панели задач и в области уведомлений.
-settings-app-icon-named = Значок приложения: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = Выбирает, кто рисует строку з�
 settings-title-bar-restart-desc = Строка заголовка изменится при следующем запуске.
 settings-collapse-sidebar = Свернуть боковую панель
 settings-collapse-sidebar-desc = Оставляет на боковой панели только значки, чтобы освободить место в узких окнах. Кнопка меню вверху делает то же самое.
-settings-draw-with = Отрисовка через { $api }
-settings-renderer-restart-desc = Приложение переключится на новый движок отрисовки при следующем запуске.
 
 ## Downloads
 

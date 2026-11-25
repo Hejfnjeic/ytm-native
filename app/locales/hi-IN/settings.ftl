@@ -184,7 +184,6 @@ settings-font-desc = संपूर्ण ऐप और गीत के लि
 settings-zoom = ज़ूम करें
 settings-zoom-desc = हर चीज़ को बड़ा या छोटा बनाता है। Ctrl + प्लस और Ctrl + माइनस भी ऐसा ही करते हैं, और Ctrl + 0 100% पर वापस चला जाता है।
 settings-window-material-desc = विषय की पृष्ठभूमि के स्थान पर Windows 11 की सामग्री पन्नों के पीछे है।
-settings-window-material-desc-needs-opengl = Windows 11 की सामग्री पन्नों के पीछे। OpenGL की जरूरत है, Vulkan की नहीं।
 settings-window-material = खिड़की सामग्री
 settings-window-material-restart-desc = अगली शुरुआत से विंडो को अपनी नई सामग्री मिलती है।
 settings-themes-font = थीम का फ़ॉन्ट
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = मिनी प्लेयर अन्य वि�
 
 ## App icon
 
-settings-app-icon-note-linux = ऐप मेनू, विंडो और ट्रे में आइकन बदलता है
-settings-app-icon-note = विंडो, टास्कबार, ट्रे और स्टार्ट मेनू पर आइकन बदलता है
-settings-app-icon = ऐप आइकन
-settings-preview = पूर्वावलोकन
-settings-preview-desc = यह टास्कबार और ट्रे में कैसा दिखता है।
-settings-app-icon-named = ऐप आइकन: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = विंडो का टाइटल बार औ�
 settings-title-bar-restart-desc = अगली शुरुआत से शीर्षक पट्टी बदल जाती है।
 settings-collapse-sidebar = साइडबार को संक्षिप्त करें
 settings-collapse-sidebar-desc = संकीर्ण विंडो के लिए, साइडबार में केवल आइकन दिखाएं। इसके शीर्ष पर स्थित मेनू बटन भी यही कार्य करता है।
-settings-draw-with = { $api } के साथ ड्रा करें
-settings-renderer-restart-desc = ऐप अगली शुरुआत से नए रेंडरर के साथ तैयार होता है।
 
 ## Downloads
 

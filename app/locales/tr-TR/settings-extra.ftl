@@ -1,6 +1,5 @@
 ### Options and descriptions used in Settings.
 
-extra-renderer-desc = OpenGL yerine { $api } (wgpu) kullanın. Belleğin yaklaşık üç katını alır ve OpenGL'nin yanlış çizim yapması durumunda kullanışlıdır. { $api } başlatılamazsa OpenGL'ye geri döner.
 extra-channel-release-desc = Kararlı sürümler günlük dinlemeye hazır. Gecelik yapılar deneyseldir ve bozulabilir.
 extra-system-shortcuts = Sistem genelinde kısayollar
 extra-system-shortcuts-desc = Bunlar, başka bir uygulama öndeyken veya pencere simge durumuna küçültülmüşken veya tepsideyken çalışır.

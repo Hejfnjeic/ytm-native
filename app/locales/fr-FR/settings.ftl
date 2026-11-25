@@ -184,7 +184,6 @@ settings-font-desc = Police de toute l’application et des paroles. Vous pouvez
 settings-zoom = Zoom
 settings-zoom-desc = Agrandit ou réduit l’interface. Ctrl + plus et Ctrl + moins font la même chose. Ctrl + 0 ramène le zoom à 100 %.
 settings-window-material-desc = Applique le matériau de Windows 11 derrière les pages à la place du fond du thème.
-settings-window-material-desc-needs-opengl = Applique le matériau de Windows 11 derrière les pages. Nécessite OpenGL.
 settings-window-material = Matériau de la fenêtre
 settings-window-material-restart-desc = Le matériau de la fenêtre changera au prochain démarrage.
 settings-themes-font = Police du thème
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = Le mini-lecteur reste au-dessus des autres fenêtres
 
 ## App icon
 
-settings-app-icon-note-linux = Change l’icône dans le menu des applications, sur la fenêtre et dans la zone de notification.
-settings-app-icon-note = Change l’icône sur la fenêtre, dans la barre des tâches, la zone de notification et le menu Démarrer.
-settings-app-icon = Icône de l’application
-settings-preview = Aperçu
-settings-preview-desc = Aspect dans la barre des tâches et la zone de notification.
-settings-app-icon-named = Icône de l’application : { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = Choisit qui dessine la barre de titre et ses boutons. 
 settings-title-bar-restart-desc = La barre de titre changera au prochain démarrage.
 settings-collapse-sidebar = Réduire la barre latérale
 settings-collapse-sidebar-desc = Affiche seulement les icônes pour les fenêtres étroites. Le bouton de menu en haut de la barre fait la même chose.
-settings-draw-with = Rendu avec { $api }
-settings-renderer-restart-desc = L’application utilisera le nouveau moteur de rendu au prochain démarrage.
 
 ## Downloads
 

@@ -184,7 +184,6 @@ settings-font-desc = 對於整個應用程式和歌詞。此電腦上安裝的�
 settings-zoom = 縮放
 settings-zoom-desc = 使一切變大或變小。 Ctrl + 加號和 Ctrl + 減號執行相同操作，Ctrl + 0 返回 100%。
 settings-window-material-desc = Windows 11 的資料位於頁後面，取代主題背景。
-settings-window-material-desc-needs-opengl = Windows 11 的資料在頁面後面。需要 OpenGL，而不是 Vulkan。
 settings-window-material = 窗戶材質
 settings-window-material-restart-desc = 視窗從下一次開始時取得新材料。
 settings-themes-font = 主題的字體
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = 迷你播放器位於其他視窗之上。
 
 ## App icon
 
-settings-app-icon-note-linux = 更改應用程式選單、視窗和托盤中的圖標
-settings-app-icon-note = 變更視窗、工作列、托盤和開始功能表上的圖標
-settings-app-icon = 應用程式圖標
-settings-preview = 預覽
-settings-preview-desc = 它在工作列和托盤中的外觀。
-settings-app-icon-named = 應用程式圖示：{ $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = 誰繪製視窗的標題列和按鈕。自動使用 YT
 settings-title-bar-restart-desc = 標題列從下次開始時發生變化。
 settings-collapse-sidebar = 折疊側邊欄
 settings-collapse-sidebar-desc = 對於狹窄的窗口，僅在側邊欄中顯示圖示。頂部的選單按鈕具有相同的作用。
-settings-draw-with = 用{ $api }抽獎
-settings-renderer-restart-desc = 應用程式從下次開始時使用新的渲染器進行繪製。
 
 ## Downloads
 

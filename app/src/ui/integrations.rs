@@ -1,6 +1,5 @@
 //! The window title, song notifications, the system media controls, the app icon, updates and the tray.
 
-use std::sync::Arc;
 use std::time::Duration;
 
 use crate::backend;
@@ -68,25 +67,6 @@ impl App {
             };
             n.show(generation, crate::notify::Song { cover, ..song });
         });
-    }
-
-    /// Switch the window, tray and shortcuts to another icon.
-    pub(crate) fn set_app_icon(&mut self, ctx: &egui::Context, id: &'static str) {
-        if id == self.app_icon {
-            return;
-        }
-        self.app_icon = id;
-        let v = crate::appicon::get(id);
-        crate::appicon::save(self.backend.data_dir(), id);
-        if cfg!(windows) {
-            crate::appicon::set_window_icon(v);
-        } else if let Some(icon) = v.icon_data() {
-            ctx.send_viewport_cmd(egui::ViewportCommand::Icon(Some(Arc::new(icon))));
-        }
-        crate::appicon::sync_shortcuts(id, self.backend.data_dir());
-        // `tray_window` makes it again with the new icon.
-        self.tray = None;
-        log::info!("app icon: {id}");
     }
 
     /// Automatic update checks: shortly after launch, then every six hours.
@@ -174,7 +154,7 @@ impl App {
         if want && self.tray.is_none() {
             let c = ctx.clone();
             self.tray_error = None;
-            match crate::tray::Tray::new(crate::appicon::get(self.app_icon), move || c.request_repaint()) {
+            match crate::tray::Tray::new(crate::appicon::icon(), move || c.request_repaint()) {
                 Ok(t) => self.tray = Some(t),
                 // Without an icon there'd be no way back: × just closes.
                 Err(e) => {

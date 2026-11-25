@@ -1,43 +1,23 @@
-//! Settings › App icon: alternative icons for the window, the tray and the Start menu,
-//! desktop and pinned taskbar shortcuts that launch this exe. The exe's own embedded
-//! icon (Explorer's file view) stays the classic one. On Linux, the app's menu entry
-//! (its .desktop file), where the desktop takes the icon from.
+//! The app's icon: on the window, in the tray, and in the settings' About.
 //!
-//! The choice lives in `<data dir>/app_icon` as plain text, so `main` can read it
-//! before the window opens.
+//! Until v0.4.3 Settings › App icon offered alternatives, which also went to the Start
+//! menu, desktop and pinned taskbar shortcuts (Windows) or the menu entry (Linux).
+//! [`reset_old_choice`] puts those back to this icon once.
 
 use std::path::{Path, PathBuf};
 
 pub struct Variant {
     pub id: &'static str,
-    pub name: &'static str,
     /// An ICO whose entries are PNGs, from 16 to 256 px.
     ico: &'static [u8],
 }
 
-macro_rules! variant {
-    ($id:literal, $name:literal) => {
-        Variant { id: $id, name: $name, ico: include_bytes!(concat!("../assets/icon/variants/", $id, ".ico")) }
-    };
-}
-
 pub const CLASSIC: &str = "classic";
 
-pub static ALL: &[Variant] = &[
-    // ytm-native's own; the others are ytm-rs's alternatives (GPL-3.0, by grapedjuice).
-    Variant { id: CLASSIC, name: "ytm-native", ico: include_bytes!("../assets/icon/icon.ico") },
-    variant!("smilering", "Smile ring"),
-    variant!("gear", "Rust gear"),
-    variant!("wave", "Waveform"),
-    variant!("vinyl", "Record"),
-    variant!("lyrics", "Lit line"),
-    variant!("duet", "Duet"),
-    variant!("kawarp", "Warp"),
-    variant!("fluent", "Fluent"),
-];
+static ICON: Variant = Variant { id: CLASSIC, ico: include_bytes!("../assets/icon/icon.ico") };
 
-pub fn get(id: &str) -> &'static Variant {
-    ALL.iter().find(|v| v.id == id).unwrap_or(&ALL[0])
+pub fn icon() -> &'static Variant {
+    &ICON
 }
 
 impl Variant {
@@ -82,14 +62,16 @@ fn ico_entries(ico: &'static [u8]) -> Vec<(u32, &'static [u8])> {
         .collect()
 }
 
-pub fn load(data_dir: &Path) -> &'static str {
-    let id = std::fs::read_to_string(data_dir.join("app_icon")).unwrap_or_default();
-    get(id.trim()).id
-}
-
-pub fn save(data_dir: &Path, id: &str) {
-    if let Err(e) = std::fs::write(data_dir.join("app_icon"), id) {
-        log::warn!("couldn't save the app icon choice: {e}");
+/// Someone who picked another icon (`<data dir>/app_icon`) before the choice was removed
+/// gets their shortcuts and menu entry back to this one, once.
+pub fn reset_old_choice(data_dir: &Path) {
+    let file = data_dir.join("app_icon");
+    let Ok(id) = std::fs::read_to_string(&file) else { return };
+    if id.trim() != CLASSIC {
+        sync_shortcuts(data_dir);
+    }
+    if let Err(e) = std::fs::remove_file(&file) {
+        log::warn!("couldn't remove the old app icon choice: {e}");
     }
 }
 
@@ -149,13 +131,13 @@ mod window {
     }
 }
 
-/// Point every shortcut to this exe at the chosen icon, in the background. The
-/// installer rewrites its shortcuts on each update, so this also runs at launch.
-pub fn sync_shortcuts(id: &'static str, data_dir: &Path) {
+/// Point every shortcut to this exe at the app's icon, in the background.
+fn sync_shortcuts(data_dir: &Path) {
     let data_dir = data_dir.to_owned();
+    let id = CLASSIC;
     std::thread::Builder::new()
         .name("app-icon".into())
-        .spawn(move || match shortcuts::sync(get(id), &data_dir) {
+        .spawn(move || match shortcuts::sync(icon(), &data_dir) {
             Ok(0) => log::debug!("app icon {id}: shortcuts already up to date"),
             Ok(n) => log::info!("app icon {id}: updated {n} shortcut(s)"),
             Err(e) => log::warn!("app icon {id}: couldn't update shortcuts: {e:#}"),
@@ -696,7 +678,7 @@ mod tests {
 
     #[test]
     fn every_icon_has_every_size() {
-        for v in ALL {
+        for v in [icon()] {
             let sizes: Vec<u32> = ico_entries(v.ico).iter().map(|(w, _)| *w).collect();
             assert!(sizes.contains(&16) && sizes.contains(&32) && sizes.contains(&256), "{}: {sizes:?}", v.id);
             for size in [16, 24, 32, 56, 256] {
@@ -708,11 +690,10 @@ mod tests {
 
     #[test]
     fn picks_the_smallest_entry_that_fits() {
-        let v = get("gear");
+        let v = icon();
         let w = |png: &[u8]| image::load_from_memory(png).unwrap().width();
         assert_eq!(w(v.png(16)), 16);
-        assert_eq!(w(v.png(50)), 64);
+        assert_eq!(w(v.png(20)), 24);
         assert_eq!(w(v.png(300)), 256);
-        assert_eq!(get("nonsense").id, CLASSIC);
     }
 }

@@ -389,7 +389,7 @@ pub fn sidebar(app: &mut App, ui: &mut Ui) {
         ui.multiply_opacity(a);
         // The app's own icon and name, not YouTube Music's logo.
         let (r, _) = ui.allocate_exact_size(vec2(32.0, 32.0), Sense::hover());
-        super::pages::icon_at(ui, crate::appicon::get(app.app_icon), r);
+        super::pages::icon_at(ui, crate::appicon::icon(), r);
         ui.add_space(8.0);
         let logo = app.look().app.top_bar.clone();
         let text_r = if logo.logo_text.is_empty() {

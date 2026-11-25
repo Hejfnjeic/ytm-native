@@ -184,7 +184,6 @@ settings-font-desc = Lettertype voor de hele app en de songteksten. Je kunt elk 
 settings-zoom = Zoom
 settings-zoom-desc = Maakt alles groter of kleiner. Ctrl + plus en Ctrl + min doen hetzelfde. Met Ctrl + 0 ga je terug naar 100%.
 settings-window-material-desc = Gebruikt het venstermateriaal van Windows 11 achter de pagina’s als thema-achtergrond.
-settings-window-material-desc-needs-opengl = Gebruikt het venstermateriaal van Windows 11 achter de pagina’s. Vereist OpenGL.
 settings-window-material = Venstermateriaal
 settings-window-material-restart-desc = Het venstermateriaal verandert bij de volgende start.
 settings-themes-font = Lettertype van het thema
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = De minispeler blijft boven andere vensters.
 
 ## App icon
 
-settings-app-icon-note-linux = Wijzigt het pictogram in het appmenu, op het venster en in het systeemvak.
-settings-app-icon-note = Wijzigt het pictogram op het venster, op de taakbalk, in het systeemvak en in het startmenu.
-settings-app-icon = App-pictogram
-settings-preview = Voorbeeld
-settings-preview-desc = Zo ziet het pictogram eruit op de taakbalk en in het systeemvak.
-settings-app-icon-named = App-pictogram: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = Bepaalt wie de titelbalk en knoppen tekent. Automatisc
 settings-title-bar-restart-desc = De titelbalk verandert bij de volgende start.
 settings-collapse-sidebar = Zijbalk inklappen
 settings-collapse-sidebar-desc = Toont alleen pictogrammen in de zijbalk voor smalle vensters. De menuknop bovenaan doet hetzelfde.
-settings-draw-with = Weergeven met { $api }
-settings-renderer-restart-desc = De app gebruikt de nieuwe renderer bij de volgende start.
 
 ## Downloads
 

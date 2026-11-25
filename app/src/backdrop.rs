@@ -1,7 +1,6 @@
 //! Windows 11's material behind the window (Settings › Appearance › Window material),
 //! in any theme: Mica, Mica Alt or Acrylic. The window must be created see-through,
-//! so a change applies from the next start, and only OpenGL's window can be (Vulkan's
-//! swapchain isn't composited that way).
+//! so a change applies from the next start.
 
 use std::path::Path;
 use std::sync::OnceLock;
@@ -50,8 +49,8 @@ pub fn save(data_dir: &Path, b: Backdrop) -> std::io::Result<()> {
 
 /// Settle this run's material, before the window opens. Returns whether the window has
 /// to be see-through.
-pub fn init(data_dir: &Path, renderer: crate::renderer::Renderer) -> bool {
-    let b = if supported() && renderer == crate::renderer::Renderer::OpenGl { load(data_dir) } else { Backdrop::None };
+pub fn init(data_dir: &Path) -> bool {
+    let b = if supported() { load(data_dir) } else { Backdrop::None };
     log::info!("backdrop: {b:?}");
     let _ = ACTIVE.set(b);
     b != Backdrop::None

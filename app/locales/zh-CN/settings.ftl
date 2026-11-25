@@ -184,7 +184,6 @@ settings-font-desc = 对于整个应用程序和歌词。此电脑上安装的�
 settings-zoom = 缩放
 settings-zoom-desc = 使一切变大或变小。 Ctrl + 加号和 Ctrl + 减号执行相同操作，Ctrl + 0 返回到 100%。
 settings-window-material-desc = Windows 11 的材料位于页面后面，代替主题背景。
-settings-window-material-desc-needs-opengl = Windows 11 的材料在页面后面。需要 OpenGL，而不是 Vulkan。
 settings-window-material = 窗户材质
 settings-window-material-restart-desc = 窗口从下一次开始时获取新材料。
 settings-themes-font = 主题的字体
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = 迷你播放器位于其他窗口之上。
 
 ## App icon
 
-settings-app-icon-note-linux = 更改应用程序菜单、窗口和托盘中的图标
-settings-app-icon-note = 更改窗口、任务栏、托盘和开始菜单上的图标
-settings-app-icon = 应用程序图标
-settings-preview = 预览
-settings-preview-desc = 它在任务栏和托盘中的外观。
-settings-app-icon-named = 应用程序图标：{ $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = 谁绘制窗口的标题栏和按钮。自动使用 YT
 settings-title-bar-restart-desc = 标题栏从下次开始时发生变化。
 settings-collapse-sidebar = 折叠侧边栏
 settings-collapse-sidebar-desc = 对于狭窄的窗口，仅在侧边栏中显示图标。顶部的菜单按钮具有相同的作用。
-settings-draw-with = 用{ $api }抽奖
-settings-renderer-restart-desc = 应用程序从下次开始时使用新的渲染器进行绘制。
 
 ## Downloads
 

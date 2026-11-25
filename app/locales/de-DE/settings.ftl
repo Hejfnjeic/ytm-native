@@ -211,7 +211,6 @@ settings-font-desc = Schriftart für die App und die Liedtexte. Jede installiert
 settings-zoom = Zoom
 settings-zoom-desc = Ändert die Größe der Oberfläche. Strg + Plus und Strg + Minus tun dasselbe. Strg + 0 stellt 100 % wieder her.
 settings-window-material-desc = Verwendet das Material von Windows 11 als Seitenhintergrund.
-settings-window-material-desc-needs-opengl = Verwendet hinter den Seiten das Material von Windows 11. Benötigt OpenGL.
 settings-window-material = Fenstermaterial
 settings-window-material-restart-desc = Das Fenstermaterial ändert sich beim nächsten Start.
 settings-themes-font = Schriftart des Designs
@@ -226,12 +225,6 @@ settings-keep-on-top-desc = Der Miniplayer bleibt vor anderen Fenstern.
 
 ## App icon
 
-settings-app-icon-note-linux = Ändert das Symbol im Anwendungsmenü, im Fenster und im Infobereich.
-settings-app-icon-note = Ändert das Symbol im Fenster, in der Taskleiste, im Infobereich und im Startmenü.
-settings-app-icon = App-Symbol
-settings-preview = Vorschau
-settings-preview-desc = So sieht das Symbol in der Taskleiste und im Infobereich aus.
-settings-app-icon-named = App-Symbol: { $name }
 
 ## Connections
 
@@ -264,8 +257,6 @@ settings-title-bar-desc = Legt fest, wer Titelleiste und Fensterschaltflächen z
 settings-title-bar-restart-desc = Die Titelleiste ändert sich beim nächsten Start.
 settings-collapse-sidebar = Seitenleiste einklappen
 settings-collapse-sidebar-desc = Zeigt in der Seitenleiste nur Symbole an, etwa für schmale Fenster. Das Menü oben in der Leiste tut dasselbe.
-settings-draw-with = Mit { $api } rendern
-settings-renderer-restart-desc = Die App rendert beim nächsten Start mit dem neu gewählten Renderer.
 
 ## Downloads
 

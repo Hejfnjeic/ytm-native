@@ -1,6 +1,5 @@
 ### Options and descriptions used in Settings.
 
-extra-renderer-desc = Pakai { $api } (wgpu), bukan OpenGL. Memakan memori sekitar tiga kali lipat dan berguna kalau tampilan OpenGL rusak. Otomatis balik ke OpenGL kalau { $api } nggak bisa jalan.
 extra-channel-release-desc = Rilis Stable siap dipakai sehari-hari. Build Nightly masih eksperimental dan bisa error.
 extra-system-shortcuts = Pintasan seluruh sistem
 extra-system-shortcuts-desc = Pintasan ini tetap jalan saat aplikasi lain lagi di depan, atau saat jendela diminimalkan atau ada di tray.

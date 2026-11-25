@@ -184,7 +184,6 @@ settings-font-desc = Czcionka całej aplikacji i tekstów utworów. Możesz wybr
 settings-zoom = Skala
 settings-zoom-desc = Zmienia rozmiar interfejsu. Ctrl + plus i Ctrl + minus robią to samo. Ctrl + 0 przywraca 100%.
 settings-window-material-desc = Używa materiału Windows 11 za stronami zamiast tła motywu.
-settings-window-material-desc-needs-opengl = Używa materiału Windows 11 za stronami. Wymaga OpenGL.
 settings-window-material = Materiał okna
 settings-window-material-restart-desc = Materiał okna zmieni się przy następnym uruchomieniu.
 settings-themes-font = Czcionka motywu
@@ -199,12 +198,6 @@ settings-keep-on-top-desc = Miniplayer pozostaje nad innymi oknami.
 
 ## App icon
 
-settings-app-icon-note-linux = Zmienia ikonę w menu aplikacji, w oknie i w zasobniku systemowym.
-settings-app-icon-note = Zmienia ikonę w oknie, na pasku zadań, w zasobniku i w menu Start.
-settings-app-icon = Ikona aplikacji
-settings-preview = Podgląd
-settings-preview-desc = Tak wygląda ikona na pasku zadań i w zasobniku.
-settings-app-icon-named = Ikona aplikacji: { $name }
 
 ## Connections
 
@@ -237,8 +230,6 @@ settings-title-bar-desc = Wybiera, kto rysuje pasek tytułu i przyciski. Tryb au
 settings-title-bar-restart-desc = Pasek tytułu zmieni się przy następnym uruchomieniu.
 settings-collapse-sidebar = Zwiń panel boczny
 settings-collapse-sidebar-desc = Pokazuje tylko ikony na panelu bocznym, co przydaje się w wąskich oknach. Przycisk menu u góry robi to samo.
-settings-draw-with = Renderuj przez { $api }
-settings-renderer-restart-desc = Aplikacja użyje nowego mechanizmu renderowania przy następnym uruchomieniu.
 
 ## Downloads
 

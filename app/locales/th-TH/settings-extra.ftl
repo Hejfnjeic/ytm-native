@@ -1,6 +1,5 @@
 ### Options and descriptions used in Settings.
 
-extra-renderer-desc = ใช้ { $api } (wgpu) แทน OpenGL ใช้เวลาประมาณสามเท่าของหน่วยความจำและมีประโยชน์หาก OpenGL ดึงข้อมูลไม่ถูกต้อง ย้อนกลับไปที่ OpenGL หาก { $api } ไม่สามารถสตาร์ทได้
 extra-channel-release-desc = เวอร์ชันเสถียรพร้อมสำหรับการฟังทุกวัน งานสร้างทุกคืนเป็นการทดลองและอาจพังได้
 extra-system-shortcuts = ทางลัดทั้งระบบ
 extra-system-shortcuts-desc = การทำงานเหล่านี้จะทำงานในขณะที่มีแอปอื่นอยู่ข้างหน้า หรือหน้าต่างย่อเล็กสุดหรืออยู่ในถาด

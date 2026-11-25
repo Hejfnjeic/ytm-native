@@ -1,227 +1,183 @@
 # Working on ytm-native
 
-> **Outdated in parts (2026-11-24):** since v0.4.0 the app is egui, and a lot of it is copied
-> from [ytm-rs](https://github.com/grapedjuice/ytm-rs) (see `app/src`: `ui/` is the interface,
-> `backend.rs` the requests, `audio.rs` playback, `lyrics.rs` + `ui/karaoke.rs` the lyrics,
-> `video.rs` music videos, `vault.rs` the login). The Slint sections below describe the old app
-> and are to be rewritten. Build and test commands still apply.
-
 > **Vibecoded:** this whole codebase is written and maintained by Claude (Anthropic's AI) through
 > Claude Code; the owner directs it but doesn't write code. This guide is for whoever (human or AI)
 > works on it next.
 
-Everything you need to change the code: how it's built, how it fits together, where to make
-common changes, and how to test and release. User-facing docs are in [README.md](README.md).
+> **Much of `app/` is copied from [ytm-rs](https://github.com/grapedjuice/ytm-rs) by
+> grapedjuice** (GPL-3.0, at commit 446c5b0): the egui interface, the lyrics and their karaoke
+> renderer, and much of the YouTube and audio code. Its features this app leaves out are
+> removed, not hidden (list in [README.md](README.md)); don't bring them back.
+
+Everything you need to change the code: how it's built, how it fits together, and how to test
+and release it. User-facing docs are in [README.md](README.md).
 
 ## Quick start
 
 ```bash
 cargo run --release                      # build and start the app (uses your stored login)
-cargo test --release                     # unit tests (fast, offline)
+cargo test                               # unit tests (fast, offline)
 scripts/install-linux.sh                 # build and install for your user (~/.local)
 ```
 
-Rust stable (edition 2024). System packages on Arch: `opus` (linked), `alsa-lib`, `fontconfig`,
-`freetype2`, `libxkbcommon`, `wayland`. No cmake needed on Linux (libopus comes from the system).
+Rust stable (edition 2024). On Arch: `alsa-lib`, `dbus`, `fontconfig`, `freetype2`, `gtk3`,
+`libxkbcommon`, `openssl`, `wayland`, `webkit2gtk-4.1` (the same list as the `PKGBUILD`).
 
-`cargo run`/`build`/`test` without `-p` mean the app (`default-members` in `Cargo.toml`). The
-binary is `target/release/ytm-native`. Debug builds work but are slow; use `--release`.
+`cargo run`/`build`/`test` without `-p` mean the app (`default-members` in `Cargo.toml`). Debug
+builds are usable: dependencies are optimized even there (`[profile.dev.package."*"]`).
 
 ## Repository layout
 
 | Path | What |
 |---|---|
-| `app/` | The player (crate `ytm-native`): `src/` Rust, `ui/app.slint` the whole UI, `assets/` icons |
-| `xtask/` | Release helpers, run as `cargo xtask …` (update patches + manifest) |
+| `app/` | The player (crate `ytm-native`): `src/` Rust, `locales/` its text in 20 languages, `assets/` icon, fonts, the one theme, yt-dlp's EJS solver (Unlicense/MIT/ISC) |
+| `app/vendor/` | Patched copies of epaint (right-to-left text), souvlaki (MPRIS updates) and winit (X11 scale, Windows move/resize repaints), from ytm-rs; see `[patch.crates-io]` in `Cargo.toml` |
 | `probe/` | Early research tools for YouTube's API (identities, formats); not part of the app |
-| `vendor/ejs/` | yt-dlp's JS challenge solver (Unlicense/MIT/ISC), run inside the app |
 | `scripts/` | install, Windows/Arch builds, release, headless test display |
 | `packaging/` | `.desktop` file, Arch `PKGBUILD` |
-| `TODO.md` | Open and done items |
+| `TODO.md` | Ideas not done |
 
 ## Ground rules
 
-- **No C++ compiled into the binary**, also not via dependencies (Slint's Qt backend was tried and
-  removed). C is acceptable (libopus, QuickJS, aws-lc) but mention new native dependencies in the
-  commit. After adding one: `find target -name '*cpp*.o'` must print nothing.
-- **No hardcoded song titles or artists** in code or tests: fixes are general rules. Unit tests
-  use made-up names; the live lyrics test reads its cases from `$YTM_LYRICS_CASES`.
-- **Performance is a feature.** The UI uses the software renderer at the monitor's refresh rate
-  (180 Hz on the main machine). Per-frame work scales with the number of elements; see
-  [Rendering](#rendering-and-performance). Re-measure CPU after UI/animation changes.
-- **YouTube cookies only go to YouTube.** Lyrics and updates use their own HTTP clients.
-- Never print or log cookies.
+- **No C++ compiled into the binary**, also not through dependencies (Slint's Qt backend was
+  tried and removed). C is acceptable (QuickJS, aws-lc, libopus on Windows); mention new native
+  dependencies in the commit. After adding one: `find target -name '*cpp*.o'` must print nothing.
+- **No hardcoded song titles or artists** in code or tests: fixes are general rules, and tests
+  use made-up names.
+- **No disk cache** (covers, pages, lyrics, translations): only the login, settings, queue,
+  history, the lyrics check's browser profile and downloaded updates are kept (`cache.rs`).
+- **One theme** (`assets/themes/presets/ytm-rs.json`). ytm-rs's theme engine (`preset.rs`)
+  stays, but the other themes and the picker are gone.
+- **Performance is a feature.** egui re-lays-out the whole window every frame, so frames are
+  the main cost: pages ask for none while idle and only what their animations need
+  (`ui/pace.rs`, the end of `App::logic`). Re-measure CPU after UI or animation changes.
+- **YouTube cookies only go to YouTube.** Never print or log them.
+- **Every user-visible text is in `locales/`**, in all 20 languages; a test fails on an English
+  id that's unused or missing.
 
 ## Architecture
 
 ```
- UI thread (Slint)                    tokio runtime
- ┌──────────────┐  callbacks → Ev    ┌───────────────────────────────┐
- │ app.slint    │ ─────────────────▶ │ App::handle(Ev)  (main.rs)     │
- │ MainWindow   │ ◀───────────────── │  one task, events in order     │
- └──────────────┘  self.ui(|ui| …)   │  spawns work → sends Ev back   │
-                                      └──────┬─────────────┬──────────┘
-            audio-decode thread ◀── Audio ───┘             │
-            audio-out thread (cpal)                 yt.rs / lyrics.rs / update.rs
-            solver thread (QuickJS)                 (async HTTP)
-            mpris thread (Linux)
+ UI thread (eframe, egui + OpenGL)           backend thread (tokio)
+ ┌───────────────────────────────┐  Req     ┌──────────────────────────────┐
+ │ ui::App: logic() + ui()       │ ───────▶ │ backend.rs: YouTube requests, │
+ │ every frame: drain Resp,      │ ◀─────── │ stream resolving, lyrics,     │
+ │ apply, lay out, draw          │  Resp    │ images, uploads …            │
+ └──────────────┬────────────────┘          └──────────────────────────────┘
+                │ commands / status
+      audio thread (audio.rs: rodio/cpal, crossfade, EQ, speed)
+      stream download (stream.rs), video decoder (video.rs), solver (jsc.rs)
+      lyrics window: a second window drawn in its own passes (ui/mini.rs, ui::Host)
 ```
 
-- **One controller.** `main.rs` has `enum Ev` and `struct App`. Every UI callback and every
-  finished background job becomes an `Ev`, handled one at a time by `App::handle`. Background
-  work is `tokio::spawn`ed and reports back with another `Ev`, often tagged with a generation
-  number (`play_gen`, `browse_gen`, …) so stale results are ignored.
-- **Rust → UI**: `self.ui(move |ui| ui.set_…(…))` runs a closure on the UI thread. Slint models
-  aren't `Send`, so build plain data first and the model inside the closure (see `push_lyrics`).
-  `sync_model` updates list models in place (keeps scroll positions).
-- **UI → Rust**: callbacks declared in `MainWindow` are wired near the end of `main()`
-  (`ui.on_…(move |…| t.send(Ev::…))`).
+- **One UI state.** `ui::App` (`ui/mod.rs`) holds everything the window shows. `logic()` runs
+  every frame (also while minimized): it drains the backend's `Resp`s (`ui/responses.rs`),
+  audio events and media keys, and handles `Action`s queued by clicks (`ui/actions.rs`).
+  `ui()` lays out and draws: `ui/shell.rs` (sidebar, top bar, player bar), `ui/pages.rs`,
+  `ui/nowplaying.rs`.
+- **Backend** (`backend.rs`): the UI sends a `Req`, the tokio side answers with a `Resp` and
+  wakes the UI. Playback resolution lives there too: resolve the stream, start the download,
+  build the decoder, hand it to the audio engine.
+- **eframe runs `ui::Host`**, which shares the `App` (an `Rc<RefCell<App>>`) with the lyrics
+  window: that window is a deferred viewport with passes of its own, so it keeps going while
+  the main window is minimized.
 
-### Files
+### How YouTube is used
 
-| File | Responsibility |
-|---|---|
-| `main.rs` | Controller: queue, radio/list sources, views and back stack, art cache, prefetch, sign-in, lyrics choice, settings, updates, state saving, smoke mode, dev flags |
-| `yt.rs` | InnerTube client: cookie session (SAPISIDHASH), search, radio (`next`), Home/album/playlist/artist parsing, TV-identity player + stream URL, chunked download, likes, play-report endpoints. 401 ⇒ `SIGNED_OUT` |
-| `solver.rs` | Solves stream `sig`/`n` challenges with yt-dlp's EJS in QuickJS (own thread, per-player cache) |
-| `audio.rs` | WebM demux (symphonia) → Opus (libopus) → optional WSOLA time-stretch → resample → cpal. `Stream`: a track's bytes while they download; the decoder waits for missing bytes |
-| `queue.rs` | Queue editing rules (Play next / Add to queue / Remove), unit-tested |
-| `lyrics.rs` | Lyrics from BetterLyrics, lrc.red (TTML, word timing, translations) LRCLIB (LRC) and YouTube Music (by video id, Android identity for timing, no cookies); ranking, translation detection, search by hand |
-| `report.rs` | Reports plays to YouTube like the website (watch history) |
-| `update.rs` | Self-updates from GitHub releases (bsdiff patches, SHA-256 checked) |
-| `settings.rs` / `state.rs` | `settings.json` (Settings page) / `state.json` (queue, volume, position) |
-| `store.rs` | Encrypted login (XChaCha20-Poly1305); key in Secret Service/KWallet, or a DPAPI file on Windows |
-| `paths.rs` | Data/cache dirs; portable mode (a `data/` folder next to the exe) |
-| `kde.rs` | Colors, font and icons from `~/.config/kdeglobals` (re-read when it changes) |
-| `mpris.rs` / `smtc.rs` / `mpris_stub.rs` | Media keys and desktop media controls: MPRIS (Linux) / SMTC (Windows, same interface) / no-op elsewhere |
-| `ui/app.slint` | All UI: Breeze-style controls (buttons, check box, slider, menus), lists, lyrics, Settings |
+- **Pages, library, likes, search, radio**: `ytmapi.rs`/`ytm.rs`, as music.youtube.com (the
+  `WEB_REMIX` client) with the imported cookies.
+- **Streams**: the visionOS client (`innertube.rs`) gives plain URLs without challenges or a PO
+  token; where a network cuts its file URLs at 1 MiB, its HLS (`hls.rs`). Premium-only, age-
+  restricted songs and Premium's quality go through the signed-in web music client
+  (`webmusic.rs`), whose challenges yt-dlp's EJS solver answers in QuickJS (`jsc.rs`; it falls
+  back to the last player version that worked). Both mirror yt-dlp's client definitions:
+  update them together when YouTube changes.
+- **Music videos**: the video's H.264 (≤720p) decoded on the CPU by rusty_h264 (`video.rs`);
+  a song's paired video comes from YouTube's counterpart (Premium) and is offset to the song.
+- **Lyrics** (`lyrics.rs`, `ui/karaoke.rs`): every Better Lyrics source. The Better Lyrics API
+  needs a Cloudflare Turnstile token: a hidden WebKitGTK (WebView2 on Windows) window solves it
+  in a child process (`ytm-native --turnstile`, `turnstile.rs`); the token lasts 24 h and is
+  kept in the vault.
+- **Login** (`vault.rs`, `ui/account.rs`): a cookies.txt from the browser, checked with YouTube,
+  stored with XChaCha20-Poly1305; the key in the Secret Service (Linux) or a DPAPI file
+  (Windows; never Credential Manager). YouTube's cookie updates are saved.
 
-### How YouTube is used (why it's built this way)
+### Window and rendering
 
-- **Search, radio, library, likes, history**: the `WEB_REMIX` identity with your cookies.
-  Mobile identities reject cookie logins.
-- **Playback**: the TV identity (`TVHTML5`) with cookies gives Premium's Opus 256k (itag 774)
-  without a PO token, but stream URLs need YouTube's `sig`/`n` challenges solved: that's the JS
-  solver. The first song after YouTube ships a new player takes ~10 s; later ones are cached.
-- **Fallback identities** (`yt::IDENTITIES`): if the TV identity gives no stream, or its URL
-  won't download, `mweb` and then `web_creator` (logged in, Opus 128k) are tried. Identities
-  without the login get URLs that stop at 1 MiB (they'd need a PO token), so none are listed.
-  `ytm-native --streams <video id>` checks every identity (`YTM_PROBE=<offset>,<len>` picks
-  the second range it reads); `YTM_IDENTITY=<n>` makes the app start at identity n.
-- **Endless radio**: the API keeps going where the website stops (~50); the queue refills when
-  fewer than 15 songs are left, and songs heard in the last 500 plays are skipped.
-- **HTTP/2** with a Chrome User-Agent: YouTube resets HTTP/2 requests that claim to be Firefox
-  (fingerprint mismatch). Any HTTP/2 protocol error switches the client to HTTP/1.1.
-
-## Common changes
-
-**A new UI property or callback.** Declare it in `MainWindow` (`app.slint`): `in property <T> foo;`
-or `callback bar(int);`. Slint generates `ui.set_foo(..)` / `ui.on_bar(..)`. Set it from the
-controller via `self.ui(..)`; for a callback, add an `Ev` variant, wire `ui.on_bar` in `main()`,
-and handle it in `App::handle`.
-
-**A new background job.** In `App`, clone what it needs (`self.yt.clone()`, `self.tx.clone()`),
-`tokio::spawn` it, and send the result as an `Ev`. Tag it with a generation if a newer request
-can supersede it.
-
-**A YouTube response format.** Save a real response with the dev tool and read it:
-`ytm-native --dump <browseId> out.json` (`cont:<token>` for continuations; uses the stored
-login, never prints cookies). Parsers live in `yt.rs`; `parse_dumps` (ignored test) runs them
-over saved responses in `$YTM_FIXTURES`.
-
-**A lyrics source.** Add a method on `lyrics::Finder` returning `Lyrics` (parse with
-`parse_ttml`/`parse_lrc`), call it in `find_all` with the same 6 s deadline, and let the ranking
-in `find_all` order it. Use the finder's own HTTP client.
-
-**A setting.** Add a field to `settings::Settings` (with a default), a check box on the Settings
-page bound to an `in-out property`, include it in the `on_settings_changed` wiring, and act on it
-in `Ev::SettingsChanged`.
+- OpenGL (glow) only. `renderer::only_used_gl_driver` makes libglvnd load just NVIDIA's EGL
+  driver when every card is NVIDIA's (Mesa's LLVM was ~100 MB of the app's memory otherwise).
+- Linux, own title bar: the window is transparent and `corners.rs` cuts rounded corners each
+  frame. The animated background and glass are GL shaders (`shader.rs`).
+- KDE Wayland can't be asked for keep-above by the app: `keep_above.rs` loads a KWin script
+  over D-Bus for the lyrics window.
 
 ## Dev switches
 
 | Switch | Effect |
 |---|---|
-| `ytm-native <cookies.txt>` / `YTM_COOKIES=<file>` | use a plain cookies file instead of the stored login |
-| `ytm-native --dump <browseId> <out.json>` | save a raw browse response |
-| `ytm-native --version` | version, platform, update mode |
-| `ytm-native --streams <video id>` | which player identities give a working stream |
-| `YTM_IDENTITY=<n>` | start at that player identity (test the fallbacks) |
-| `YTM_HTTP1=1` | HTTP/1.1 only |
-| `YTM_UPDATE_API=<url>` | GitHub API base for update checks (tests serve a fake release) |
-| `SLINT_BACKEND=…` | another Slint backend/renderer (default: winit + software) |
-| `XDG_CONFIG_HOME` / `XDG_DATA_HOME` | test with other KDE settings / data dirs |
+| `YTM_DATA_DIR=<dir>` | another data folder (a scratch profile; its settings are `<dir>/app.ron`) |
+| `YTM_MUTE=1` | no sound |
+| `YTM_SMOKE=<query>` / `id:<videoId>` | search and play the first result / play that video (`YTM_VIDEO=1`: as a music video) |
+| `YTM_PAGE=settings` / `artist:<id>` | open on that page |
+| `YTM_NOWPLAYING=1`, `YTM_NP_TAB=lyrics\|art` | open Now playing on that tab |
+| `YTM_MINI=<secs>[,<secs>…]` | switch to the lyrics window and back at those times |
+| `YTM_SCRIPT="<secs>:<step>;…"` + `YTM_SCRIPT_DIR` | scripted input: `c:x,y` click, `m:x,y` move, `t:text`, `k:esc`, `w:n` scroll, `s:name` screenshot, `q` quit at once, `x` close the window as a user would (the app's closing runs) |
+| `YTM_UPDATE_FEED=<url>` | read the update release from there (a fake release; with `YTM_UPDATE_FORCE=1` any build counts as installed, `YTM_UPDATE_DRYRUN=1` logs instead of installing) |
+| `RUST_LOG=ytm_native=debug` | logging |
 
-### Smoke tests (the real app, scripted)
+The full list is in `ui/dev.rs` and `grep -r 'YTM_' app/src`.
 
-Smoke mode runs the GUI muted, without play reporting and without reading or saving state,
-takes screenshots with Slint's own renderer and quits ~30 s after its search.
+### Testing on a headless display
 
-| Variable | Effect |
-|---|---|
-| `YTM_SMOKE=<query>` | search, start a radio from the first result, seek near the end (auto-advance) |
-| `YTM_SMOKE=lyrics:<query>` / `lightbox:<query>` | same, then open Lyrics / the image viewer |
-| `YTM_SMOKE=home` / `liked` / `library` / `resume` | Home / play Liked Music / Library / restore the session and play |
-| `YTM_SMOKE_SHOT=<file.png>` | final screenshot path |
-| `YTM_SMOKE_BURST=<n>` | also save n frames 120 ms apart (animation checks) |
-| `YTM_SMOKE_SIZE=<w>x<h>` | window size (the minimum width is 960) |
-| `YTM_SMOKE_MINIMIZE=<secs>` | minimize after n seconds (idle CPU) |
-| `YTM_SMOKE_INPUT="<secs>:<action>:<arg>; …"` | scripted input via Slint's event dispatch: `click:x,y`, `rclick:x,y`, `wheel:x,y,dy`, `key:space\|left\|right\|up\|down\|esc\|<letter>` (`ctrl+` prefix), `shot:<name>`; disables the near-end seek |
-| `YTM_SMOKE_STATE=1` | let smoke mode use saved state (pair with `XDG_DATA_HOME=<tmp>`) |
-
-Run it on a virtual display so windows don't appear on your desktop:
+Test windows go on a virtual KWin so they never appear on (or take focus from) the desktop:
 
 ```bash
-scripts/headless.sh env YTM_SMOKE='lyrics:some song' YTM_SMOKE_SHOT=/tmp/shot.png target/release/ytm-native
+scripts/headless.sh env YTM_DATA_DIR=/tmp/prof YTM_MUTE=1 YTM_SMOKE=id:<videoId> \
+    YTM_SCRIPT="15:s:shot;16:q" YTM_SCRIPT_DIR=/tmp target/debug/ytm-native
 scripts/headless.sh --stop      # end the virtual KWin
 ```
 
-CPU: sample `/proc/<pid>/stat` (utime+stime) over ~12 s. Reference at 180 Hz: normal view ~7 %,
-lyrics ~7–9 %, lyrics plus a long scrolling title 16–22 %, minimized ~1 %. RAM ~150 MB playing.
-
-## Rendering and performance
-
-The Slint **software renderer** on winit (the GPU renderer pulled ~300 MB of driver libraries
-into the process). Lessons learned:
-
-- Per-frame cost scales with element count. Lyrics are a `ListView` (only visible lines exist);
-  only pieces near "now" read the per-frame clock (`animation-tick()`), line state uses a 50 ms
-  clock, the rest the 250 ms app clock. The marquee moves 1 px per 28 ms timer tick. Everything
-  frame-driven stops while minimized (`Runtime.awake`).
-- The software renderer doesn't draw `transform-scale` on text: the lyric "grow" changes the font
-  size inside a fixed-width slot. All lyric lines use the same piece layout so wrapping never
-  changes when a line becomes current.
-- **Never `animate content-y` on a ListView whose rows differ in height**: the ListView rewrites
-  `content-y` as its row estimates change, restarting the animation forever. Lyrics scroll with
-  a small follower (the active line re-measures itself every 8 ms).
-- Slint: gradient stop positions must be constant; no transforms on a component's root; a
-  `PopupWindow` has no "closed" callback; elements inside a popup can't be read from outside.
+- The headless KWin shares the real session bus, so the lyrics window's keep-above request
+  reaches the real KWin (harmless: it matches only that window's title).
+- When measuring or stopping a test copy, pick it by its `YTM_DATA_DIR` in
+  `/proc/<pid>/environ`, never by name: the user's own copy has the same name.
+- CPU: sample `/proc/<pid>/stat` (utime+stime) over ~12 s. Reference (release, 60 Hz): idle
+  ~0.1 %, Now playing with karaoke ~8 %, lyrics window ~6 %. Memory (NVIDIA): ~260 MB RSS, of
+  which the app's own ~95 MB; the rest is shared driver code.
 
 ## Data on disk
 
 | | Linux | Windows (portable) |
 |---|---|---|
-| login (encrypted) | `~/.local/share/ytm-native/session.enc`, key in KWallet | `data\session.enc` + `data\session.key` (DPAPI) |
-| queue, settings, recent plays | `~/.local/share/ytm-native/{state,settings,history}.json` | `data\…` |
-| player cache | `~/.cache/ytm-native/` | `cache\` |
+| login, Better Lyrics token (encrypted) | `~/.local/share/ytm-native/{session,lyrics-jwt}.enc`, key in the Secret Service | `data\…`, key in a DPAPI file |
+| settings | `~/.local/share/ytm-native/app.ron` | `data\app.ron` |
+| queue, recent plays | `state.json`, `history.json` there | `data\…` |
+| solver, lyrics check profile, updates | `ejs/`, `webview-lyrics/`, `updates/` there | `data\…` |
 
 ## Builds and releases
 
 ```bash
-scripts/install-linux.sh [--uninstall]     # build + install for your user
-scripts/build-windows.sh                   # dist/ytm-native-<ver>-windows-x86_64.7z (cross-compiled)
+scripts/install-linux.sh [--uninstall]     # build + install for your user (never updates itself)
+scripts/build-windows.sh                   # dist/ytm-native-portable-<ver>.zip (cross-compiled)
 scripts/build-arch.sh                      # dist/ytm-native-<ver>-1-x86_64.pkg.tar.zst
-DRY_RUN=1 scripts/release.sh 0.3.0         # build every release file into dist/v0.3.0, don't publish
-scripts/release.sh 0.3.0                   # the whole release (see the script's header)
+DRY_RUN=1 scripts/release.sh 1.0.1         # build every release file into dist/v1.0.1, don't publish
+NOTES_FILE=notes.md scripts/release.sh 1.0.1   # the whole release (see the script's header)
 ```
 
+- A release has three downloads, which are also what the app's updater (`update.rs`) fetches:
+  - `ytm-native-<ver>-linux-x86_64.tar.gz`: `install.sh` puts the program in
+    `~/.local/lib/ytm-native/` with `install.txt` beside it (so it replaces itself as it
+    closes) and links `~/.local/bin/ytm-native` to it.
+  - `ytm-native-portable-<ver>.zip` (Windows): `ytm-native.exe`, `WebView2Loader.dll` (MinGW
+    links WebView2's loader as a DLL), `portable.txt` (data beside the exe, updates swap the
+    exe) at the top level, where the updater looks.
+  - `ytm-native-<ver>-1-x86_64.pkg.tar.zst` (Arch): the program in `/usr/lib/ytm-native/` with
+    `pacman.txt`, so it only tells when a new version is out.
+- Release notes are shown in the app ("What's new"), so write them for listeners, in plain
+  words. The app stops reading at the `## Install` section `release.sh` adds.
 - Windows cross-compiling needs `rustup target add x86_64-pc-windows-gnu`, `mingw-w64-gcc`,
-  `cmake` (libopus from source there) and `7zip`. The .exe imports only Windows system DLLs.
-- **Updates**: a release carries `update-manifest.json` and bsdiff patches from the last five
-  releases (`cargo xtask release-files`). Release builds (`YTM_RELEASE_BUILD=1`, set by
-  `release.sh`) download the patch for their version, check the SHA-256 of the result and
-  replace themselves; anything else only announces the new version. A day of changes made a
-  ~3 MB patch versus a 48 MB executable. See `app/src/update.rs`.
-- **Arch**: the `PKGBUILD` builds from the release tarball with `YTM_PACKAGED=pacman` (pacman
-  owns the files, so the app only announces updates).
-- **yt-dlp's solver** (`vendor/ejs/`): update from yt-dlp-ejs releases when stream URLs stop
-  working; `solver.rs` loads `core.min.js` and `lib.min.js`.
+  `cmake` and `7zip`. Windows builds are never run here: friends report problems.
+- Before publishing, `release.sh` checks the binaries contain no paths from your home folder.
+  After publishing it deletes `dist/v<ver>/` and the Arch build folders.
+- **yt-dlp's solver** (`app/assets/ejs/`): update from yt-dlp-ejs releases when signed-in
+  streams stop working.

@@ -1,3 +1,0 @@
-# `cargo xtask <command>`: release helpers (see xtask/src/main.rs).
-[alias]
-xtask = "run --release -q -p xtask --"

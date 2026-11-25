@@ -29,9 +29,6 @@ build() {
     cd "$pkgname-$pkgver"
     export RUSTUP_TOOLCHAIN=stable
     export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-target}"
-    # pacman owns the installed files: the app only tells about new versions, it doesn't
-    # replace itself.
-    export YTM_PACKAGED=pacman
     # Keep the builder's home directory out of the binary (source paths of panic messages).
     export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$HOME=/build"
     export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$HOME=/build"
@@ -42,13 +39,17 @@ check() {
     cd "$pkgname-$pkgver"
     export RUSTUP_TOOLCHAIN=stable
     export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-target}"
-    export YTM_PACKAGED=pacman
     cargo test --frozen --release -p ytm-native
 }
 
 package() {
     cd "$pkgname-$pkgver"
-    install -Dm755 "${CARGO_TARGET_DIR:-target}/release/ytm-native" "$pkgdir/usr/bin/ytm-native"
+    # The program with pacman.txt beside it: the app then knows pacman owns it, and only
+    # tells when a new version is out (update.rs).
+    install -Dm755 "${CARGO_TARGET_DIR:-target}/release/ytm-native" "$pkgdir/usr/lib/ytm-native/ytm-native"
+    echo "Installed by pacman: updates come as a new package." > "$pkgdir/usr/lib/ytm-native/pacman.txt"
+    install -dm755 "$pkgdir/usr/bin"
+    ln -s /usr/lib/ytm-native/ytm-native "$pkgdir/usr/bin/ytm-native"
     install -Dm644 packaging/ytm-native.desktop "$pkgdir/usr/share/applications/ytm-native.desktop"
     install -Dm644 app/assets/icon/icon.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/ytm-native.svg"
     for n in 16 22 24; do

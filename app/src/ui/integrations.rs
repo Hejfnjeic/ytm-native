@@ -301,8 +301,8 @@ mod tests {
 
     #[test]
     fn window_title_is_the_song() {
-        assert_eq!(window_title(Some(("Get Lucky", "Daft Punk".to_owned()))), "Get Lucky – Daft Punk");
-        assert_eq!(window_title(Some(("Get Lucky", String::new()))), "Get Lucky");
+        assert_eq!(window_title(Some(("Lucky Stars", "Neon Harbor".to_owned()))), "Lucky Stars – Neon Harbor");
+        assert_eq!(window_title(Some(("Lucky Stars", String::new()))), "Lucky Stars");
         assert_eq!(window_title(Some(("", String::new()))), "YT Music native");
         assert_eq!(window_title(None), "YT Music native");
     }

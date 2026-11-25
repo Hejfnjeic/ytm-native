@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Cross-compile the Windows version and pack it as a portable .7z:
-#   scripts/build-windows.sh   -> dist/ytm-native-<ver>-windows-x86_64.7z
-#                                 (+ dist/ytm-native-<ver>-windows-x86_64.exe, used by updates)
-# The .7z holds "YT Music native/" with ytm-native.exe, data/ (login, queue, history), README.
+# Cross-compile the Windows version and pack it as a portable .zip:
+#   scripts/build-windows.sh   -> dist/ytm-native-portable-<ver>.zip
+# The name is the one the app's updater looks for (update.rs, asset_name), and it unpacks
+# the zip expecting ytm-native.exe at the top, so the files aren't in a folder of their own:
+# ytm-native.exe, WebView2Loader.dll, portable.txt, data/ (login, queue, history), README.
 # Needs: rustup target x86_64-pc-windows-gnu, mingw-w64-gcc, cmake, 7zip.
 # YTM_RELEASE_BUILD=1 in the environment makes a build that updates itself (scripts/release.sh).
 set -euo pipefail
@@ -21,21 +22,19 @@ loader=$(ls -d ~/.cargo/registry/src/*/webview2-com-sys-*/x64/WebView2Loader.dll
 cp "$loader" "$out/WebView2Loader.dll"
 # Portable: settings and login in data\ beside the exe, and updates replace it in place.
 echo "Portable build: everything is kept in the data folder beside ytm-native.exe." > "$out/portable.txt"
-cp "$exe" "dist/ytm-native-$version-windows-x86_64.exe"
 cat > "$out/README.txt" <<'TXT'
 YT Music native (unofficial)
 
 Portable: everything the app saves stays in this folder.
   data\   your login (encrypted, can only be opened by your Windows user on this PC),
           queue, settings and the list of recently played songs
-  cache\  re-creatable files (created when needed)
 Delete the whole folder to remove everything.
 
 Sign in: start ytm-native.exe and follow the steps on screen.
-Updates install themselves (Settings > Updates); unpacking a newer .7z over this folder works too.
+Updates install themselves (Settings > Updates); unpacking a newer .zip over this folder works too.
 TXT
-archive="dist/ytm-native-$version-windows-x86_64.7z"
+archive="$PWD/dist/ytm-native-portable-$version.zip"
 rm -f "$archive"
-(cd dist && 7z a -t7z -mx=9 "$(basename "$archive")" "YT Music native" >/dev/null)
+(cd "$out" && 7z a -tzip -mx=9 "$archive" . >/dev/null)
 rm -r "$out"
-ls -l "$archive" "dist/ytm-native-$version-windows-x86_64.exe"
+ls -l "$archive"

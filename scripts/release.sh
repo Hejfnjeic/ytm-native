@@ -3,15 +3,14 @@
 #
 #  1. sets the version in app/Cargo.toml and commits it ("Release v<version>")
 #  2. builds self-updating release binaries (YTM_RELEASE_BUILD=1): Linux + Windows (cross)
-#  3. packs them: Linux .tar.gz (binary + install.sh), Windows portable .7z, Arch .pkg.tar.zst
-#  4. downloads the last 5 releases' executables and makes update patches from each of them,
-#     plus update-manifest.json (cargo xtask release-files)
-#  5. tags, pushes, and creates the GitHub release with all files and notes from the git log
+#  3. packs them: Linux .tar.gz (program + install.sh), Windows portable .zip, Arch .pkg.tar.zst.
+#     These three are the release's downloads, and what the app's updater fetches.
+#  4. tags, pushes, and creates the GitHub release with them and notes from the git log
 #
 # Needs: gh (logged in), the Windows toolchain (see scripts/build-windows.sh), makepkg, 7z.
-# Everything goes to dist/v<version>/ first; nothing is published until step 5 (after which
+# Everything goes to dist/v<version>/ first; nothing is published until step 4 (after which
 # dist/v<version>/ is removed: it's all on GitHub). Set
-# DRY_RUN=1 to stop before step 5 (to look at the files), NOTES_FILE=<md> for hand-written notes.
+# DRY_RUN=1 to stop before step 4 (to look at the files), NOTES_FILE=<md> for hand-written notes.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -25,7 +24,7 @@ if [[ -z "${DRY_RUN:-}" ]]; then
 fi
 out="dist/$tag"
 [[ -e "$out" ]] && { echo "$out already exists; move it away first" >&2; exit 1; }
-mkdir -p "$out/previous"
+mkdir -p "$out"
 
 echo "== 1. version $version"
 current=$(grep -m1 '^version' app/Cargo.toml | cut -d'"' -f2)
@@ -53,15 +52,18 @@ no_home() {
 export YTM_RELEASE_BUILD=1
 cargo test -q --release -p ytm-native
 cargo build --release -p ytm-native
-linux="$out/ytm-native-$version-linux-x86_64"
+linux="$out/.linux-bin"
 cp target/release/ytm-native "$linux"
 scripts/build-windows.sh
-mv "dist/ytm-native-$version-windows-x86_64.exe" "dist/ytm-native-$version-windows-x86_64.7z" "$out/"
+mv "dist/ytm-native-portable-$version.zip" "$out/"
 unset YTM_RELEASE_BUILD
 scripts/build-arch.sh
 mv dist/ytm-native-"$version"-*-x86_64.pkg.tar.zst "$out/"
 no_home "$linux"
-no_home "$out/ytm-native-$version-windows-x86_64.exe"
+winexe="$out/.win-exe"
+unzip -p "$out/ytm-native-portable-$version.zip" ytm-native.exe > "$winexe"
+no_home "$winexe"
+rm "$winexe"
 pkgbin="$out/.pkg-bin"
 tar -xOf "$out"/ytm-native-"$version"-*-x86_64.pkg.tar.zst usr/bin/ytm-native > "$pkgbin"
 no_home "$pkgbin"
@@ -74,15 +76,7 @@ cp "$linux" "$stage/ytm-native"
 cp scripts/install-linux.sh "$stage/install.sh"
 cp packaging/ytm-native.desktop app/assets/icon/icon.svg app/assets/icon/icon-small.svg README.md LICENSE "$stage/"
 tar -C "$out" -czf "$out/ytm-native-$version-linux-x86_64.tar.gz" "ytm-native-$version"
-mv "$stage" "$out/.staging-linux"
-
-echo "== 4. update patches"
-if command -v gh >/dev/null && gh release list --limit 1 >/dev/null 2>&1; then
-    for t in $(gh release list --limit 5 --json tagName -q '.[].tagName'); do
-        gh release download "$t" -D "$out/previous" -p 'ytm-native-*-linux-x86_64' -p 'ytm-native-*-windows-x86_64.exe' 2>/dev/null || true
-    done
-fi
-cargo xtask release-files "$out" "$version"
+rm -r "$stage" "$linux"
 
 prev=$(git describe --tags --abbrev=0 "HEAD^" 2>/dev/null || true)
 {
@@ -96,23 +90,18 @@ prev=$(git describe --tags --abbrev=0 "HEAD^" 2>/dev/null || true)
     echo "## Install"
     echo "- **Arch Linux:** \`sudo pacman -U ytm-native-$version-*-x86_64.pkg.tar.zst\` (pacman handles updates; the app tells you when one is out)."
     echo "- **Other Linux:** unpack \`ytm-native-$version-linux-x86_64.tar.gz\` and run \`./install.sh\` (installs to ~/.local; updates itself)."
-    echo "- **Windows:** unpack \`ytm-native-$version-windows-x86_64.7z\` anywhere and run \`ytm-native.exe\` (portable; updates itself)."
-    echo
-    echo "The \`.bsdiff\` files and \`update-manifest.json\` are for the app's own updater."
+    echo "- **Windows:** unpack \`ytm-native-portable-$version.zip\` into a folder of its own and run \`ytm-native.exe\` (portable; updates itself). Keep \`WebView2Loader.dll\` beside it."
 } > "$out/notes.md"
 
-files=("$out"/ytm-native-"$version"-linux-x86_64 "$out"/ytm-native-"$version"-linux-x86_64.tar.gz \
-       "$out"/ytm-native-"$version"-windows-x86_64.exe "$out"/ytm-native-"$version"-windows-x86_64.7z \
-       "$out"/ytm-native-"$version"-*-x86_64.pkg.tar.zst "$out"/update-manifest.json)
-shopt -s nullglob
-files+=("$out"/*.bsdiff)
+files=("$out"/ytm-native-"$version"-linux-x86_64.tar.gz "$out"/ytm-native-portable-"$version".zip \
+       "$out"/ytm-native-"$version"-*-x86_64.pkg.tar.zst)
 ls -l "${files[@]}"
 if [[ -n "${DRY_RUN:-}" ]]; then
     echo "DRY_RUN: stopping before publishing. Notes: $out/notes.md"
     exit 0
 fi
 
-echo "== 5. publish $tag"
+echo "== 4. publish $tag"
 git tag -a "$tag" -m "ytm-native $version"
 git push origin HEAD --follow-tags
 gh release create "$tag" "${files[@]}" --title "ytm-native $version" --notes-file "$out/notes.md"

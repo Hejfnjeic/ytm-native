@@ -287,7 +287,7 @@ fn suggested_hit(r: &Value, podcasts: bool) -> Option<Card> {
         return Some(Card { title: t.title.clone(), subtitle: subtitle(), thumbs: t.thumbs.clone(), round: false, links: t.artists.clone(), target: Target::Song(t) });
     }
     let mut t = list_item(r)?;
-    // These rows lead with their kind ("Song • Daft Punk • 401M plays"), in the language
+    // These rows lead with their kind ("Song • Neon Harbor • 401M plays"), in the language
     // asked for: not an artist, whatever it's called.
     let mut lead = runs(detail);
     if let (Some(kind), Some(dot)) = (lead.next(), lead.next())
@@ -2636,7 +2636,7 @@ mod tests {
         let song = json!({"musicResponsiveListItemRenderer": {
             "flexColumns": [
                 col(json!([{"text": "Harder, Better, Faster, Stronger", "navigationEndpoint": watch}])),
-                col(json!([{"text": "Daft Punk", "navigationEndpoint": browse("UC_kRDKYrUlrbtrSiyu5Tflg", "MUSIC_PAGE_TYPE_ARTIST")}])),
+                col(json!([{"text": "Neon Harbor", "navigationEndpoint": browse("UC_kRDKYrUlrbtrSiyu5Tflg", "MUSIC_PAGE_TYPE_ARTIST")}])),
                 col(json!([{"text": "Discovery", "navigationEndpoint": browse("MPREb_GDfJeO4t1sl", "MUSIC_PAGE_TYPE_ALBUM")}])),
             ],
             "fixedColumns": [{"musicResponsiveListItemFixedColumnRenderer": {"text": {"runs": [{"text": "3:45"}]}}}],
@@ -2652,7 +2652,7 @@ mod tests {
         assert!(!c.owned && !c.is_album);
         assert_eq!(c.tracks.iter().map(|t| t.title.as_str()).collect::<Vec<_>>(), ["Harder, Better, Faster, Stronger"]);
         let t = &c.tracks[0];
-        assert_eq!((t.id.as_str(), t.artist_line().as_str(), t.duration), ("JhulBGMA7G4", "Daft Punk", Some(225)));
+        assert_eq!((t.id.as_str(), t.artist_line().as_str(), t.duration), ("JhulBGMA7G4", "Neon Harbor", Some(225)));
         assert_eq!(t.album.as_ref().map(|a| a.name.as_str()), Some("Discovery"));
         assert_eq!(c.set_ids.len(), c.tracks.len());
         assert_eq!(token.as_deref(), Some("next-page"));
@@ -2674,16 +2674,16 @@ mod tests {
         let thumb = json!({"musicThumbnailRenderer": {"thumbnail": {"thumbnails": [{"url": "https://lh3.googleusercontent.com/qLhu6P", "width": 60, "height": 60}]}}});
         let daft = browse("UCRr1xG_2WIDs18a6cIiCxeA", "MUSIC_PAGE_TYPE_ARTIST");
         let artist = json!({"musicResponsiveListItemRenderer": {"thumbnail": thumb, "navigationEndpoint": daft,
-            "flexColumns": [col(json!([{"text": "Daft Punk"}])), col(json!([{"text": "65.2M monthly audience"}]))]}});
+            "flexColumns": [col(json!([{"text": "Neon Harbor"}])), col(json!([{"text": "65.2M monthly audience"}]))]}});
         let song = |kind: &str, id: &str, title: &str, count: &str| {
             let watch = json!({"watchEndpoint": {"videoId": id, "watchEndpointMusicSupportedConfigs": {"watchEndpointMusicConfig": {"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"}}}});
             json!({"musicResponsiveListItemRenderer": {"thumbnail": thumb, "navigationEndpoint": watch, "playlistItemData": {"videoId": id},
                 "flexColumns": [col(json!([{"text": title, "navigationEndpoint": watch}])),
-                    col(json!([{"text": kind}, {"text": " • "}, {"text": "Daft Punk", "navigationEndpoint": daft}, {"text": " • "}, {"text": count}]))]}})
+                    col(json!([{"text": kind}, {"text": " • "}, {"text": "Neon Harbor", "navigationEndpoint": daft}, {"text": " • "}, {"text": count}]))]}})
         };
         let album = json!({"musicResponsiveListItemRenderer": {"thumbnail": thumb, "navigationEndpoint": browse("MPREb_ram", "MUSIC_PAGE_TYPE_ALBUM"),
-            "flexColumns": [col(json!([{"text": "Random Access Memories"}])),
-                col(json!([{"text": "Album"}, {"text": " • "}, {"text": "Daft Punk", "navigationEndpoint": daft}, {"text": " • "}, {"text": "2013"}]))]}});
+            "flexColumns": [col(json!([{"text": "Silver Lining Tapes"}])),
+                col(json!([{"text": "Album"}, {"text": " • "}, {"text": "Neon Harbor", "navigationEndpoint": daft}, {"text": " • "}, {"text": "2013"}]))]}});
         let answer = |rows: Vec<Value>| json!({"contents": [
             {"searchSuggestionsSectionRenderer": {"contents": [{"searchSuggestionRenderer": {"suggestion": {"runs": [{"text": "daft punk"}]}}}]}},
             {"searchSuggestionsSectionRenderer": {"contents": rows}}
@@ -2692,22 +2692,22 @@ mod tests {
         let shown: Vec<_> = hits.iter().map(|c| (c.title.as_str(), c.subtitle.as_str(), c.round)).collect();
         assert_eq!(
             shown,
-            [("Daft Punk", "65.2M monthly audience", true), ("Harder, Better, Faster, Stronger", "Song • Daft Punk • 401M plays", false), ("Random Access Memories", "Album • Daft Punk • 2013", false)]
+            [("Neon Harbor", "65.2M monthly audience", true), ("Harder, Better, Faster, Stronger", "Song • Neon Harbor • 401M plays", false), ("Silver Lining Tapes", "Album • Neon Harbor • 2013", false)]
         );
         assert!(matches!(&hits[0].target, Target::Artist(id) if id == "UCRr1xG_2WIDs18a6cIiCxeA"));
         assert!(matches!(&hits[2].target, Target::Album(id) if id == "MPREb_ram"));
         let Target::Song(t) = &hits[1].target else { panic!("a song plays") };
-        assert_eq!((t.id.as_str(), t.artist_line().as_str()), ("JhulBGMA7G4", "Daft Punk"));
+        assert_eq!((t.id.as_str(), t.artist_line().as_str()), ("JhulBGMA7G4", "Neon Harbor"));
         assert!(!hits[0].thumbs.is_empty() && !t.thumbs.is_empty());
         // In another language the kind is no artist either.
-        let hits = parse_suggested_hits(&answer(vec![song("Canción", "wU26xVT_vBU", "One More Time", "860 M de reproducciones")]));
+        let hits = parse_suggested_hits(&answer(vec![song("Canción", "wU26xVT_vBU", "Once Again Tonight", "860 M de reproducciones")]));
         let Target::Song(t) = &hits[0].target else { panic!("a song plays") };
-        assert_eq!(t.artists.iter().map(|a| a.name.as_str()).collect::<Vec<_>>(), ["Daft Punk"]);
+        assert_eq!(t.artists.iter().map(|a| a.name.as_str()).collect::<Vec<_>>(), ["Neon Harbor"]);
         // An episode plays by its show, and only with podcasts shown.
         let show = browse("MPSPPL1", "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE");
         let watch = json!({"watchEndpoint": {"videoId": "xjZ31IKfu4Q"}});
         let episode = json!({"musicResponsiveListItemRenderer": {"thumbnail": thumb, "navigationEndpoint": watch, "playlistItemData": {"videoId": "xjZ31IKfu4Q"},
-            "flexColumns": [col(json!([{"text": "The Buried Bodies Case", "navigationEndpoint": watch}])),
+            "flexColumns": [col(json!([{"text": "The Missing Ledger Case", "navigationEndpoint": watch}])),
                 col(json!([{"text": "Episode"}, {"text": " • "}, {"text": "Dec 28, 2025"}, {"text": " • "}, {"text": "Radiolab", "navigationEndpoint": show}]))]}});
         let rows = || answer(vec![episode.clone(), song("Song", "JhulBGMA7G4", "Harder, Better, Faster, Stronger", "401M plays")]);
         let off = parse_suggested_hits_with(&rows(), false);
@@ -2735,12 +2735,12 @@ mod tests {
     }
 
     // Trimmed from real music.youtube.com responses (October 2026).
-    const SEARCH_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://yt3.googleusercontent.com/JzRduI","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Blinding Lights","navigationEndpoint":{"watchEndpoint":{"videoId":"_l3v7ZyJZUI"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Emily Dawn","navigationEndpoint":{"browseEndpoint":{"browseId":"UCpTBon3nXs5Y4OuFVr2q6Ug","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":", "},{"text":"Vive","navigationEndpoint":{"browseEndpoint":{"browseId":"UCZOyQvwe70uoAMFSoUyWJWw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" & "},{"text":"Sandy Beach","navigationEndpoint":{"browseEndpoint":{"browseId":"UCgWx_rcbegYfQuvrkwqKdEw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" • "},{"text":"Blinding Lights","navigationEndpoint":{"browseEndpoint":{"browseId":"MPREb_91LK9pVGLhy","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}},{"text":" • "},{"text":"2:52"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"2.8K plays"}]}}}],"playlistItemData":{"videoId":"_l3v7ZyJZUI"}}}"#;
-    const PLAYLIST_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://yt3.googleusercontent.com/Xl4q7A","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Universe...","navigationEndpoint":{"watchEndpoint":{"videoId":"F9apex1lPEw","playlistId":"RDCLAK5uy_mPolD_J22gS1SKxufARWcTZd1UrAH_0ZI"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"R3HAB","navigationEndpoint":{"browseEndpoint":{"browseId":"UCjpBcfMn2g8afa3XIZmS3mw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" & "},{"text":"Jason Stephenson"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"259K plays"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Dream inside a dream…","navigationEndpoint":{"browseEndpoint":{"browseId":"MPREb_t6uDCi8Ljsr","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}}]}}}],"fixedColumns":[{"musicResponsiveListItemFixedColumnRenderer":{"text":{"runs":[{"text":"1:52"}]}}}],"playlistItemData":{"videoId":"F9apex1lPEw"}}}"#;
-    const ALBUM_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Alone Again","navigationEndpoint":{"watchEndpoint":{"videoId":"JH398xAYpZA","playlistId":"OLAK5uy_l4UqNJCpAF3kNaV37LHdRc_A07MmVdiSU"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"54M plays"}]}}}],"fixedColumns":[{"musicResponsiveListItemFixedColumnRenderer":{"text":{"runs":[{"text":"4:11"}]}}}],"playlistItemData":{"videoId":"JH398xAYpZA"},"index":{"runs":[{"text":"1"}]}}}"#;
-    const QUICK_PICK: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://yt3.googleusercontent.com/r6AM19","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"地味な色 - Sober Color","navigationEndpoint":{"watchEndpoint":{"videoId":"ccOWvt_7Xig","playlistId":"RDAMVMccOWvt_7Xig"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"mei ehara","navigationEndpoint":{"browseEndpoint":{"browseId":"UC6E1po8d95GkLmZD2azY9Ig","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" • "},{"text":"37K plays"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Sway","navigationEndpoint":{"browseEndpoint":{"browseId":"MPREb_ZVsoTQ0vbS4","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}}]}}}],"playlistItemData":{"videoId":"ccOWvt_7Xig"}}}"#;
+    const SEARCH_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://yt3.googleusercontent.com/JzRduI","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Bright Glare","navigationEndpoint":{"watchEndpoint":{"videoId":"_l3v7ZyJZUI"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Ivy Moss","navigationEndpoint":{"browseEndpoint":{"browseId":"UCpTBon3nXs5Y4OuFVr2q6Ug","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":", "},{"text":"Vive","navigationEndpoint":{"browseEndpoint":{"browseId":"UCZOyQvwe70uoAMFSoUyWJWw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" & "},{"text":"Sandy Beach","navigationEndpoint":{"browseEndpoint":{"browseId":"UCgWx_rcbegYfQuvrkwqKdEw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" • "},{"text":"Bright Glare","navigationEndpoint":{"browseEndpoint":{"browseId":"MPREb_91LK9pVGLhy","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}},{"text":" • "},{"text":"2:52"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"2.8K plays"}]}}}],"playlistItemData":{"videoId":"_l3v7ZyJZUI"}}}"#;
+    const PLAYLIST_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://yt3.googleusercontent.com/Xl4q7A","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Universe...","navigationEndpoint":{"watchEndpoint":{"videoId":"F9apex1lPEw","playlistId":"RDCLAK5uy_mPolD_J22gS1SKxufARWcTZd1UrAH_0ZI"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"R3HAB","navigationEndpoint":{"browseEndpoint":{"browseId":"UCjpBcfMn2g8afa3XIZmS3mw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" & "},{"text":"Owen Brooks"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"259K plays"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Dream inside a dream…","navigationEndpoint":{"browseEndpoint":{"browseId":"MPREb_t6uDCi8Ljsr","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}}]}}}],"fixedColumns":[{"musicResponsiveListItemFixedColumnRenderer":{"text":{"runs":[{"text":"1:52"}]}}}],"playlistItemData":{"videoId":"F9apex1lPEw"}}}"#;
+    const ALBUM_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Lone Again","navigationEndpoint":{"watchEndpoint":{"videoId":"JH398xAYpZA","playlistId":"OLAK5uy_l4UqNJCpAF3kNaV37LHdRc_A07MmVdiSU"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"54M plays"}]}}}],"fixedColumns":[{"musicResponsiveListItemFixedColumnRenderer":{"text":{"runs":[{"text":"4:11"}]}}}],"playlistItemData":{"videoId":"JH398xAYpZA"},"index":{"runs":[{"text":"1"}]}}}"#;
+    const QUICK_PICK: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://yt3.googleusercontent.com/r6AM19","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"静かな街 - Quiet Town","navigationEndpoint":{"watchEndpoint":{"videoId":"ccOWvt_7Xig","playlistId":"RDAMVMccOWvt_7Xig"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"mei ehara","navigationEndpoint":{"browseEndpoint":{"browseId":"UC6E1po8d95GkLmZD2azY9Ig","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" • "},{"text":"37K plays"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Sway","navigationEndpoint":{"browseEndpoint":{"browseId":"MPREb_ZVsoTQ0vbS4","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}}]}}}],"playlistItemData":{"videoId":"ccOWvt_7Xig"}}}"#;
     const PANEL_ITEM: &str = r#"{"playlistPanelVideoRenderer":{"title":{"runs":[{"text":"Resonance"}]},"longBylineText":{"runs":[{"text":"Home","navigationEndpoint":{"browseEndpoint":{"browseId":"UCfWnoT0YX8RfjFaXmg2Eq5g","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}},{"text":" • "},{"text":"Odyssey","navigationEndpoint":{"browseEndpoint":{"browseId":"MPREb_83fMW9gQPxu","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}},{"text":" • "},{"text":"2014"}]},"thumbnail":{"thumbnails":[{"url":"https://yt3.googleusercontent.com/S6e6T4","width":60,"height":60}]},"lengthText":{"runs":[{"text":"3:33"}]},"navigationEndpoint":{"watchEndpoint":{"videoId":"aBhrEv5Z7uc","playlistId":"RDAMVMJ7p4bzqLvCw","index":3}},"videoId":"aBhrEv5Z7uc"}}"#;
-    const ARTIST_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://lh3.googleusercontent.com/U-SAmN","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"The Weeknd"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Artist"},{"text":" • "},{"text":"239M monthly audience"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseId":"UClYV6hHlupm_S_ObS1W-DYw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}}}"#;
+    const ARTIST_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"thumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"https://lh3.googleusercontent.com/U-SAmN","width":60,"height":60}]}}},"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"The Midnights"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Artist"},{"text":" • "},{"text":"239M monthly audience"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseId":"UClYV6hHlupm_S_ObS1W-DYw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}}}}}}"#;
 
     fn row(s: &str) -> Value {
         serde_json::from_str::<Value>(s).unwrap()["musicResponsiveListItemRenderer"].clone()
@@ -2753,9 +2753,9 @@ mod tests {
     #[test]
     fn search_row_has_artists_album_length_and_plays() {
         let t = list_item(&row(SEARCH_ROW)).unwrap();
-        assert_eq!(names(&t), ["Emily Dawn", "Vive", "Sandy Beach"]);
+        assert_eq!(names(&t), ["Ivy Moss", "Vive", "Sandy Beach"]);
         assert!(t.artists.iter().all(|a| a.id.is_some()));
-        assert_eq!(t.album.as_ref().map(|a| a.name.as_str()), Some("Blinding Lights"));
+        assert_eq!(t.album.as_ref().map(|a| a.name.as_str()), Some("Bright Glare"));
         assert_eq!(t.duration, Some(172));
         assert_eq!(t.plays, Some(2_800));
     }
@@ -2763,7 +2763,7 @@ mod tests {
     #[test]
     fn playlist_row_keeps_unlinked_artists() {
         let t = list_item(&row(PLAYLIST_ROW)).unwrap();
-        assert_eq!(names(&t), ["R3HAB", "Jason Stephenson"]);
+        assert_eq!(names(&t), ["R3HAB", "Owen Brooks"]);
         assert_eq!(t.artists[0].id.as_deref(), Some("UCjpBcfMn2g8afa3XIZmS3mw"));
         assert_eq!(t.artists[1].id, None);
         assert_eq!(t.album.as_ref().and_then(|a| a.id.as_deref()), Some("MPREb_t6uDCi8Ljsr"));
@@ -2773,7 +2773,7 @@ mod tests {
     #[test]
     fn album_row_has_number_and_no_artists() {
         let t = list_item(&row(ALBUM_ROW)).unwrap();
-        assert_eq!((t.title.as_str(), t.track_nr, t.duration), ("Alone Again", Some(1), Some(251)));
+        assert_eq!((t.title.as_str(), t.track_nr, t.duration), ("Lone Again", Some(1), Some(251)));
         assert!(t.artists.is_empty());
     }
 
@@ -2808,7 +2808,7 @@ mod tests {
 
     // Library › Uploads row, shaped like a real answer (November 2026): the artist and album lead
     // to the account's uploads, the artist's page type UNKNOWN and the album's ALBUM.
-    const UPLOAD_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"A Sky Full Of Stars","navigationEndpoint":{"watchEndpoint":{"videoId":"FDpg6FxVQZU"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Coldplay","navigationEndpoint":{"browseEndpoint":{"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CICr2crg7OWpchIIY29sZHBsYXk","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_UNKNOWN"}}}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Ghost Stories","navigationEndpoint":{"browseEndpoint":{"browseId":"FEmusic_library_privately_owned_release_detailb_po_CICr2crg7OWpchIOZ2hvc3Qgc3Rvcmllcw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}}]}}}],"fixedColumns":[{"musicResponsiveListItemFixedColumnRenderer":{"text":{"runs":[{"text":"4:28"}]}}}]}}"#;
+    const UPLOAD_ROW: &str = r#"{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"A Field Of Lanterns","navigationEndpoint":{"watchEndpoint":{"videoId":"FDpg6FxVQZU"}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Coldplay","navigationEndpoint":{"browseEndpoint":{"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CICr2crg7OWpchIIY29sZHBsYXk","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_UNKNOWN"}}}}}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Paper Ghosts","navigationEndpoint":{"browseEndpoint":{"browseId":"FEmusic_library_privately_owned_release_detailb_po_CICr2crg7OWpchIOZ2hvc3Qgc3Rvcmllcw","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}}}}}]}}}],"fixedColumns":[{"musicResponsiveListItemFixedColumnRenderer":{"text":{"runs":[{"text":"4:28"}]}}}]}}"#;
 
     #[test]
     fn upload_row_links_its_artist_and_album_to_their_uploads_pages() {
@@ -2817,7 +2817,7 @@ mod tests {
         let t = list_item(&row(UPLOAD_ROW)).unwrap();
         assert_eq!(names(&t), ["Coldplay"]);
         assert_eq!(t.artists[0].id.as_deref(), Some(ARTIST));
-        assert_eq!(t.album.as_ref().map(|a| (a.name.as_str(), a.id.as_deref())), Some(("Ghost Stories", Some(ALBUM))));
+        assert_eq!(t.album.as_ref().map(|a| (a.name.as_str(), a.id.as_deref())), Some(("Paper Ghosts", Some(ALBUM))));
         assert_eq!(t.duration, Some(268));
         // Whatever page type the run carries: none, or a plain artist's.
         let bare = UPLOAD_ROW.replace(r#","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_UNKNOWN"}}"#, "");
@@ -2853,13 +2853,13 @@ mod tests {
         let row: Value = serde_json::from_str(UPLOAD_ROW).unwrap();
         // A row that names its song only in its menu, and one with no song (Shuffle all).
         let menu_only = json!({"musicResponsiveListItemRenderer": {
-            "flexColumns": [{"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": [{"text": "Midnight City"}]}}}],
+            "flexColumns": [{"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": [{"text": "Harbor Lights"}]}}}],
             "menu": {"menuRenderer": {"items": [{"menuServiceItemRenderer": {"serviceEndpoint": {"queueAddEndpoint": {"queueTarget": {"videoId": "dX3k_QDnzHE"}}}}}]}},
         }});
         let shuffle = json!({"musicResponsiveListItemRenderer": {"flexColumns": [{"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": [{"text": "Shuffle all"}]}}}]}});
         json!({
             "header": {"musicDetailHeaderRenderer": {
-                "title": {"runs": [{"text": "Ghost Stories"}]},
+                "title": {"runs": [{"text": "Paper Ghosts"}]},
                 "subtitle": {"runs": [{"text": "Album"}, {"text": " • "}, {"text": "Coldplay", "navigationEndpoint": {"browseEndpoint": {"browseId": "FEmusic_library_privately_owned_artist_detaila_po_CICr2crg7OWpchIIY29sZHBsYXk"}}}, {"text": " • "}, {"text": "2014"}]},
                 "thumbnail": {"croppedSquareThumbnailRenderer": {"thumbnail": {"thumbnails": [{"url": "https://lh3.googleusercontent.com/gs=w226-h226", "width": 226, "height": 226}]}}},
             }},
@@ -2874,10 +2874,10 @@ mod tests {
     fn uploaded_album_page_lists_its_songs() {
         let id = "FEmusic_library_privately_owned_release_detailb_po_CICr2crg7OWpchIOZ2hvc3Qgc3Rvcmllcw";
         let (a, token) = parse_upload_album(&upload_album_page(), id).unwrap();
-        assert_eq!((a.title.as_str(), a.subtitle.as_str(), a.is_album, a.save_id.as_deref()), ("Ghost Stories", "Album • Coldplay • 2014", true, None));
+        assert_eq!((a.title.as_str(), a.subtitle.as_str(), a.is_album, a.save_id.as_deref()), ("Paper Ghosts", "Album • Coldplay • 2014", true, None));
         assert_eq!(a.artists[0].id.as_deref(), Some("FEmusic_library_privately_owned_artist_detaila_po_CICr2crg7OWpchIIY29sZHBsYXk"));
         assert_eq!(a.thumbs.len(), 1);
-        assert_eq!(a.tracks.iter().map(|t| (t.id.as_str(), t.title.as_str())).collect::<Vec<_>>(), [("FDpg6FxVQZU", "A Sky Full Of Stars"), ("dX3k_QDnzHE", "Midnight City")]);
+        assert_eq!(a.tracks.iter().map(|t| (t.id.as_str(), t.title.as_str())).collect::<Vec<_>>(), [("FDpg6FxVQZU", "A Field Of Lanterns"), ("dX3k_QDnzHE", "Harbor Lights")]);
         // What a row leaves out, the header says.
         let last = &a.tracks[1];
         assert_eq!((names(last), last.album.as_ref().and_then(|l| l.id.as_deref()), last.thumbs.len()), (vec!["Coldplay"], Some(id), 1));
@@ -2890,7 +2890,7 @@ mod tests {
         let shelf = v["contents"]["singleColumnBrowseResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0].clone();
         let v = json!({"contents": {"twoColumnBrowseResultsRenderer": {
             "tabs": [{"tabRenderer": {"content": {"sectionListRenderer": {"contents": [{"musicResponsiveHeaderRenderer": {
-                "title": {"runs": [{"text": "Ghost Stories"}]},
+                "title": {"runs": [{"text": "Paper Ghosts"}]},
                 "subtitle": {"runs": [{"text": "Album"}, {"text": " • "}, {"text": "2014"}]},
                 "straplineTextOne": {"runs": [{"text": "Coldplay"}]},
             }}]}}}}],
@@ -2917,9 +2917,9 @@ mod tests {
     // A search of your uploads and one of your library, trimmed from real answers (November
     // 2026). Only the picked tab holds results. Uploads come in one untitled shelf: your
     // uploads' artist and album (leading to pages of your own), then the songs.
-    const UPLOADS_SEARCH: &str = r#"{"contents":{"tabbedSearchResultsRenderer":{"tabs":[{"tabRenderer":{"title":"YT Music","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYAQ%3D%3D","query":"kaede"}}}},{"tabRenderer":{"title":"Library","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYBA%3D%3D","query":"kaede"}}}},{"tabRenderer":{"title":"Uploads","selected":true,"content":{"sectionListRenderer":{"contents":[{"musicShelfRenderer":{"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Kaede"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}},"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl"}}}},{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Stardust in Blue"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Album"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_UNKNOWN"}},"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl"}},"text":"Kaede"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"FEmusic_library_privately_owned_release_detailb_po_CJD2uP34k9CPgQESEHN0YXJkdXN0IGluIGJsdWUaBWthZWRlIg1odHRwIHVwbG9hZGVy"}}}},{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"watchEndpoint":{"videoId":"pQlgsq6hpWE","watchEndpointMusicSupportedConfigs":{"watchEndpointMusicConfig":{"musicVideoType":"MUSIC_VIDEO_TYPE_PRIVATELY_OWNED_TRACK"}}}},"text":"さよならはハート仕掛け - Farewell Is A Heartwork"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_UNKNOWN"}},"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl"}},"text":"Kaede"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"FEmusic_library_privately_owned_release_detailb_po_CJD2uP34k9CPgQESEHN0YXJkdXN0IGluIGJsdWUaBWthZWRlIg1odHRwIHVwbG9hZGVy"}},"text":"Stardust in Blue"}]}}}],"playlistItemData":{"videoId":"pQlgsq6hpWE"}}}]}}]}}}}]}}}"#;
+    const UPLOADS_SEARCH: &str = r#"{"contents":{"tabbedSearchResultsRenderer":{"tabs":[{"tabRenderer":{"title":"YT Music","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYAQ%3D%3D","query":"maple"}}}},{"tabRenderer":{"title":"Library","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYBA%3D%3D","query":"maple"}}}},{"tabRenderer":{"title":"Uploads","selected":true,"content":{"sectionListRenderer":{"contents":[{"musicShelfRenderer":{"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Maple"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}},"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl"}}}},{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Moonlit Harbor"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Album"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_UNKNOWN"}},"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl"}},"text":"Maple"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"FEmusic_library_privately_owned_release_detailb_po_CJD2uP34k9CPgQESEHN0YXJkdXN0IGluIGJsdWUaBWthZWRlIg1odHRwIHVwbG9hZGVy"}}}},{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"watchEndpoint":{"videoId":"pQlgsq6hpWE","watchEndpointMusicSupportedConfigs":{"watchEndpointMusicConfig":{"musicVideoType":"MUSIC_VIDEO_TYPE_PRIVATELY_OWNED_TRACK"}}}},"text":"ひかりの坂 - Hill of Light"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_UNKNOWN"}},"browseId":"FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl"}},"text":"Maple"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"FEmusic_library_privately_owned_release_detailb_po_CJD2uP34k9CPgQESEHN0YXJkdXN0IGluIGJsdWUaBWthZWRlIg1odHRwIHVwbG9hZGVy"}},"text":"Moonlit Harbor"}]}}}],"playlistItemData":{"videoId":"pQlgsq6hpWE"}}}]}}]}}}}]}}}"#;
     // Library results come in titled shelves; its artists lead to "MPLA" and their channel.
-    const LIBRARY_SEARCH: &str = r#"{"contents":{"tabbedSearchResultsRenderer":{"tabs":[{"tabRenderer":{"title":"YT Music","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYAQ%3D%3D","query":"kaede"}}}},{"tabRenderer":{"title":"Library","selected":true,"content":{"sectionListRenderer":{"contents":[{"musicShelfRenderer":{"title":{"runs":[{"text":"Artists"}]},"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Kaede"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"3.8K subscribers"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_LIBRARY_ARTIST"}},"browseId":"MPLAUCMJIUyOLyBdal5XpZW3-96w"}}}}]}},{"musicShelfRenderer":{"title":{"runs":[{"text":"Albums"}]},"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Stardust in Blue"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Album"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}},"browseId":"UCMJIUyOLyBdal5XpZW3-96w"}},"text":"Kaede"},{"text":" & "},{"text":"Lamp"},{"text":" • "},{"text":"2020"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"MPREb_54uxDZG0XOp"}}}}]}},{"musicShelfRenderer":{"title":{"runs":[{"text":"Songs"}]},"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"watchEndpoint":{"videoId":"G0BLtNsvMP8","watchEndpointMusicSupportedConfigs":{"watchEndpointMusicConfig":{"musicVideoType":"MUSIC_VIDEO_TYPE_ATV"}}}},"text":"When We Were Young"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}},"browseId":"UCMJIUyOLyBdal5XpZW3-96w"}},"text":"Kaede"},{"text":" & "},{"text":"Lamp"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"MPREb_54uxDZG0XOp"}},"text":"Stardust in Blue"}]}}}],"playlistItemData":{"videoId":"G0BLtNsvMP8"}}}]}}]}}}},{"tabRenderer":{"title":"Uploads","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYAw%3D%3D","query":"kaede"}}}}]}}}"#;
+    const LIBRARY_SEARCH: &str = r#"{"contents":{"tabbedSearchResultsRenderer":{"tabs":[{"tabRenderer":{"title":"YT Music","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYAQ%3D%3D","query":"maple"}}}},{"tabRenderer":{"title":"Library","selected":true,"content":{"sectionListRenderer":{"contents":[{"musicShelfRenderer":{"title":{"runs":[{"text":"Artists"}]},"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Maple"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"3.8K subscribers"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_LIBRARY_ARTIST"}},"browseId":"MPLAUCMJIUyOLyBdal5XpZW3-96w"}}}}]}},{"musicShelfRenderer":{"title":{"runs":[{"text":"Albums"}]},"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Moonlit Harbor"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Album"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}},"browseId":"UCMJIUyOLyBdal5XpZW3-96w"}},"text":"Maple"},{"text":" & "},{"text":"Moth"},{"text":" • "},{"text":"2020"}]}}}],"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"MPREb_54uxDZG0XOp"}}}}]}},{"musicShelfRenderer":{"title":{"runs":[{"text":"Songs"}]},"contents":[{"musicResponsiveListItemRenderer":{"flexColumns":[{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"watchEndpoint":{"videoId":"G0BLtNsvMP8","watchEndpointMusicSupportedConfigs":{"watchEndpointMusicConfig":{"musicVideoType":"MUSIC_VIDEO_TYPE_ATV"}}}},"text":"Summer We Were Young"}]}}},{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ARTIST"}},"browseId":"UCMJIUyOLyBdal5XpZW3-96w"}},"text":"Maple"},{"text":" & "},{"text":"Moth"},{"text":" • "},{"navigationEndpoint":{"browseEndpoint":{"browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_ALBUM"}},"browseId":"MPREb_54uxDZG0XOp"}},"text":"Moonlit Harbor"}]}}}],"playlistItemData":{"videoId":"G0BLtNsvMP8"}}}]}}]}}}},{"tabRenderer":{"title":"Uploads","selected":false,"endpoint":{"searchEndpoint":{"params":"agIYAw%3D%3D","query":"maple"}}}}]}}}"#;
 
     #[test]
     fn uploads_search_finds_your_songs_albums_and_artists() {
@@ -2928,26 +2928,26 @@ mod tests {
         assert_eq!(
             cards,
             [
-                ("Kaede", "Artist", &Target::Artist("FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl".into()), true),
+                ("Maple", "Artist", &Target::Artist("FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl".into()), true),
                 (
-                    "Stardust in Blue",
-                    "Album • Kaede",
+                    "Moonlit Harbor",
+                    "Album • Maple",
                     &Target::Album("FEmusic_library_privately_owned_release_detailb_po_CJD2uP34k9CPgQESEHN0YXJkdXN0IGluIGJsdWUaBWthZWRlIg1odHRwIHVwbG9hZGVy".into()),
                     false
                 ),
             ]
         );
         // The album's artist leads to their uploads page, whatever its page type.
-        assert_eq!(r.cards[1].links, [Link { name: "Kaede".into(), id: Some("FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl".into()) }]);
+        assert_eq!(r.cards[1].links, [Link { name: "Maple".into(), id: Some("FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl".into()) }]);
         // Library › Uploads' own tabs aren't pages to open.
         assert_eq!(target(&json!({"browseEndpoint": {"browseId": "FEmusic_library_privately_owned_releases"}})), None);
         assert_eq!(r.tracks.len(), 1);
         let t = &r.tracks[0];
-        assert_eq!((t.id.as_str(), t.title.as_str()), ("pQlgsq6hpWE", "さよならはハート仕掛け - Farewell Is A Heartwork"));
-        assert_eq!(names(t), ["Kaede"]);
+        assert_eq!((t.id.as_str(), t.title.as_str()), ("pQlgsq6hpWE", "ひかりの坂 - Hill of Light"));
+        assert_eq!(names(t), ["Maple"]);
         assert_eq!(t.artists[0].id.as_deref(), Some("FEmusic_library_privately_owned_artist_detaila_po_CJD2uP34k9CPgQESBWthZWRl"));
         let album = "FEmusic_library_privately_owned_release_detailb_po_CJD2uP34k9CPgQESEHN0YXJkdXN0IGluIGJsdWUaBWthZWRlIg1odHRwIHVwbG9hZGVy";
-        assert_eq!(t.album.as_ref().map(|a| (a.name.as_str(), a.id.as_deref())), Some(("Stardust in Blue", Some(album))));
+        assert_eq!(t.album.as_ref().map(|a| (a.name.as_str(), a.id.as_deref())), Some(("Moonlit Harbor", Some(album))));
         assert!(!t.video);
     }
 
@@ -2958,11 +2958,11 @@ mod tests {
         assert_eq!(
             cards,
             [
-                ("Kaede", "3.8K subscribers", &Target::Artist("UCMJIUyOLyBdal5XpZW3-96w".into())),
-                ("Stardust in Blue", "Album • Kaede & Lamp • 2020", &Target::Album("MPREb_54uxDZG0XOp".into())),
+                ("Maple", "3.8K subscribers", &Target::Artist("UCMJIUyOLyBdal5XpZW3-96w".into())),
+                ("Moonlit Harbor", "Album • Maple & Moth • 2020", &Target::Album("MPREb_54uxDZG0XOp".into())),
             ]
         );
-        assert_eq!(r.tracks.iter().map(|t| t.title.as_str()).collect::<Vec<_>>(), ["When We Were Young"]);
+        assert_eq!(r.tracks.iter().map(|t| t.title.as_str()).collect::<Vec<_>>(), ["Summer We Were Young"]);
         assert_eq!(r.tracks[0].album.as_ref().and_then(|a| a.id.as_deref()), Some("MPREb_54uxDZG0XOp"));
     }
 
@@ -2993,26 +2993,26 @@ mod tests {
     fn artist_search_row_becomes_a_round_card() {
         let c = list_card(&row(ARTIST_ROW)).unwrap();
         assert_eq!(c.target, Target::Artist("UClYV6hHlupm_S_ObS1W-DYw".into()));
-        assert_eq!((c.title.as_str(), c.subtitle.as_str(), c.round), ("The Weeknd", "239M monthly audience", true));
+        assert_eq!((c.title.as_str(), c.subtitle.as_str(), c.round), ("The Midnights", "239M monthly audience", true));
     }
 
     #[test]
     fn album_header() {
         let v = json!({"contents": {"twoColumnBrowseResultsRenderer": {
             "tabs": [{"tabRenderer": {"content": {"sectionListRenderer": {"contents": [{"musicResponsiveHeaderRenderer": {
-                "title": {"runs": [{"text": "After Hours"}]},
+                "title": {"runs": [{"text": "Late Shift"}]},
                 "subtitle": {"runs": [{"text": "Album"}, {"text": " • "}, {"text": "2020"}]},
-                "straplineTextOne": {"runs": [{"text": "The Weeknd", "navigationEndpoint": {"browseEndpoint": {"browseId": "UCw"}}}]},
+                "straplineTextOne": {"runs": [{"text": "The Midnights", "navigationEndpoint": {"browseEndpoint": {"browseId": "UCw"}}}]},
                 "buttons": [{"musicPlayButtonRenderer": {"playNavigationEndpoint": {"watchPlaylistEndpoint": {"playlistId": "OLAK5uy_x"}}}}]
             }}]}}}}],
             "secondaryContents": {"sectionListRenderer": {"contents": [{"musicShelfRenderer": {"contents": [serde_json::from_str::<Value>(ALBUM_ROW).unwrap()]}}]}}
         }}});
         let (a, videos) = parse_album(&v, "MPREb_x").unwrap();
         assert!(videos.is_empty());
-        assert_eq!(a.subtitle, "Album • The Weeknd • 2020");
+        assert_eq!(a.subtitle, "Album • The Midnights • 2020");
         assert_eq!(a.save_id.as_deref(), Some("OLAK5uy_x"));
         let t = &a.tracks[0];
-        assert_eq!(t.artists[0].name, "The Weeknd");
+        assert_eq!(t.artists[0].name, "The Midnights");
         assert_eq!(t.album.as_ref().and_then(|l| l.id.as_deref()), Some("MPREb_x"));
     }
 
@@ -3030,7 +3030,7 @@ mod tests {
         let rows: Vec<Value> = rows.iter().map(|(id, title, kind)| album_row(id, title, kind)).collect();
         json!({"contents": {"twoColumnBrowseResultsRenderer": {
             "tabs": [{"tabRenderer": {"content": {"sectionListRenderer": {"contents": [{"musicResponsiveHeaderRenderer": {
-                "title": {"runs": [{"text": "Whenever You Need Somebody"}]},
+                "title": {"runs": [{"text": "Whenever You Call My Name"}]},
                 "buttons": [{"musicPlayButtonRenderer": {"playNavigationEndpoint": {"watchPlaylistEndpoint": {"playlistId": "OLAK5uy_x"}}}}]
             }}]}}}}],
             "secondaryContents": {"sectionListRenderer": {"contents": [{"musicShelfRenderer": {"contents": rows}}]}}
@@ -3046,12 +3046,12 @@ mod tests {
         json!({"contents": {"singleColumnWatchNextResults": {"playlist": {"playlist": {"title": title, "contents": contents}}}}})
     }
 
-    const RICK_ROWS: [(&str, &str, &str); 3] = [
-        ("dQw4w9WgXcQ", "Never Gonna Give You Up", "MUSIC_VIDEO_TYPE_OMV"),
-        ("BeyEGebJ1l4", "Whenever You Need Somebody", "MUSIC_VIDEO_TYPE_OMV"),
-        ("d0t04zd918U", "The Love Has Gone", "MUSIC_VIDEO_TYPE_ATV"),
+    const ARTIST_ROWS: [(&str, &str, &str); 3] = [
+        ("dQw4w9WgXcQ", "Always Gonna Hold On", "MUSIC_VIDEO_TYPE_OMV"),
+        ("BeyEGebJ1l4", "Whenever You Call My Name", "MUSIC_VIDEO_TYPE_OMV"),
+        ("d0t04zd918U", "The Spark Is Gone", "MUSIC_VIDEO_TYPE_ATV"),
     ];
-    const RICK_SONGS: [(&str, &str, &str); 3] = [("lYBUbBu4W08", "Never Gonna Give You Up", "3:34"), ("raBobo3GZYA", "Whenever You Need Somebody", "3:54"), ("d0t04zd918U", "The Love Has Gone", "4:21")];
+    const ARTIST_SONGS: [(&str, &str, &str); 3] = [("lYBUbBu4W08", "Always Gonna Hold On", "3:34"), ("raBobo3GZYA", "Whenever You Call My Name", "3:54"), ("d0t04zd918U", "The Spark Is Gone", "4:21")];
 
     /// The album's track ids after swapping in `vr`'s songs, the way `album` does.
     fn swapped(rows: &[(&str, &str, &str)], vr: &Value) -> Vec<String> {
@@ -3064,45 +3064,45 @@ mod tests {
 
     #[test]
     fn album_music_videos_become_the_albums_songs() {
-        let (mut a, videos) = parse_album(&album_page(&RICK_ROWS), "MPREb_x").unwrap();
+        let (mut a, videos) = parse_album(&album_page(&ARTIST_ROWS), "MPREb_x").unwrap();
         assert_eq!(videos, [0, 1]);
-        let songs = album_songs(&vr_album("Album - Whenever You Need Somebody", &RICK_SONGS)).unwrap();
+        let songs = album_songs(&vr_album("Album - Whenever You Call My Name", &ARTIST_SONGS)).unwrap();
         assert_eq!(swap_songs(&mut a, &videos, &songs, None), 2);
         assert_eq!(a.tracks.iter().map(|t| t.id.as_str()).collect::<Vec<_>>(), ["lYBUbBu4W08", "raBobo3GZYA", "d0t04zd918U"]);
         // The song's own length; the album's title.
-        assert_eq!((a.tracks[1].title.as_str(), a.tracks[1].duration), ("Whenever You Need Somebody", Some(234)));
+        assert_eq!((a.tracks[1].title.as_str(), a.tracks[1].duration), ("Whenever You Call My Name", Some(234)));
     }
 
     #[test]
     fn album_in_another_language_is_matched_by_its_english_titles() {
-        let rows = [("34Na4j8AVgA", "スターボーイ（feat. ダフト・パンク）", "MUSIC_VIDEO_TYPE_OMV"), ("diW6jXhLE0E", "パーティー・モンスター", "MUSIC_VIDEO_TYPE_OMV")];
-        let songs = album_songs(&vr_album("Album - Starboy", &[("aaaaaaaaaaa", "Starboy", "3:50"), ("bbbbbbbbbbb", "Party Monster", "4:09")])).unwrap();
+        let rows = [("34Na4j8AVgA", "ナイトライダー（feat. ネオン・ハーバー）", "MUSIC_VIDEO_TYPE_OMV"), ("diW6jXhLE0E", "ベルベット・ライオット", "MUSIC_VIDEO_TYPE_OMV")];
+        let songs = album_songs(&vr_album("Album - Nightrider", &[("aaaaaaaaaaa", "Nightrider", "3:50"), ("bbbbbbbbbbb", "Velvet Riot", "4:09")])).unwrap();
         let (mut a, videos) = parse_album(&album_page(&rows), "MPREb_x").unwrap();
         assert_eq!(swap_songs(&mut a, &videos, &songs, None), 0);
-        let english = ["Starboy (feat. Daft Punk)".to_owned(), "Party Monster".to_owned()];
+        let english = ["Nightrider (feat. Neon Harbor)".to_owned(), "Velvet Riot".to_owned()];
         assert_eq!(swap_songs(&mut a, &videos, &songs, Some(&english)), 2);
         // The page's own titles stay.
-        assert_eq!((a.tracks[0].id.as_str(), a.tracks[0].title.as_str()), ("aaaaaaaaaaa", "スターボーイ（feat. ダフト・パンク）"));
+        assert_eq!((a.tracks[0].id.as_str(), a.tracks[0].title.as_str()), ("aaaaaaaaaaa", "ナイトライダー（feat. ネオン・ハーバー）"));
     }
 
     #[test]
     fn album_songs_change_nothing_unless_they_line_up() {
-        let vr = vr_album("Album - Whenever You Need Somebody", &RICK_SONGS);
+        let vr = vr_album("Album - Whenever You Call My Name", &ARTIST_SONGS);
         let listed = ["dQw4w9WgXcQ", "BeyEGebJ1l4", "d0t04zd918U"];
         // A row the page leaves out (or one more song) would shift every pair after it.
-        assert_eq!(swapped(&RICK_ROWS[..2], &vr), listed[..2]);
+        assert_eq!(swapped(&ARTIST_ROWS[..2], &vr), listed[..2]);
         // A title that doesn't match keeps its music video; the others still change.
-        let mut renamed = RICK_ROWS;
-        renamed[1].1 = "Whenever You Need Somebody (Radio Edit)";
+        let mut renamed = ARTIST_ROWS;
+        renamed[1].1 = "Whenever You Call My Name (Radio Edit)";
         assert_eq!(swapped(&renamed, &vr), ["lYBUbBu4W08", "BeyEGebJ1l4", "d0t04zd918U"]);
         // A song row stays as listed even when the song list says otherwise.
-        let mut other = RICK_SONGS;
+        let mut other = ARTIST_SONGS;
         other[2].0 = "elsewhere";
-        assert_eq!(swapped(&RICK_ROWS, &vr_album("Album - Whenever You Need Somebody", &other))[2], "d0t04zd918U");
+        assert_eq!(swapped(&ARTIST_ROWS, &vr_album("Album - Whenever You Call My Name", &other))[2], "d0t04zd918U");
         // The same id opens the artist's Top Songs, which is no album.
-        let top = vr_album("Song - Rick Astley", &RICK_SONGS);
+        let top = vr_album("Song - Rob Ashby", &ARTIST_SONGS);
         assert_eq!(album_songs(&top), None);
-        assert_eq!(swapped(&RICK_ROWS, &top), listed);
+        assert_eq!(swapped(&ARTIST_ROWS, &top), listed);
         // An entry that doesn't read makes the positions unreliable.
         let mut broken = vr.clone();
         broken["contents"]["singleColumnWatchNextResults"]["playlist"]["playlist"]["contents"][1] = json!({"automixPreviewVideoRenderer": {}});
@@ -3111,22 +3111,22 @@ mod tests {
 
     #[test]
     fn titles_match_but_for_case_and_punctuation() {
-        assert!(same_title("The Less I Know The Better", "The Less I Know the Better"));
-        assert!(same_title("Don't Say Goodbye", "dont say goodbye"));
-        assert!(same_title("Für Elise", "für  elise"));
-        assert!(same_title("Levitating (feat. DaBaby)", "Levitating"));
-        assert!(same_title("Stan [Featuring Dido]", "stan"));
-        assert!(same_title("LOYALTY. (ft. Rihanna)", "LOYALTY."));
-        assert!(!same_title("Levitating (Remix)", "Levitating"));
-        assert!(!same_title("Mitwa", "Tere Mere Honthon Pe - Mitwa"));
+        assert!(same_title("The More I See The Better", "The More I See the Better"));
+        assert!(same_title("Don't Say So Long", "dont say so long"));
+        assert!(same_title("Für Elena", "für  elena"));
+        assert!(same_title("Floating (feat. MC Pebble)", "Floating"));
+        assert!(same_title("Ember [Featuring Iris]", "ember"));
+        assert!(same_title("HONESTY. (ft. Nova)", "HONESTY."));
+        assert!(!same_title("Floating (Remix)", "Floating"));
+        assert!(!same_title("Mitwa", "Barsaat Ki Dhun - Musafir"));
         assert!(!same_title("", ""));
     }
 
     #[test]
     fn a_guest_credited_in_another_language_is_harmless() {
-        assert!(qualifiers_agree("Wake Me Up (avec Justice)", "Wake Me Up"));
-        assert!(qualifiers_agree("Tití Me Preguntó (con Bad Bunny)", "Tití Me Preguntó"));
-        assert!(!qualifiers_agree("Wake Me Up (Remix)", "Wake Me Up"));
+        assert!(qualifiers_agree("Shake Me Loose (avec Lumière)", "Shake Me Loose"));
+        assert!(qualifiers_agree("Mañana Llegó (con Luna Sol)", "Mañana Llegó"));
+        assert!(!qualifiers_agree("Shake Me Loose (Remix)", "Shake Me Loose"));
         assert!(!qualifiers_agree("Song (Part 2)", "Song") && !qualifiers_agree("Song (Part 1)", "Song (Part 2)"));
     }
 
@@ -3136,7 +3136,7 @@ mod tests {
     #[ignore]
     async fn lyrics_live() {
         let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-lyrics-test"));
-        let text = lyrics(&api, "fJ9rUzIMcZQ").await.unwrap().expect("Bohemian Rhapsody has lyrics");
+        let text = lyrics(&api, "fJ9rUzIMcZQ").await.unwrap().expect("Velvet Overture has lyrics");
         assert!(text.starts_with("Is this the real life?"), "{text}");
     }
 
@@ -3148,7 +3148,7 @@ mod tests {
         let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-album-songs-test"));
         let a = album(&api, "MPREb_dcYZhAh5urI").await.unwrap();
         println!("{:?}", a.tracks.iter().map(|t| (&t.id, &t.title, t.duration)).collect::<Vec<_>>());
-        assert_eq!(a.tracks[0].id, "lYBUbBu4W08", "Never Gonna Give You Up should be the song, not the music video");
+        assert_eq!(a.tracks[0].id, "lYBUbBu4W08", "Always Gonna Hold On should be the song, not the music video");
     }
 
     #[test]
@@ -3157,7 +3157,7 @@ mod tests {
             "tabs": [{"tabRenderer": {"content": {"sectionListRenderer": {"contents": [{"musicResponsiveHeaderRenderer": {
                 "title": {"runs": [{"text": "Official Videos"}]},
                 "secondSubtitle": {"runs": [{"text": "22M views"}, {"text": " • "}, {"text": "1,046 tracks"}]},
-                "facepile": {"avatarStackViewModel": {"text": {"content": "The Weeknd"}, "rendererContext": {"commandContext": {"onTap": {"innertubeCommand": {"browseEndpoint": {"browseId": "UC0"}}}}}}}
+                "facepile": {"avatarStackViewModel": {"text": {"content": "The Midnights"}, "rendererContext": {"commandContext": {"onTap": {"innertubeCommand": {"browseEndpoint": {"browseId": "UC0"}}}}}}}
             }}]}}}}],
             "secondaryContents": {"sectionListRenderer": {"contents": [{"musicPlaylistShelfRenderer": {"contents": [
                 serde_json::from_str::<Value>(PLAYLIST_ROW).unwrap(),
@@ -3166,7 +3166,7 @@ mod tests {
         }}});
         let (p, token, count) = parse_playlist(&v, "PLx").unwrap();
         assert_eq!(count, Some(1046));
-        assert_eq!(p.byline(), "The Weeknd • 1046 songs");
+        assert_eq!(p.byline(), "The Midnights • 1046 songs");
         assert_eq!(p.artists[0].id.as_deref(), Some("UC0"));
         assert_eq!(p.tracks.len(), 1);
         assert_eq!(token.as_deref(), Some("NEXT"));
@@ -3217,7 +3217,7 @@ mod tests {
 
     #[test]
     fn artist_subscription() {
-        let page = |button: Value| json!({"header": {"musicImmersiveHeaderRenderer": {"title": {"runs": [{"text": "Alex G"}]}, "subscriptionButton": button}}});
+        let page = |button: Value| json!({"header": {"musicImmersiveHeaderRenderer": {"title": {"runs": [{"text": "Ezra K"}]}, "subscriptionButton": button}}});
         let followed = parse_artist(&page(json!({"subscribeButtonRenderer": {"subscribed": true, "channelId": "UCx"}})), "UCa").unwrap();
         assert!(followed.subscribed);
         assert_eq!(followed.channel_id.as_deref(), Some("UCx"));
@@ -3252,7 +3252,7 @@ mod tests {
             "header": {"musicImmersiveHeaderRenderer": {"title": {"runs": [{"text": "Ashe"}]}}},
             "contents": {"singleColumnBrowseResultsRenderer": {"tabs": [{"tabRenderer": {"content": {"sectionListRenderer": {"contents": [
                 shelf(json!({"runs": [{"text": "Videos"}]}), vec![song("vvvvvvvvvvv", "A video")]),
-                shelf(library, vec![song("aaaaaaaaaaa", "Moral of the Story"), song("bbbbbbbbbbb", "Till Forever Falls Apart")]),
+                shelf(library, vec![song("aaaaaaaaaaa", "Moral of the Story"), song("bbbbbbbbbbb", "Till The Stars Fall")]),
             ]}}}}]}}
         });
         let page = parse_artist(&v, "UCa").unwrap();
@@ -3274,7 +3274,7 @@ mod tests {
         assert_eq!(count("40.1M"), Some(40_100_000));
         assert_eq!(count("1,234 views"), Some(1_234));
         assert_eq!(parse_duration("1:02:03"), Some(3723));
-        assert!(!looks_like_duration("Blinding Lights"));
+        assert!(!looks_like_duration("Bright Glare"));
     }
 
     // Settings › Song info: what's told apart without the English words.
@@ -3341,7 +3341,7 @@ mod tests {
     fn japanese_song_row_has_its_plays() {
         let r = json!({
             "flexColumns": [
-                {"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": [{"text": "咲き誇れ", "navigationEndpoint": {"watchEndpoint": {"videoId": "aaaaaaaaaaa",
+                {"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": [{"text": "花の道", "navigationEndpoint": {"watchEndpoint": {"videoId": "aaaaaaaaaaa",
                     "watchEndpointMusicSupportedConfigs": {"watchEndpointMusicConfig": {"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"}}}}}]}}},
                 {"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": [{"text": "LE SSERAFIM", "navigationEndpoint": {"browseEndpoint": {"browseId": "UCx",
                     "browseEndpointContextSupportedConfigs": {"browseEndpointContextMusicConfig": {"pageType": "MUSIC_PAGE_TYPE_ARTIST"}}}}}, {"text": "、"}, {"text": "YOASOBI", "navigationEndpoint": {"browseEndpoint": {"browseId": "UCy",
@@ -3423,79 +3423,79 @@ mod tests {
 
     #[test]
     fn lyrics_are_looked_up_by_the_bare_title_and_first_artist() {
-        let v = video("Dua Lipa - Levitating (feat. DaBaby) (Official Music Video)", &["Dua Lipa", "DaBaby"], 203);
-        assert_eq!(lyrics_names(&v), ("Levitating".to_owned(), "Dua Lipa".to_owned()));
+        let v = video("Mira Vale - Floating (feat. MC Pebble) (Official Music Video)", &["Mira Vale", "MC Pebble"], 203);
+        assert_eq!(lyrics_names(&v), ("Floating".to_owned(), "Mira Vale".to_owned()));
         // A song's own qualifiers stay: they're part of its name on LRCLib too.
-        assert_eq!(lyrics_names(&song("Together Forever (2022 Remaster)", &["Rick Astley"], 200)).0, "Together Forever (2022 Remaster)");
+        assert_eq!(lyrics_names(&song("Side By Side (2022 Remaster)", &["Rob Ashby"], 200)).0, "Side By Side (2022 Remaster)");
     }
 
     #[test]
     fn a_music_video_title_loses_its_video_markings() {
-        assert_eq!(song_title("Ghostbusters (Official HD Video)"), "Ghostbusters");
-        assert_eq!(song_title("Take On Me (Official Video) [4K]"), "Take On Me");
-        assert_eq!(song_title("Bad Guy | Official Lyric Video"), "Bad Guy");
-        assert_eq!(song_title("\"Jaan-E-Zigar Jaaneman\" Lyrical Video"), "\"Jaan-E-Zigar Jaaneman");
+        assert_eq!(song_title("Spookchasers (Official HD Video)"), "Spookchasers");
+        assert_eq!(song_title("Run With Me (Official Video) [4K]"), "Run With Me");
+        assert_eq!(song_title("Wrong Turn | Official Lyric Video"), "Wrong Turn");
+        assert_eq!(song_title("\"Dil-E-Nadaan Raat\" Lyrical Video"), "\"Dil-E-Nadaan Raat");
         assert_eq!(song_title("Hothon Se Chhu Lo Tum (From \"Prem Geet\")"), "Hothon Se Chhu Lo Tum (From \"Prem Geet\")");
-        assert_eq!(song_title("Together Forever (2022 Remaster)"), "Together Forever (2022 Remaster)");
+        assert_eq!(song_title("Side By Side (2022 Remaster)"), "Side By Side (2022 Remaster)");
         // Nothing left once the markings are off: keep the title.
         assert_eq!(song_title("Official Video"), "Official Video");
-        assert_eq!(song_title("Ça Plane Pour Moi (Clip Officiel)"), "Ça Plane Pour Moi");
+        assert_eq!(song_title("Ça Va Très Bien (Clip Officiel)"), "Ça Va Très Bien");
     }
 
     #[test]
     fn the_song_of_a_music_video_is_found_by_a_sure_match_only() {
         // Pairs YouTube Music itself makes for Premium (November 2026).
-        assert!(same_song(&video("Never Gonna Give You Up", &["Rick Astley"], 214), &song("Never Gonna Give You Up", &["Rick Astley"], 214)));
-        assert!(same_song(&video("Kisi Nazar Ko Tera Intezar", &["Asha Bhosle"], 452), &song("Kisi Nazar Ko Tera Intezar", &["Asha Bhosle", "Bhupinder Singh"], 404)));
-        assert!(same_song(&video("Saagar Jaisi Aankhonwali (From \"Saagar\")", &["Kishore Kumar"], 270), &song("Saagar Jaisi Aankhonwali (From \"Saagar\")", &["Kishore Kumar", "R. D. Burman"], 304)));
-        assert!(same_song(&video("Ghostbusters (Official HD Video)", &["Ray Parker Jr."], 246), &song("Ghostbusters", &["Ray Parker Jr."], 240)));
+        assert!(same_song(&video("Always Gonna Hold On", &["Rob Ashby"], 214), &song("Always Gonna Hold On", &["Rob Ashby"], 214)));
+        assert!(same_song(&video("Kabhi Suraj Ko Mera Pata", &["Kavya Rao"], 452), &song("Kabhi Suraj Ko Mera Pata", &["Kavya Rao", "Arjun Singh"], 404)));
+        assert!(same_song(&video("Saagar Jaisi Aankhonwali (From \"Saagar\")", &["Kiran Mehta"], 270), &song("Saagar Jaisi Aankhonwali (From \"Saagar\")", &["Kiran Mehta", "R. D. Burman"], 304)));
+        assert!(same_song(&video("Spookchasers (Official HD Video)", &["Sam Porter Jr."], 246), &song("Spookchasers", &["Sam Porter Jr."], 240)));
         // A remaster of the same recording is still the song.
-        assert!(same_song(&video("Together Forever", &["Rick Astley"], 204), &song("Together Forever (2022 Remaster)", &["Rick Astley"], 206)));
-        // YouTube pairs "Mitwa" with "Tere Mere Honthon Pe - Mitwa"; a search can't be that sure.
-        assert!(!same_song(&video("Mitwa", &["Lata Mangeshkar"], 289), &song("Tere Mere Honthon Pe - Mitwa", &["Lata Mangeshkar"], 334)));
+        assert!(same_song(&video("Side By Side", &["Rob Ashby"], 204), &song("Side By Side (2022 Remaster)", &["Rob Ashby"], 206)));
+        // YouTube pairs "Mitwa" with "Barsaat Ki Dhun - Musafir"; a search can't be that sure.
+        assert!(!same_song(&video("Mitwa", &["Nila Sharma"], 289), &song("Barsaat Ki Dhun - Musafir", &["Nila Sharma"], 334)));
 
-        let take_on_me = video("Take On Me (Official Video)", &["a-ha"], 244);
+        let take_on_me = video("Run With Me (Official Video)", &["a-ha"], 244);
         for (hit, why) in [
-            (song("Take On Me (Live)", &["a-ha"], 240), "a live recording"),
-            (song("Take On Me - Live from MTV Unplugged", &["a-ha"], 240), "an unplugged one"),
-            (song("Take On Me (Remix)", &["a-ha"], 244), "a remix"),
-            (song("Take On Me", &["Weezer"], 244), "a cover"),
-            (song("Take On Me (Acoustic Version)", &["a-ha"], 244), "an acoustic version"),
-            (song("Take On Me", &["a-ha"], 500), "a much longer recording"),
-            (song("Take On Me", &["a-ha"], 190), "a much shorter one"),
-            (Track { duration: None, ..song("Take On Me", &["a-ha"], 0) }, "an unknown length"),
-            (video("Take On Me", &["a-ha"], 244), "another music video"),
+            (song("Run With Me (Live)", &["a-ha"], 240), "a live recording"),
+            (song("Run With Me - Live from MTV Unplugged", &["a-ha"], 240), "an unplugged one"),
+            (song("Run With Me (Remix)", &["a-ha"], 244), "a remix"),
+            (song("Run With Me", &["Weezer"], 244), "a cover"),
+            (song("Run With Me (Acoustic Version)", &["a-ha"], 244), "an acoustic version"),
+            (song("Run With Me", &["a-ha"], 500), "a much longer recording"),
+            (song("Run With Me", &["a-ha"], 190), "a much shorter one"),
+            (Track { duration: None, ..song("Run With Me", &["a-ha"], 0) }, "an unknown length"),
+            (video("Run With Me", &["a-ha"], 244), "another music video"),
             (song("Take", &["a-ha"], 244), "a shorter title"),
         ] {
             assert!(!same_song(&take_on_me, &hit), "{why} isn't the song");
         }
-        assert!(!same_song(&video("Love Story", &["Taylor Swift"], 236), &song("Love Story (Taylor's Version)", &["Taylor Swift"], 235)), "a re-recording isn't the song");
+        assert!(!same_song(&video("Paper Hearts", &["Jordan Reed"], 236), &song("Paper Hearts (Jordan's Version)", &["Jordan Reed"], 235)), "a re-recording isn't the song");
         // An edit named past a "|" is another cut of it.
-        assert!(!same_song(&video("Take On Me | Radio Edit", &["a-ha"], 225), &song("Take On Me", &["a-ha"], 226)), "a radio edit isn't the song");
-        assert!(!same_song(&video("Take On Me", &[], 244), &song("Take On Me", &["a-ha"], 244)), "no artist to compare");
+        assert!(!same_song(&video("Run With Me | Radio Edit", &["a-ha"], 225), &song("Run With Me", &["a-ha"], 226)), "a radio edit isn't the song");
+        assert!(!same_song(&video("Run With Me", &[], 244), &song("Run With Me", &["a-ha"], 244)), "no artist to compare");
         // Cut down for the video: the song runs longer.
-        assert!(same_song(&video("Funky Town", &["Lipps Inc."], 237), &song("Funky Town", &["Lipps Inc."], 471)));
+        assert!(same_song(&video("Groove Avenue", &["Fizz Co."], 237), &song("Groove Avenue", &["Fizz Co."], 471)));
         // A much longer song by other singers is another recording.
-        assert!(!same_song(&video("Ae Mere Humsafar", &["Alka Yagnik", "Udit Narayan"], 314), &song("Ae Mere Humsafar", &["Vinod Rathod", "Alka Yagnik"], 454)));
+        assert!(!same_song(&video("O Mere Saathiya", &["Meera Varma", "Rohan Iyer"], 314), &song("O Mere Saathiya", &["Dev Malhotra", "Meera Varma"], 454)));
         // "Artist - Title" videos.
-        assert!(same_song(&video("Michael Sembello - Maniac (From \"Flashdance\") (Official Audio)", &["Michael Sembello"], 245), &song("Maniac", &["Michael Sembello"], 245)));
-        assert!(!same_song(&video("Daft Punk - Maniac", &["Michael Sembello"], 245), &song("Maniac", &["Michael Sembello"], 245)), "a lead that isn't the artist stays");
+        assert!(same_song(&video("Marco Bellini - Frenzy (From \"Flashdance\") (Official Audio)", &["Marco Bellini"], 245), &song("Frenzy", &["Marco Bellini"], 245)));
+        assert!(!same_song(&video("Neon Harbor - Frenzy", &["Marco Bellini"], 245), &song("Frenzy", &["Marco Bellini"], 245)), "a lead that isn't the artist stays");
         // Clean and explicit, or a remix in the video's own markings, are other recordings.
         assert!(!same_song(&video("Song | Acoustic Version", &["A"], 200), &song("Song", &["A"], 200)));
         assert!(!same_song(&video("Song (Official Acoustic Video)", &["A"], 200), &song("Song", &["A"], 200)));
         assert!(!same_song(&video("Song (Foo Remix)", &["A"], 200), &song("Song (Bar Remix)", &["A"], 200)));
-        assert!(!same_song(&video("Bad Guy (Remix Official Video)", &["Billie Eilish"], 207), &song("Bad Guy", &["Billie Eilish"], 195)));
+        assert!(!same_song(&video("Wrong Turn (Remix Official Video)", &["Rory Quill"], 207), &song("Wrong Turn", &["Rory Quill"], 195)));
         assert!(!same_song(&video("WAP (Clean)", &["Cardi B"], 187), &song("WAP (Explicit)", &["Cardi B"], 187)));
-        assert!(!same_song(&video("Running Up That Hill", &["Kate Bush"], 296), &song("Running Up That Hill (A Deal With God)", &["Kate Bush"], 299)));
+        assert!(!same_song(&video("Climbing Up The Ridge", &["Cate Brook"], 296), &song("Climbing Up The Ridge (A Pact With Fate)", &["Cate Brook"], 299)));
         // A tribute band, or the same song with other singers.
-        assert!(!same_song(&video("Bohemian Rhapsody", &["Queen"], 355), &song("Bohemian Rhapsody", &["Queen Tribute Band"], 355)));
+        assert!(!same_song(&video("Velvet Overture", &["Queen"], 355), &song("Velvet Overture", &["Crown Tribute Band"], 355)));
         assert!(!same_song(&video("Duet", &["Singer A", "Singer B"], 200), &song("Duet", &["Singer A", "Singer C"], 200)));
         // The same artist page counts whatever the name says.
         let linked = |name: &str| Link { name: name.into(), id: Some("UCx".into()) };
-        assert!(same_song(&Track { artists: vec![linked("Ray Parker Jr.")], ..video("Ghostbusters", &[], 246) }, &Track { artists: vec![linked("Ray Parker, Jr.")], ..song("Ghostbusters", &[], 240) }));
+        assert!(same_song(&Track { artists: vec![linked("Sam Porter Jr.")], ..video("Spookchasers", &[], 246) }, &Track { artists: vec![linked("Sam Porter, Jr.")], ..song("Spookchasers", &[], 240) }));
         // An unlinked credit comes as one name.
-        assert!(same_song(&video("Kisi Nazar Ko Tera Intezar", &["Asha Bhosle"], 452), &song("Kisi Nazar Ko Tera Intezar", &["Asha Bhosle | Bhupinder"], 405)));
-        assert!(!same_song(&video("Take On Me", &["a"], 244), &song("Take On Me", &["a-ha"], 244)), "only whole names count");
+        assert!(same_song(&video("Kabhi Suraj Ko Mera Pata", &["Kavya Rao"], 452), &song("Kabhi Suraj Ko Mera Pata", &["Kavya Rao | Arjun"], 405)));
+        assert!(!same_song(&video("Run With Me", &["a"], 244), &song("Run With Me", &["a-ha"], 244)), "only whole names count");
     }
 
     #[test]
@@ -3503,7 +3503,7 @@ mod tests {
         // Trimmed from a Premium account's `next` answer (November 2026).
         let item = |id: &str, title: &str, kind: &str| {
             json!({"playlistPanelVideoRenderer": {"videoId": id, "title": {"runs": [{"text": title}]}, "lengthText": {"runs": [{"text": "3:34"}]},
-                "longBylineText": {"runs": [{"text": "Rick Astley"}]},
+                "longBylineText": {"runs": [{"text": "Rob Ashby"}]},
                 "navigationEndpoint": {"watchEndpoint": {"videoId": id, "watchEndpointMusicSupportedConfigs": {"watchEndpointMusicConfig": {"musicVideoType": kind}}}}}})
         };
         let wrap = |primary: Value, counterpart: Value| {
@@ -3511,8 +3511,8 @@ mod tests {
                 "segmentMap": {"segment": [{"primaryVideoStartTimeMilliseconds": "0", "counterpartVideoStartTimeMilliseconds": "927", "durationMilliseconds": "212500"}]}}]}})
         };
         let v = json!({"contents": {"singleColumnMusicWatchNextResultsRenderer": {"tabbedRenderer": {"watchNextTabbedResultsRenderer": {"tabs": [{"tabRenderer": {"content": {"musicQueueRenderer": {"content": {"playlistPanelRenderer": {"contents": [
-            wrap(item("raBobo3GZYA", "Whenever You Need Somebody", "MUSIC_VIDEO_TYPE_ATV"), item("BeyEGebJ1l4", "Whenever You Need Somebody", "MUSIC_VIDEO_TYPE_OMV")),
-            wrap(item("dQw4w9WgXcQ", "Never Gonna Give You Up", "MUSIC_VIDEO_TYPE_OMV"), item("lYBUbBu4W08", "Never Gonna Give You Up", "MUSIC_VIDEO_TYPE_ATV")),
+            wrap(item("raBobo3GZYA", "Whenever You Call My Name", "MUSIC_VIDEO_TYPE_ATV"), item("BeyEGebJ1l4", "Whenever You Call My Name", "MUSIC_VIDEO_TYPE_OMV")),
+            wrap(item("dQw4w9WgXcQ", "Always Gonna Hold On", "MUSIC_VIDEO_TYPE_OMV"), item("lYBUbBu4W08", "Always Gonna Hold On", "MUSIC_VIDEO_TYPE_ATV")),
         ]}}}}}}]}}}}});
         // Both ways round, for taking a like away.
         let keep = HashSet::new();
@@ -3587,10 +3587,10 @@ mod tests {
     async fn searched_song_live() {
         let api = crate::ytmapi::Api::new(&std::env::temp_dir().join("ytm-native-album-songs-test"));
         for v in [
-            video("Never Gonna Give You Up", &["Rick Astley"], 214),
-            video("Take On Me (Official Video)", &["a-ha"], 244),
-            video("Kisi Nazar Ko Tera Intezar", &["Asha Bhosle"], 452),
-            video("Bad Guy", &["Billie Eilish"], 207),
+            video("Always Gonna Hold On", &["Rob Ashby"], 214),
+            video("Run With Me (Official Video)", &["a-ha"], 244),
+            video("Kabhi Suraj Ko Mera Pata", &["Kavya Rao"], 452),
+            video("Wrong Turn", &["Rory Quill"], 207),
         ] {
             let found = searched_song(&api, &v, false).await.unwrap();
             println!("{} -> {:?}", v.title, found.as_ref().map(|s| (&s.id, &s.title, s.artist_line(), s.duration)));
@@ -3629,10 +3629,10 @@ mod podcast_tests {
         let col = |runs: Value| json!({"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": runs}}});
         let r = json!({
             "playlistItemData": {"videoId": "xjZ31IKfu4Q"},
-            "flexColumns": [col(json!([{"text": "The Buried Bodies Case"}])), col(json!([{"text": "2d ago"}, {"text": " • "}, show_run("Radiolab", "MPSPPL1")]))],
+            "flexColumns": [col(json!([{"text": "The Missing Ledger Case"}])), col(json!([{"text": "2d ago"}, {"text": " • "}, show_run("Radiolab", "MPSPPL1")]))],
         });
         let t = episode_row(&r).unwrap();
-        assert_eq!(t.title, "The Buried Bodies Case");
+        assert_eq!(t.title, "The Missing Ledger Case");
         assert_eq!(t.artists, [Link { name: "Radiolab".into(), id: Some("MPSPPL1".into()) }]);
     }
 
@@ -3641,7 +3641,7 @@ mod podcast_tests {
         let col = |runs: Value| json!({"musicResponsiveListItemFlexColumnRenderer": {"text": {"runs": runs}}});
         let r = json!({
             "playlistItemData": {"videoId": "xjZ31IKfu4Q"},
-            "flexColumns": [col(json!([{"text": "The Buried Bodies Case"}])), col(json!([{"text": "Episode"}, {"text": " • "}, {"text": "Dec 28, 2025"}, {"text": " • "}, show_run("Radiolab", "MPSPPL1")]))],
+            "flexColumns": [col(json!([{"text": "The Missing Ledger Case"}])), col(json!([{"text": "Episode"}, {"text": " • "}, {"text": "Dec 28, 2025"}, {"text": " • "}, show_run("Radiolab", "MPSPPL1")]))],
         });
         assert_eq!(list_item(&r).unwrap().plays, None);
         let t = episode_row(&r).unwrap();

@@ -36,7 +36,7 @@ A native desktop YouTube Music player for your own account, written in Rust with
   lyrics, kept above other windows.
 - **Music videos** (optional): the music video in Now playing, in time with the song, up to 720p.
 - **Desktop**: media keys and system media controls, tray, system-wide shortcuts, your own title
-  bar with rounded corners or the system's, software rendering for the least memory.
+  bar with rounded corners or the system's.
 - **Updates itself** from GitHub releases; a "What's new" window shows the changes, and the app
   restarts only when you say so.
 
@@ -50,8 +50,8 @@ Downloads are on the [releases page](https://github.com/Hejfnjeic/ytm-native/rel
 | | |
 |---|---|
 | **Arch Linux** | `sudo pacman -U ytm-native-<version>-1-x86_64.pkg.tar.zst`. pacman owns the files, so the app tells you about new versions instead of updating itself. |
-| **Other Linux** (x86_64) | Unpack `ytm-native-<version>-linux-x86_64.tar.gz` and run `./install.sh` (installs to `~/.local`, adds a menu entry; `./install.sh --uninstall` removes it). Updates itself. |
-| **Windows** (x86_64) | Unpack `ytm-native-<version>-windows-x86_64.7z` anywhere and start `ytm-native.exe`. Portable: everything stays in its folder. Updates itself. |
+| **Other Linux** (x86_64) | Unpack `ytm-native-<version>-linux-x86_64.tar.gz` and run `./install.sh` (installs to `~/.local`, adds a menu entry; `~/.local/lib/ytm-native/install.sh --uninstall` removes it). Updates itself. |
+| **Windows** (x86_64) | Unpack `ytm-native-portable-<version>.zip` into a folder of its own and start `ytm-native.exe`. Portable: everything stays in that folder. Updates itself. |
 | **From source** | See [HACKING.md](HACKING.md): `cargo run --release`, or `scripts/install-linux.sh`. |
 
 Linux needs a Secret Service provider (KWallet or GNOME Keyring) to keep the login's key,
@@ -82,6 +82,8 @@ tends to be logged out within hours, because the browser keeps rotating it.
 | Ctrl+← / Ctrl+→ | previous / next song |
 | Ctrl+↑ / Ctrl+↓ | volume |
 | Ctrl+F | search |
+| Ctrl+K | command palette |
+| Ctrl+M | lyrics window |
 | Esc | leave the search field |
 
 ## Privacy

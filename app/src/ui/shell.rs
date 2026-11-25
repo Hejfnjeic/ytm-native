@@ -1086,7 +1086,7 @@ fn suggested_hits(ui: &mut Ui, app: &mut App) {
 }
 
 /// The line under a suggested row's title. Songs, videos and albums come with theirs
-/// ("Song • Daft Punk • 401M plays"); an artist's gives only its audience.
+/// ("Song • Neon Harbor • 401M plays"); an artist's gives only its audience.
 fn hit_line(c: &crate::model::Card) -> String {
     match &c.target {
         Target::Artist(_) if c.subtitle.is_empty() || c.subtitle == "Artist" => crate::tr!("ui-artist").to_string(),

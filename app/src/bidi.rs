@@ -148,7 +148,7 @@ mod tests {
     #[test]
     fn numbers_and_latin_stay_left_to_right() {
         assert_eq!(visual("שיר 123"), "123 שיר");
-        assert_eq!(visual("אני אוהב Taylor Swift"), "Taylor Swift אוהב אני");
+        assert_eq!(visual("אני אוהב Jordan Reed"), "Jordan Reed אוהב אני");
         // A Latin title with an RTL word inside keeps its order around it.
         assert_eq!(visual("Song (שלום עולם) remix"), "Song (עולם שלום) remix");
     }

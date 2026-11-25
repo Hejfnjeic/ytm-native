@@ -92,7 +92,7 @@ pub(super) fn dev_screenshot(ctx: &egui::Context, now: f64) {
 
 /// Dev hook: `YTM_SCRIPT="<secs>:<step>;…"` drives a test window that has no mouse or
 /// keyboard, with seconds from the first frame. Steps: `m:x,y` moves the pointer, `c:x,y`
-/// clicks, `d:x,y` and `u:x,y` press and let go there (a drag, with moves between), `r:w,h` resizes, `t:text` types, `k:esc` presses Esc (`k:f` F, and so on), `w:n` scrolls n lines (down), `f:n` flicks a touchpad n pixels (down) over 0.1 s, as Wayland sends it, `s:name` saves `<YTM_SCRIPT_DIR>/name.png`, `q` quits.
+/// clicks, `d:x,y` and `u:x,y` press and let go there (a drag, with moves between), `r:w,h` resizes, `t:text` types, `k:esc` presses Esc (`k:f` F, and so on), `w:n` scrolls n lines (down), `f:n` flicks a touchpad n pixels (down) over 0.1 s, as Wayland sends it, `s:name` saves `<YTM_SCRIPT_DIR>/name.png`, `q` quits at once, `x` closes the window as the user would (the app's own closing runs).
 pub(super) fn dev_script(ctx: &egui::Context, raw: &mut egui::RawInput) {
     use std::sync::OnceLock;
     use std::time::Instant;
@@ -106,6 +106,7 @@ pub(super) fn dev_script(ctx: &egui::Context, raw: &mut egui::RawInput) {
         Swipe(egui::TouchPhase, f32),
         Shot(&'static str),
         Quit,
+        Close,
     }
     let Some(script) = dev_var("YTM_SCRIPT") else { return };
     static START: OnceLock<Instant> = OnceLock::new();
@@ -140,6 +141,9 @@ pub(super) fn dev_script(ctx: &egui::Context, raw: &mut egui::RawInput) {
                 }
                 ("s", _) => steps.push((at, Step::Shot(value))),
                 ("q", _) => steps.push((at, Step::Quit)),
+                // Closes the window as the user would: the app's own closing runs (saving,
+                // installing a downloaded update), where `q` ends the process there and then.
+                ("x", _) => steps.push((at, Step::Close)),
                 _ => log::warn!("YTM_SCRIPT: can't read {step}"),
             }
         }
@@ -174,6 +178,7 @@ pub(super) fn dev_script(ctx: &egui::Context, raw: &mut egui::RawInput) {
                 });
             }
             Step::Quit => std::process::exit(0),
+            Step::Close => ctx.send_viewport_cmd(egui::ViewportCommand::Close),
         }
     }
     NEXT.store(next, Ordering::Relaxed);

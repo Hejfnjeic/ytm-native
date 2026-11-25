@@ -307,7 +307,7 @@ mod tests {
     }
 
     fn songs() -> Vec<Track> {
-        vec![track("Around the World", "Daft Punk", "Homework"), track("Levitating", "Dua Lipa", "Future Nostalgia"), track("One More Time", "Daft Punk", "Discovery"), track("ÉTÉ", "Angèle", "Brol")]
+        vec![track("Around the Bend", "Neon Harbor", "Static Bloom"), track("Floating", "Ora Vale", "Retro Futures"), track("Once Again Tonight", "Neon Harbor", "Lighthouse"), track("ÉTÉ", "Aurèle", "Brume")]
     }
 
     fn find(query: &str) -> Option<Vec<usize>> {
@@ -317,21 +317,21 @@ mod tests {
 
     #[test]
     fn finds_by_title_artist_and_album() {
-        assert_eq!(find("levitating"), Some(vec![1]));
-        assert_eq!(find("daft"), Some(vec![0, 2]));
-        assert_eq!(find("Discovery"), Some(vec![2]));
+        assert_eq!(find("floating"), Some(vec![1]));
+        assert_eq!(find("harbor"), Some(vec![0, 2]));
+        assert_eq!(find("Lighthouse"), Some(vec![2]));
     }
 
     #[test]
     fn every_word_has_to_match_but_anywhere() {
-        assert_eq!(find("punk time"), Some(vec![2]));
-        assert_eq!(find("punk levitating"), Some(vec![]));
+        assert_eq!(find("harbor tonight"), Some(vec![2]));
+        assert_eq!(find("harbor floating"), Some(vec![]));
     }
 
     #[test]
     fn case_doesnt_matter_in_any_alphabet() {
         assert_eq!(find("été"), Some(vec![3]));
-        assert_eq!(find("ANGÈLE"), Some(vec![3]));
+        assert_eq!(find("AURÈLE"), Some(vec![3]));
     }
 
     #[test]
@@ -342,7 +342,7 @@ mod tests {
 
     #[test]
     fn it_belongs_to_one_list() {
-        let f = ListFind { page: Some(Page::Playlist("a".into())), query: "daft".into(), ..Default::default() };
+        let f = ListFind { page: Some(Page::Playlist("a".into())), query: "harbor".into(), ..Default::default() };
         assert_eq!(f.rows(&Page::Playlist("b".into()), &songs()), None);
     }
 
@@ -353,7 +353,7 @@ mod tests {
         let page = Page::Playlist("a".into());
         let mut f = ListFind { page: Some(page.clone()), query: String::new(), hide_explicit: true, ..Default::default() };
         assert_eq!(f.rows(&page, &tracks), Some(vec![0, 1, 3]));
-        f.query = "daft".into();
+        f.query = "harbor".into();
         assert_eq!(f.rows(&page, &tracks), Some(vec![0]));
         // Another list's search doesn't apply, but hiding still does.
         assert_eq!(f.rows(&Page::Playlist("b".into()), &tracks), Some(vec![0, 1, 3]));
@@ -373,7 +373,7 @@ mod tests {
         for (t, secs) in tracks.iter_mut().zip([300, 200, 320, 180]) {
             t.duration = Some(secs);
         }
-        // Accents don't count: "ÉTÉ" is among the e's, before "Levitating".
+        // Accents don't count: "ÉTÉ" is among the e's, before "Floating".
         assert_eq!(sorted(Sort::Title, "", &tracks), Some(vec![0, 3, 1, 2]));
         assert_eq!(sorted(Sort::TitleDesc, "", &tracks), Some(vec![2, 1, 3, 0]));
         // One artist's songs by title.
@@ -383,7 +383,7 @@ mod tests {
         assert_eq!(sorted(Sort::Default, "", &tracks), None);
         assert_eq!(sorted(Sort::Reversed, "", &tracks), Some(vec![3, 2, 1, 0]));
         // Found songs turn around too.
-        assert_eq!(sorted(Sort::Reversed, "daft", &tracks), Some(vec![2, 0]));
+        assert_eq!(sorted(Sort::Reversed, "harbor", &tracks), Some(vec![2, 0]));
         // Nor in what's looked for.
         assert_eq!(sorted(Sort::Default, "ete", &tracks), Some(vec![3]));
     }
@@ -399,8 +399,8 @@ mod tests {
 
     #[test]
     fn found_songs_are_sorted_too() {
-        assert_eq!(sorted(Sort::Title, "daft", &songs()), Some(vec![0, 2]));
-        assert_eq!(sorted(Sort::TitleDesc, "daft", &songs()), Some(vec![2, 0]));
+        assert_eq!(sorted(Sort::Title, "harbor", &songs()), Some(vec![0, 2]));
+        assert_eq!(sorted(Sort::TitleDesc, "harbor", &songs()), Some(vec![2, 0]));
     }
 
     #[test]
@@ -438,7 +438,7 @@ mod tests {
     #[test]
     fn play_takes_the_whole_list_sorted() {
         let page = Page::Playlist("a".into());
-        let mut f = ListFind { page: Some(page.clone()), query: "daft".into(), ..Default::default() };
+        let mut f = ListFind { page: Some(page.clone()), query: "harbor".into(), ..Default::default() };
         assert_eq!(f.sorted(&page, &songs()), None);
         f.set_sort(&page, Sort::TitleDesc);
         assert_eq!(f.sorted(&page, &songs()), Some(vec![2, 1, 3, 0]));

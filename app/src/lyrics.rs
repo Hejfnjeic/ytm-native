@@ -1473,10 +1473,10 @@ mod tests {
     #[test]
     fn lrc_skips_credits_and_reads_offset() {
         // The extension reads `offset` in seconds.
-        let l = parse_lrc("[offset:+0.5]\n[00:01.00]作词 : 野田洋次郎\n[00:05.00]Hello\n[00:07.00]World", 10_000);
+        let l = parse_lrc("[offset:+0.5]\n[00:01.00]作词 : 青木陽太\n[00:05.00]Hello\n[00:07.00]World", 10_000);
         assert_eq!(l.len(), 2);
         assert_eq!(l[0].start, 4500);
-        assert_eq!(lrc_songwriters("[00:01.00]作词 : 野田洋次郎\n"), vec!["野田洋次郎"]);
+        assert_eq!(lrc_songwriters("[00:01.00]作词 : 青木陽太\n"), vec!["青木陽太"]);
     }
 
     #[test]
@@ -1488,23 +1488,23 @@ mod tests {
 
     #[test]
     fn qrc_drops_title_and_reads_syllables() {
-        let xml = "<Lyric_1 LyricContent=\"[ti:x]\n[0,6350]Song - Artist(0,198)\n[1000,2000]Get(1000,500) (1500,10)Lucky(1510,490)\n\"/>";
+        let xml = "<Lyric_1 LyricContent=\"[ti:x]\n[0,6350]Song - Artist(0,198)\n[1000,2000]Lucky(1000,500) (1500,10)Stars(1510,490)\n\"/>";
         let l = parse_qrc(xml, 3000, Some(("Song", "Artist")));
         let sung: Vec<&Line> = l.iter().filter(|l| !l.instrumental).collect();
         assert_eq!(sung.len(), 1);
-        assert_eq!(sung[0].text, "Get Lucky");
+        assert_eq!(sung[0].text, "Lucky Stars");
         assert_eq!(sung[0].parts[2].start, 1510);
     }
 
     #[test]
     fn ttml_parts_background_agents_and_extras() {
-        let xml = r#"<tt xmlns="http://www.w3.org/ns/ttml" xmlns:itunes="http://music.apple.com/lyric-ttml-internal" xmlns:ttm="http://www.w3.org/ns/ttml#metadata" xml:lang="ja"><head><metadata><ttm:agent type="person" xml:id="v1"/><ttm:agent type="person" xml:id="v2"/><iTunesMetadata xmlns="http://music.apple.com/lyric-ttml-internal"><translations><translation xml:lang="en"><text for="L1">Hello world</text></translation></translations><songwriters><songwriter>野田洋次郎</songwriter></songwriters><transliterations><transliteration xml:lang="ja-Latn"><text for="L1"><span begin="1.0" end="2.0">kon</span> <span begin="2.0" end="3.0">nichiwa</span></text></transliteration></transliterations></iTunesMetadata></metadata></head><body dur="20.0"><div>
+        let xml = r#"<tt xmlns="http://www.w3.org/ns/ttml" xmlns:itunes="http://music.apple.com/lyric-ttml-internal" xmlns:ttm="http://www.w3.org/ns/ttml#metadata" xml:lang="ja"><head><metadata><ttm:agent type="person" xml:id="v1"/><ttm:agent type="person" xml:id="v2"/><iTunesMetadata xmlns="http://music.apple.com/lyric-ttml-internal"><translations><translation xml:lang="en"><text for="L1">Hello world</text></translation></translations><songwriters><songwriter>青木陽太</songwriter></songwriters><transliterations><transliteration xml:lang="ja-Latn"><text for="L1"><span begin="1.0" end="2.0">kon</span> <span begin="2.0" end="3.0">nichiwa</span></text></transliteration></transliterations></iTunesMetadata></metadata></head><body dur="20.0"><div>
 <p begin="1.0" end="3.0" itunes:key="L1" ttm:agent="v1"><span begin="1.0" end="1.5">こん</span><span begin="1.5" end="2.0">に</span> <span begin="2.0" end="3.0">ちは</span><span ttm:role="x-bg"><span begin="2.5" end="3.5">(yeah)</span></span></p>
 <p begin="10.0" end="11.0" itunes:key="L2" ttm:agent="v2">Line two</p></div></body></tt>"#;
         let t = parse_ttml(xml, 0);
         assert!(t.word_synced);
         assert_eq!(t.language.as_deref(), Some("ja"));
-        assert_eq!(t.songwriters, vec!["野田洋次郎"]);
+        assert_eq!(t.songwriters, vec!["青木陽太"]);
         let l = &t.lines[0];
         assert_eq!(l.text, "こんに ちは(yeah)");
         assert_eq!(l.parts.len(), 5);
@@ -1582,6 +1582,6 @@ mod tests {
         let bl = got.iter().find(|l| l.provider == Provider::BLyricsRich).unwrap();
         assert_eq!(bl.sync, Sync::Word);
         assert!(bl.lines.iter().any(|l| l.timed_roman.len() > 3));
-        assert_eq!(bl.songwriters, vec!["野田洋次郎"]);
+        assert_eq!(bl.songwriters, vec!["青木陽太"]);
     }
 }

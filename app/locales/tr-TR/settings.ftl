@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Sürenin yanında derecelendirmeleri göster.
 settings-ratings-dim-disliked = Dim'in beğenmediği şarkılar
 settings-ratings-dim-disliked-desc = Beğenilmeyen şarkıları şarkı listelerinde sessiz renklerde gösterin.
 settings-ratings-skip-disliked = Beğenmeme sonraki parçaya atlar
-settings-ratings-skip-disliked-desc = YouTube Music beğenmemeyi onayladıktan sonra ilerleyin. Birlikte Dinle'deki konuklar toplantı sahibinin oynatmasını takip eder.
+settings-ratings-skip-disliked-desc = YouTube Music beğenmemeyi onayladıktan sonra ilerleyin.
 settings-ratings-dislike-notices = Bildirimleri beğenmedim
 settings-ratings-dislike-notices-desc = Beğenmediğiniz bir şey kaydedildiğinde veya kaldırıldığında bir mesaj göster.
 settings-ratings-unlike-notices = Kaldırma bildirimlerini beğen
@@ -94,7 +94,7 @@ settings-centre = Merkez
 ## Equalizer
 
 settings-equalizer = Ekolayzer
-settings-equalizer-desc = Sesi derin bastan tize doğru şekillendirin. Yalnızca duyduklarınız değişir: indirmeler veya başkalarının duydukları değil.
+settings-equalizer-desc = Sesi derin bastan tize doğru şekillendirin.
 settings-preset = Ön Ayar
 settings-custom = Özel
 settings-equalizer-preset = Ekolayzer ön ayarı
@@ -216,7 +216,7 @@ settings-restart-now = Şimdi yeniden başlat
 
 settings-window = Pencere
 settings-open-on = Başlangıç sayfası
-settings-open-on-desc = Uygulamanın başladığı sayfa. İndirilenler dışında Kitaplığın kendi sekmelerinde oturum açmanız gerekir; Oturum kapatıldığında uygulama Ana Sayfa'da açılır.
+settings-open-on-desc = Uygulamanın başladığı sayfa. Oturum kapalıyken Ana Sayfa açılır.
 settings-home = Ana Sayfa
 settings-close-to-tray-desc-linux = Tepside bir simge tutar. × öğesine tıklamak oradaki pencereyi gizler ve müziğin çalmaya devam etmesini sağlar. Simgenin menüsü onu geri getirir, gizler veya çıkar. Sistemin medya kontrollerinde şarkıya tıklamak da şarkıyı geri getirir ve Ctrl+Q sonlandırılır.
 settings-close-to-tray-desc = Tepside bir simge tutar. × öğesine tıklamak oradaki pencereyi gizler ve müziğin çalmaya devam etmesini sağlar. Geri getirmek için simgeye tıklayın veya gizlemek, göstermek veya çıkmak için sağ tıklayın.

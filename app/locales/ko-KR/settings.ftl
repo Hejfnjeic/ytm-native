@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = 기간 옆에 평점을 표시합니다. 등�
 settings-ratings-dim-disliked = 싫어하는 노래 희미해
 settings-ratings-dim-disliked-desc = 노래 목록에서 싫어하는 노래를 음소거 색상으로 표시합니다.
 settings-ratings-skip-disliked = 싫어요는 다음 트랙으로 건너뜁니다.
-settings-ratings-skip-disliked-desc = YouTube Music가 싫어요를 확인한 후 진행합니다. 함께 듣기의 게스트는 호스트의 재생을 따라갑니다.
+settings-ratings-skip-disliked-desc = YouTube Music가 싫어요를 확인한 후 진행합니다.
 settings-ratings-dislike-notices = 알림을 싫어함
 settings-ratings-dislike-notices-desc = 싫어요가 저장되거나 삭제되면 메시지를 표시합니다.
 settings-ratings-unlike-notices = 삭제 알림 좋아요
@@ -94,7 +94,7 @@ settings-centre = 센터
 ## Equalizer
 
 settings-equalizer = 평형 장치
-settings-equalizer-desc = 깊은 저음부터 고음까지 사운드를 형성합니다. 내가 듣는 내용만 변경됩니다. 다운로드나 Jam에 참여한 다른 사람이 듣는 내용은 변경되지 않습니다.
+settings-equalizer-desc = 깊은 저음부터 고음까지 사운드를 형성합니다.
 settings-preset = 프리셋
 settings-custom = 커스텀
 settings-equalizer-preset = 이퀄라이저 프리셋
@@ -216,7 +216,7 @@ settings-restart-now = 지금 다시 시작
 
 settings-window = 창
 settings-open-on = 시작 페이지
-settings-open-on-desc = 앱이 시작되는 페이지입니다. 다운로드를 제외한 라이브러리 자체 탭에는 로그인이 필요합니다. 로그아웃하면 홈에서 앱이 열립니다.
+settings-open-on-desc = 앱이 시작되는 페이지입니다. 로그아웃 상태에서는 홈에서 열립니다.
 settings-home = 홈
 settings-close-to-tray-desc-linux = 트레이에 아이콘을 유지합니다. ×를 클릭하면 창이 숨겨지고 음악이 계속 재생됩니다. 아이콘 메뉴는 아이콘을 다시 가져오거나 숨기거나 종료합니다. 시스템의 미디어 컨트롤에서 노래를 클릭하면 노래도 다시 표시되고 Ctrl+Q는 종료됩니다.
 settings-close-to-tray-desc = 트레이에 아이콘을 유지합니다. ×를 클릭하면 창이 숨겨지고 음악이 계속 재생됩니다. 다시 가져오려면 아이콘을 클릭하고, 숨기거나 표시하거나 종료하려면 마우스 오른쪽 버튼을 클릭하세요.

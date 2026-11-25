@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Mostra le valutazioni accanto alla durata. Pa
 settings-ratings-dim-disliked = Attenua i brani contrassegnati con «Non mi piace»
 settings-ratings-dim-disliked-desc = Mostra negli elenchi i brani con «Non mi piace» in colori attenuati.
 settings-ratings-skip-disliked = Salta il brano dopo «Non mi piace»
-settings-ratings-skip-disliked-desc = Passa al brano successivo quando YouTube Music conferma il voto. In Ascolta insieme, gli ospiti seguono la riproduzione di chi ospita.
+settings-ratings-skip-disliked-desc = Passa al brano successivo quando YouTube Music conferma il voto.
 settings-ratings-dislike-notices = Notifiche per «Non mi piace»
 settings-ratings-dislike-notices-desc = Mostra un avviso quando aggiungi o rimuovi un «Non mi piace».
 settings-ratings-unlike-notices = Notifiche di rimozione dei «Mi piace»
@@ -94,7 +94,7 @@ settings-centre = Centro
 ## Equalizer
 
 settings-equalizer = Equalizzatore
-settings-equalizer-desc = Regola il suono dai bassi profondi agli alti. Cambia solo ciò che ascolti tu. I download e l’audio degli altri partecipanti non cambiano.
+settings-equalizer-desc = Regola il suono dai bassi profondi agli alti.
 settings-preset = Preimpostazione
 settings-custom = Personalizzato
 settings-equalizer-preset = Preimpostazione dell’equalizzatore
@@ -216,7 +216,7 @@ settings-restart-now = Riavvia ora
 
 settings-window = Finestra
 settings-open-on = Pagina all’avvio
-settings-open-on-desc = Sceglie la pagina iniziale dell’app. Le schede della raccolta richiedono l’accesso, tranne Download. Senza accesso si apre Home.
+settings-open-on-desc = Sceglie la pagina iniziale dell’app. Senza accesso si apre Home.
 settings-home = Home
 settings-close-to-tray-desc-linux = Mantiene un’icona nell’area di notifica. Con × la finestra si nasconde e la musica continua. Dal menu dell’icona puoi mostrare o nascondere la finestra oppure uscire. Anche un clic sul brano nei controlli multimediali di sistema la riapre. Ctrl+Q chiude l’app.
 settings-close-to-tray-desc = Mantiene un’icona nell’area di notifica. Con × la finestra si nasconde e la musica continua. Fai clic sull’icona per riaprirla oppure fai clic destro per nasconderla, mostrarla o uscire.

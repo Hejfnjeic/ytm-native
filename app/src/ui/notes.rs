@@ -14,6 +14,8 @@ pub enum Block {
     Bullet(String),
 }
 
+/// The release notes as blocks. They end at the "Install" section release.sh adds for
+/// the downloads page: in the app there's nothing to install.
 pub fn parse(md: &str) -> Vec<Block> {
     let mut out = Vec::new();
     let mut para = String::new();
@@ -29,7 +31,11 @@ pub fn parse(md: &str) -> Vec<Block> {
             flush(&mut para, &mut out);
         } else if t.starts_with('#') {
             flush(&mut para, &mut out);
-            out.push(Block::Heading(t.trim_start_matches('#').trim().to_owned()));
+            let heading = t.trim_start_matches('#').trim();
+            if heading.eq_ignore_ascii_case("install") {
+                return out;
+            }
+            out.push(Block::Heading(heading.to_owned()));
         } else if let Some(b) = t.strip_prefix("- ").or_else(|| t.strip_prefix("* ")) {
             flush(&mut para, &mut out);
             out.push(Block::Bullet(b.trim().to_owned()));
@@ -206,17 +212,20 @@ pub fn show(ui: &mut Ui, blocks: &[Block], size: f32) {
     }
 }
 
-/// The card's short list: feature headings and bullets (first sentence), up to
-/// three, plus how many more there are. A "Fixes" heading isn't an item itself.
+/// The card's short list, up to three, plus how many more there are: a feature (a
+/// heading with a paragraph under it) by its heading, and each bullet by its bold lead-in
+/// ("**Lyrics window**: …") or else its first sentence. Headings over a list ("Fixes")
+/// or over another heading (the notes' title) only group, so they aren't items.
 pub fn summary(blocks: &[Block]) -> (Vec<String>, usize) {
     let mut items = Vec::new();
-    for b in blocks {
+    for (i, b) in blocks.iter().enumerate() {
         match b {
-            Block::Heading(t) if !t.to_lowercase().starts_with("fix") => items.push(plain(t)),
+            Block::Heading(t) if matches!(blocks.get(i + 1), Some(Block::Para(_))) => items.push(plain(t)),
             Block::Bullet(t) => {
+                let lead = t.strip_prefix("**").and_then(|r| r.find("**").map(|e| &r[..e])).filter(|l| !l.is_empty());
                 let t = plain(t);
                 let first = t.find(". ").map_or(t.as_str(), |i| &t[..i]);
-                items.push(first.trim_end_matches('.').to_owned());
+                items.push(lead.map_or_else(|| first.trim_end_matches('.').to_owned(), plain));
             }
             _ => {}
         }
@@ -489,5 +498,13 @@ mod tests {
         let (items, more) = summary(&parse(MD));
         assert_eq!(items, vec!["Uploads", "Mixes play again", "Icons are centred in their buttons"]);
         assert_eq!(more, 1);
+    }
+
+    #[test]
+    fn summary_skips_section_headings_and_takes_bold_lead_ins() {
+        let md = "## Fixes for the lyrics window\n\n### Fixed\n- **Lyrics window**: it keeps going. Really.\n- Videos fit.\n\n### Removed\n- **Software rendering** is gone.\n\n## Install\n- **Arch Linux:** pacman.\n";
+        let (items, more) = summary(&parse(md));
+        assert_eq!(items, vec!["Lyrics window", "Videos fit", "Software rendering"]);
+        assert_eq!(more, 0);
     }
 }

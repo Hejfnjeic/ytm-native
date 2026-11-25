@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Pokazuje oceny obok czasu trwania. Najedź na
 settings-ratings-dim-disliked = Przygaszaj utwory z oceną negatywną
 settings-ratings-dim-disliked-desc = Wyświetla na listach utwory z oceną negatywną w przygaszonych kolorach.
 settings-ratings-skip-disliked = Pomijaj utwór po ocenie negatywnej
-settings-ratings-skip-disliked-desc = Przechodzi dalej po potwierdzeniu oceny przez YouTube Music. Podczas wspólnego słuchania goście słuchają tego, co odtwarza gospodarz.
+settings-ratings-skip-disliked-desc = Przechodzi dalej po potwierdzeniu oceny przez YouTube Music.
 settings-ratings-dislike-notices = Powiadomienia o ocenach negatywnych
 settings-ratings-dislike-notices-desc = Wyświetla komunikat po zapisaniu lub cofnięciu oceny negatywnej.
 settings-ratings-unlike-notices = Powiadomienia o cofnięciu polubienia
@@ -94,7 +94,7 @@ settings-centre = Środek
 ## Equalizer
 
 settings-equalizer = Korektor
-settings-equalizer-desc = Reguluje dźwięk od głębokiego basu po wysokie tony. Zmiana dotyczy tylko Twojego odsłuchu. Pobrane pliki i odsłuch innych uczestników pozostają bez zmian.
+settings-equalizer-desc = Reguluje dźwięk od głębokiego basu po wysokie tony.
 settings-preset = Ustawienie wstępne
 settings-custom = Własne
 settings-equalizer-preset = Ustawienie korektora
@@ -216,7 +216,7 @@ settings-restart-now = Uruchom ponownie teraz
 
 settings-window = Okno
 settings-open-on = Strona po uruchomieniu
-settings-open-on-desc = Wybiera stronę startową. Karty biblioteki oprócz pobranych wymagają zalogowania. Bez logowania otwiera się strona główna.
+settings-open-on-desc = Wybiera stronę startową. Bez logowania otwiera się strona główna.
 settings-home = Główna
 settings-close-to-tray-desc-linux = Zostawia ikonę w zasobniku. Kliknięcie × ukrywa okno, a muzyka gra dalej. Menu ikony pozwala pokazać lub ukryć okno albo zamknąć aplikację. Kliknięcie utworu w systemowych kontrolkach multimediów też przywraca okno. Ctrl+Q zamyka aplikację.
 settings-close-to-tray-desc = Zostawia ikonę w zasobniku. Kliknięcie × ukrywa okno, a muzyka gra dalej. Kliknij ikonę, by przywrócić okno, lub kliknij prawym przyciskiem, by ukryć lub pokazać okno albo zamknąć aplikację.

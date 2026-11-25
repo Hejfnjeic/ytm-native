@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Mostra as avaliações ao lado da duração. 
 settings-ratings-dim-disliked = Atenuar músicas não curtidas
 settings-ratings-dim-disliked-desc = Mostra músicas com “não gostar” em cores suaves nas listas.
 settings-ratings-skip-disliked = Não gostar pula para a próxima
-settings-ratings-skip-disliked-desc = Avança depois que o YouTube Music confirma o “não gostar”. Convidados em Ouvir juntos seguem a reprodução do anfitrião.
+settings-ratings-skip-disliked-desc = Avança depois que o YouTube Music confirma o “não gostar”.
 settings-ratings-dislike-notices = Notificações de não gostar
 settings-ratings-dislike-notices-desc = Mostra uma mensagem quando um “não gostar” é salvo ou removido.
 settings-ratings-unlike-notices = Notificações de remoção de curtida
@@ -94,7 +94,7 @@ settings-centre = Centro
 ## Equalizer
 
 settings-equalizer = Equalizador
-settings-equalizer-desc = Molda o som do grave profundo ao agudo. Só o que você ouve muda: não downloads, nem o que outros em um jam ouvem.
+settings-equalizer-desc = Molda o som do grave profundo ao agudo.
 settings-preset = Predefinição
 settings-custom = Personalizado
 settings-equalizer-preset = Predefinição do equalizador
@@ -218,7 +218,7 @@ settings-restart-now = Reiniciar agora
 
 settings-window = Janela
 settings-open-on = Abrir em
-settings-open-on-desc = A página em que o app inicia. As abas da Biblioteca exigem login, exceto Downloads; desconectado, o app abre na Home.
+settings-open-on-desc = A página em que o app inicia. Desconectado, o app abre na Home.
 settings-home = Home
 settings-close-to-tray-desc-linux = Mantém um ícone na bandeja. Clicar em × esconde a janela lá e a música continua. O menu do ícone traz de volta, esconde ou sai. Clicar na música nos controles de mídia do sistema também traz de volta, e Ctrl+Q sai.
 settings-close-to-tray-desc = Mantém um ícone na bandeja. Clicar em × esconde a janela lá e a música continua. Clique no ícone para trazer de volta, ou clique com o botão direito para esconder, mostrar ou sair.

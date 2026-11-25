@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = แสดงการให้คะแนน
 settings-ratings-dim-disliked = เพลงที่ไม่ชอบติ่มซำ
 settings-ratings-dim-disliked-desc = แสดงเพลงที่ไม่ชอบด้วยสีที่ไม่ออกเสียงในรายการเพลง
 settings-ratings-skip-disliked = ไม่ชอบ ข้ามไปยังเพลงถัดไป
-settings-ratings-skip-disliked-desc = ก้าวหน้าหลังจาก YouTube Music ยืนยันการไม่ชอบ แขกรับเชิญใน Listen จะติดตามการเล่นของผู้จัดด้วยกัน
+settings-ratings-skip-disliked-desc = ก้าวหน้าหลังจาก YouTube Music ยืนยันการไม่ชอบ
 settings-ratings-dislike-notices = ไม่ชอบการแจ้งเตือน
 settings-ratings-dislike-notices-desc = แสดงข้อความเมื่อมีการบันทึกหรือลบการไม่ชอบ
 settings-ratings-unlike-notices = ชอบการแจ้งเตือนการลบ
@@ -94,7 +94,7 @@ settings-centre = ตรงกลาง
 ## Equalizer
 
 settings-equalizer = อีควอไลเซอร์
-settings-equalizer-desc = ปรับเสียงจากเสียงเบสทุ้มลึกไปจนถึงเสียงแหลม การเปลี่ยนแปลงเฉพาะสิ่งที่คุณได้ยิน: ไม่ใช่การดาวน์โหลด หรือสิ่งที่คนอื่นได้ยิน
+settings-equalizer-desc = ปรับเสียงจากเสียงเบสทุ้มลึกไปจนถึงเสียงแหลม
 settings-preset = ตั้งค่าล่วงหน้า
 settings-custom = กำหนดเอง
 settings-equalizer-preset = อีควอไลเซอร์ที่ตั้งไว้ล่วงหน้า
@@ -216,7 +216,7 @@ settings-restart-now = เปิดแอปใหม่ตอนนี้
 
 settings-window = หน้าต่าง
 settings-open-on = หน้าเมื่อเปิดแอป
-settings-open-on-desc = หน้าที่แอปเริ่มต้น คุณต้องลงชื่อเข้าใช้แท็บของไลบรารี ยกเว้นการดาวน์โหลด ออกจากระบบแล้ว แอปจะเปิดบนหน้าแรก
+settings-open-on-desc = หน้าที่แอปเปิดเมื่อเริ่มต้น หากยังไม่ได้ลงชื่อเข้าใช้ แอปจะเปิดที่หน้าแรก
 settings-home = หน้าแรก
 settings-close-to-tray-desc-linux = เก็บไอคอนไว้ในถาด การคลิก × จะซ่อนหน้าต่างตรงนั้นและเล่นเพลงต่อไป เมนูของไอคอนจะนำกลับมา ซ่อน หรือออก การคลิกเพลงในตัวควบคุมสื่อของระบบจะเป็นการนำเพลงนั้นกลับมาด้วย และ Ctrl+Q จะหยุดทำงาน
 settings-close-to-tray-desc = เก็บไอคอนไว้ในถาด การคลิก × จะซ่อนหน้าต่างตรงนั้นและเล่นเพลงต่อไป คลิกที่ไอคอนเพื่อนำกลับมา หรือคลิกขวาเพื่อซ่อน แสดง หรือออก

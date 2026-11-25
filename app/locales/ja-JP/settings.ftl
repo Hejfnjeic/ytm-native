@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = 曲の長さの横に評価を表示します
 settings-ratings-dim-disliked = 低評価の曲を薄く表示
 settings-ratings-dim-disliked-desc = 曲一覧で低評価の曲を控えめな色で表示します。
 settings-ratings-skip-disliked = 低評価を付けたら次の曲へ
-settings-ratings-skip-disliked-desc = YouTube Music が低評価を確認したら次の曲に進みます。一緒に聴くセッションのゲストはホストの再生に従います。
+settings-ratings-skip-disliked-desc = YouTube Music が低評価を確認したら次の曲に進みます。
 settings-ratings-dislike-notices = 低評価の通知
 settings-ratings-dislike-notices-desc = 低評価を保存または取り消したときに通知します。
 settings-ratings-unlike-notices = 高評価を取り消したときの通知
@@ -94,7 +94,7 @@ settings-centre = 中央
 ## Equalizer
 
 settings-equalizer = イコライザー
-settings-equalizer-desc = 低音から高音まで音質を調整します。効果は自分の再生にだけ適用されます。ダウンロードや一緒に聴く相手の音には影響しません。
+settings-equalizer-desc = 低音から高音まで音質を調整します。
 settings-preset = プリセット
 settings-custom = カスタム
 settings-equalizer-preset = イコライザーのプリセット
@@ -216,7 +216,7 @@ settings-restart-now = 今すぐ再起動
 
 settings-window = ウィンドウ
 settings-open-on = 起動時のページ
-settings-open-on-desc = 起動時に開くページです。「ダウンロード」以外のライブラリ タブにはログインが必要です。未ログイン時はホームを開きます。
+settings-open-on-desc = 起動時に開くページです。未ログイン時はホームを開きます。
 settings-home = ホーム
 settings-close-to-tray-desc-linux = 通知領域にアイコンを表示します。× を押すとウィンドウを隠し、再生は続きます。アイコンのメニューで表示、非表示、終了を選べます。システムのメディア コントロールで曲をクリックしても戻れます。Ctrl+Q で終了します。
 settings-close-to-tray-desc = 通知領域にアイコンを表示します。× を押すとウィンドウを隠し、再生は続きます。アイコンをクリックするとウィンドウが戻ります。右クリックで表示、非表示、終了を選べます。

@@ -63,7 +63,7 @@ settings-ratings-list-icons-desc = Zeigt Bewertungen neben der Dauer. Zeige mit 
 settings-ratings-dim-disliked = Titel mit „Mag ich nicht“ abblenden
 settings-ratings-dim-disliked-desc = Zeigt Titel mit „Mag ich nicht“ in Listen in gedämpften Farben an.
 settings-ratings-skip-disliked = Bei „Mag ich nicht“ weiterschalten
-settings-ratings-skip-disliked-desc = Springt weiter, sobald YouTube Music die Bewertung bestätigt. Beim gemeinsamen Hören folgen Gäste der Wiedergabe des Gastgebers.
+settings-ratings-skip-disliked-desc = Springt weiter, sobald YouTube Music die Bewertung bestätigt.
 settings-ratings-dislike-notices = Hinweise zu „Mag ich nicht“
 settings-ratings-dislike-notices-desc = Zeigt beim Speichern oder Entfernen von „Mag ich nicht“ einen Hinweis an.
 settings-ratings-unlike-notices = Hinweise beim Entfernen von Likes
@@ -98,7 +98,7 @@ settings-centre = Mitte
 ## Equalizer
 
 settings-equalizer = Equalizer
-settings-equalizer-desc = Passt den Klang von tiefen Bässen bis zu den Höhen an. Das wirkt nur auf deinen Ton. Downloads und andere Teilnehmer einer gemeinsamen Sitzung bleiben unberührt.
+settings-equalizer-desc = Passt den Klang von tiefen Bässen bis zu den Höhen an.
 settings-preset = Voreinstellung
 settings-custom = Benutzerdefiniert
 settings-equalizer-preset = Equalizer-Voreinstellung
@@ -145,7 +145,7 @@ settings-weight-semibold = Halbfett
 settings-weight-bold = Fett
 settings-weight-extra-bold = Extrafett
 settings-translation-size = Größe der Übersetzung
-settings-translation-size-desc = Zeigt übersetzte und lateinisch umschriebene Zeilen neben dem Liedtext größer oder kleiner an. 100 % entspricht dem Design.
+settings-translation-size-desc = Zeigt übersetzte Zeilen neben dem Liedtext größer oder kleiner an. 100 % entspricht dem Design.
 settings-quick-line-changes = Schneller Zeilenwechsel
 settings-quick-line-changes-desc = Die nächste Zeile rückt schnell nach, wie bei Better Lyrics. Ausgeschaltet bestimmt das Design das Tempo.
 settings-lyrics-full-frame-rate = Liedtexte mit Bildschirm-Bildrate
@@ -243,7 +243,7 @@ settings-restart-now = Jetzt neu starten
 
 settings-window = Fenster
 settings-open-on = Startseite beim Öffnen
-settings-open-on-desc = Wählt die Seite beim Start. Bibliotheks-Tabs außer „Downloads“ erfordern eine Anmeldung. Ohne Anmeldung öffnet sich die Startseite.
+settings-open-on-desc = Wählt die Seite beim Start. Ohne Anmeldung öffnet sich die Startseite.
 settings-home = Startseite
 settings-close-to-tray-desc-linux = Behält ein Symbol im Infobereich. × blendet das Fenster aus, während die Musik weiterspielt. Über das Symbolmenü kannst du es anzeigen, ausblenden oder die App beenden. Ein Klick auf den Titel in der Mediensteuerung zeigt es ebenfalls an. Strg+Q beendet die App.
 settings-close-to-tray-desc = Behält ein Symbol im Infobereich. × blendet das Fenster aus, während die Musik weiterspielt. Klicke auf das Symbol zum Anzeigen oder mit der rechten Maustaste, um es aus- oder einzublenden oder die App zu beenden.

@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = अवधि के साथ रेटिं
 settings-ratings-dim-disliked = डिम को गाने नापसंद थे
 settings-ratings-dim-disliked-desc = नापसंद किए गए गानों को गाने की सूची में म्यूट रंगों में दिखाएं।
 settings-ratings-skip-disliked = नापसंद अगले ट्रैक पर चला जाता है
-settings-ratings-skip-disliked-desc = YouTube Music के बाद नापसंद नापसंद की पुष्टि करता है। लिसन में मेहमान एक साथ मेज़बान के प्लेबैक का अनुसरण करते हैं।
+settings-ratings-skip-disliked-desc = YouTube Music के बाद नापसंद नापसंद की पुष्टि करता है।
 settings-ratings-dislike-notices = सूचनाएं नापसंद करें
 settings-ratings-dislike-notices-desc = जब कोई नापसंद सहेजा जाता है या हटा दिया जाता है तो एक संदेश दिखाएं।
 settings-ratings-unlike-notices = निष्कासन सूचनाओं की तरह
@@ -94,7 +94,7 @@ settings-centre = केंद्र
 ## Equalizer
 
 settings-equalizer = तुल्यकारक
-settings-equalizer-desc = ध्वनि को गहरे बास से तिगुना तक आकार दें। केवल वही बदलता है जो आप सुनते हैं: डाउनलोड नहीं, या जाम में अन्य लोग क्या सुनते हैं।
+settings-equalizer-desc = ध्वनि को गहरे बास से तिगुना तक आकार दें।
 settings-preset = प्रीसेट
 settings-custom = कस्टम
 settings-equalizer-preset = इक्वलाइज़र प्रीसेट
@@ -216,7 +216,7 @@ settings-restart-now = अभी फिर से शुरू करें
 
 settings-window = खिड़की
 settings-open-on = शुरुआती पेज
-settings-open-on-desc = वह पेज जिस पर ऐप शुरू होता है। डाउनलोड को छोड़कर, लाइब्रेरी के स्वयं के टैब में आपको साइन इन करना होगा; साइन आउट करने पर, ऐप होम पर खुलता है।
+settings-open-on-desc = वह पेज जिस पर ऐप शुरू होता है। साइन आउट होने पर ऐप होम पर खुलता है।
 settings-home = होम
 settings-close-to-tray-desc-linux = ट्रे में एक आइकन रखता है। × क्लिक करने से विंडो छिप जाती है और संगीत बजता रहता है। आइकन का मेनू इसे वापस लाता है, छुपाता है या छोड़ देता है। सिस्टम के मीडिया नियंत्रण में गाने पर क्लिक करने से वह भी वापस आ जाता है, और Ctrl+Q बंद हो जाता है।
 settings-close-to-tray-desc = ट्रे में एक आइकन रखता है। × क्लिक करने से विंडो छिप जाती है और संगीत बजता रहता है। इसे वापस लाने के लिए आइकन पर क्लिक करें, या छिपाने, दिखाने या छोड़ने के लिए राइट-क्लिक करें।

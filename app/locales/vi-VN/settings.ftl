@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Hiển thị xếp hạng bên cạnh thời 
 settings-ratings-dim-disliked = Dim những bài hát không thích
 settings-ratings-dim-disliked-desc = Hiển thị các bài hát không thích ở chế độ tắt tiếng trong danh sách bài hát.
 settings-ratings-skip-disliked = Không thích chuyển sang bài hát tiếp theo
-settings-ratings-skip-disliked-desc = Nâng cao sau khi YouTube Music xác nhận việc không thích. Khách trong Listen cùng nhau theo dõi quá trình phát của chủ nhà.
+settings-ratings-skip-disliked-desc = Nâng cao sau khi YouTube Music xác nhận việc không thích.
 settings-ratings-dislike-notices = Thông báo không thích
 settings-ratings-dislike-notices-desc = Hiển thị thông báo khi lượt không thích được lưu hoặc xóa.
 settings-ratings-unlike-notices = Thông báo xóa lượt thích
@@ -94,7 +94,7 @@ settings-centre = Trung tâm
 ## Equalizer
 
 settings-equalizer = Bộ chỉnh âm
-settings-equalizer-desc = Định hình âm thanh từ âm trầm sâu đến âm bổng. Chỉ những gì bạn nghe thấy mới thay đổi: không phải nội dung tải xuống hoặc những gì người khác đang nghe.
+settings-equalizer-desc = Định hình âm thanh từ âm trầm sâu đến âm bổng.
 settings-preset = Đặt trước
 settings-custom = Tùy chỉnh
 settings-equalizer-preset = Cài đặt sẵn bộ chỉnh âm
@@ -216,7 +216,7 @@ settings-restart-now = Khởi động lại ngay
 
 settings-window = Cửa sổ
 settings-open-on = Trang khi mở ứng dụng
-settings-open-on-desc = Trang khởi động ứng dụng. Các tab riêng của Thư viện cần bạn đăng nhập, ngoại trừ Tải xuống; đăng xuất, ứng dụng sẽ mở trên Trang chủ.
+settings-open-on-desc = Trang mở khi khởi động ứng dụng. Khi chưa đăng nhập, ứng dụng mở Trang chủ.
 settings-home = Trang chủ
 settings-close-to-tray-desc-linux = Giữ một biểu tượng trong khay. Nhấp vào × ẩn cửa sổ ở đó và tiếp tục phát nhạc. Menu của biểu tượng sẽ đưa nó trở lại, ẩn nó hoặc thoát. Việc nhấp vào bài hát trong bộ điều khiển phương tiện của hệ thống cũng sẽ đưa bài hát đó trở lại và Ctrl+Q sẽ thoát.
 settings-close-to-tray-desc = Giữ một biểu tượng trong khay. Nhấp vào × ẩn cửa sổ ở đó và tiếp tục phát nhạc. Nhấp vào biểu tượng để hiển thị lại hoặc nhấp chuột phải vào biểu tượng để ẩn, hiển thị hoặc thoát.

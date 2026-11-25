@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Toont beoordelingen naast de speelduur. Wijs 
 settings-ratings-dim-disliked = Negatief beoordeelde nummers dimmen
 settings-ratings-dim-disliked-desc = Toont negatief beoordeelde nummers in lijsten met gedempte kleuren.
 settings-ratings-skip-disliked = Overslaan bij ‘Vind ik niet leuk’
-settings-ratings-skip-disliked-desc = Gaat verder zodra YouTube Music de beoordeling bevestigt. Gasten bij Samen luisteren volgen de weergave van de host.
+settings-ratings-skip-disliked-desc = Gaat verder zodra YouTube Music de beoordeling bevestigt.
 settings-ratings-dislike-notices = Meldingen voor ‘Vind ik niet leuk’
 settings-ratings-dislike-notices-desc = Toont een melding wanneer je ‘Vind ik niet leuk’ opslaat of intrekt.
 settings-ratings-unlike-notices = Meldingen bij het intrekken van een like
@@ -94,7 +94,7 @@ settings-centre = Midden
 ## Equalizer
 
 settings-equalizer = Equalizer
-settings-equalizer-desc = Regelt het geluid van diepe bas tot hoge tonen. Je hoort het effect alleen zelf. Downloads en andere deelnemers blijven onveranderd.
+settings-equalizer-desc = Regelt het geluid van diepe bas tot hoge tonen.
 settings-preset = Voorinstelling
 settings-custom = Aangepast
 settings-equalizer-preset = Equalizervoorinstelling
@@ -216,7 +216,7 @@ settings-restart-now = Nu herstarten
 
 settings-window = Venster
 settings-open-on = Pagina bij opstarten
-settings-open-on-desc = Kiest welke pagina bij het starten opent. Voor tabbladen in Bibliotheek moet je inloggen, behalve Downloads. Uitgelogd opent Home.
+settings-open-on-desc = Kiest welke pagina bij het starten opent. Uitgelogd opent Home.
 settings-home = Home
 settings-close-to-tray-desc-linux = Houdt een pictogram in het systeemvak. Met × verberg je het venster en speelt de muziek door. Via het pictogrammenu kun je het venster tonen of verbergen, of de app afsluiten. Klik op het nummer in de mediabediening om het venster terug te halen. Ctrl+Q sluit de app.
 settings-close-to-tray-desc = Houdt een pictogram in het systeemvak. Met × verberg je het venster en speelt de muziek door. Klik op het pictogram om het venster terug te halen of klik met rechts om te verbergen, te tonen of af te sluiten.

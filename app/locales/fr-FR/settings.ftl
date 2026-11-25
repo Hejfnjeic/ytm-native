@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Affiche les évaluations à côté de la dur�
 settings-ratings-dim-disliked = Estomper les titres non aimés
 settings-ratings-dim-disliked-desc = Affiche les titres non aimés dans des couleurs atténuées dans les listes.
 settings-ratings-skip-disliked = Passer au titre suivant après un avis négatif
-settings-ratings-skip-disliked-desc = Passe au titre suivant après confirmation par YouTube Music. En écoute collective, les invités suivent la lecture de l’hôte.
+settings-ratings-skip-disliked-desc = Passe au titre suivant après confirmation par YouTube Music.
 settings-ratings-dislike-notices = Notifications d’avis négatif
 settings-ratings-dislike-notices-desc = Affiche un message lorsqu’un avis négatif est enregistré ou retiré.
 settings-ratings-unlike-notices = Notifications de retrait d’un « J’aime »
@@ -94,7 +94,7 @@ settings-centre = Centre
 ## Equalizer
 
 settings-equalizer = Égaliseur
-settings-equalizer-desc = Ajuste le son des basses profondes aux aigus. Seule votre écoute change. Les téléchargements et le son des autres participants restent inchangés.
+settings-equalizer-desc = Ajuste le son des basses profondes aux aigus.
 settings-preset = Préréglage
 settings-custom = Personnalisé
 settings-equalizer-preset = Préréglage de l’égaliseur
@@ -216,7 +216,7 @@ settings-restart-now = Redémarrer maintenant
 
 settings-window = Fenêtre
 settings-open-on = Page au démarrage
-settings-open-on-desc = Page affichée au démarrage. Les onglets de la bibliothèque nécessitent une connexion, sauf Téléchargements. Sans connexion, l’accueil s’ouvre.
+settings-open-on-desc = Page affichée au démarrage. Sans connexion, l’accueil s’ouvre.
 settings-home = Accueil
 settings-close-to-tray-desc-linux = Garde une icône dans la zone de notification. × masque la fenêtre et laisse la musique jouer. Le menu de l’icône permet de réafficher, de masquer ou de quitter l’application. Un clic sur le titre dans les commandes multimédias du système réaffiche aussi la fenêtre. Ctrl+Q quitte l’application.
 settings-close-to-tray-desc = Garde une icône dans la zone de notification. × masque la fenêtre et laisse la musique jouer. Cliquez sur l’icône pour la réafficher ou utilisez le menu contextuel pour la masquer, l’afficher ou quitter l’application.

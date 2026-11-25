@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = 在持续时间旁边显示评分。将鼠标
 settings-ratings-dim-disliked = 昏暗不喜欢的歌曲
 settings-ratings-dim-disliked-desc = 在歌曲列表中以柔和的颜色显示不喜欢的歌曲。
 settings-ratings-skip-disliked = 不喜欢跳到下一首
-settings-ratings-skip-disliked-desc = YouTube Music确认不喜欢后前进。 Listen中的嘉宾一起跟随主持人的播放。
+settings-ratings-skip-disliked-desc = YouTube Music确认不喜欢后前进。
 settings-ratings-dislike-notices = 不喜欢通知
 settings-ratings-dislike-notices-desc = 保存或删除不喜欢的内容时显示消息。
 settings-ratings-unlike-notices = 喜欢删除通知
@@ -94,7 +94,7 @@ settings-centre = 中心
 ## Equalizer
 
 settings-equalizer = 均衡器
-settings-equalizer-desc = 将声音塑造为从深沉的低音到高音。只有您听到的内容会发生变化：下载或其他人听到的内容不会发生变化。
+settings-equalizer-desc = 将声音塑造为从深沉的低音到高音。
 settings-preset = 预设
 settings-custom = 自定义
 settings-equalizer-preset = 均衡器预设
@@ -216,7 +216,7 @@ settings-restart-now = 立即重启
 
 settings-window = 窗口
 settings-open-on = 启动页面
-settings-open-on-desc = 应用程序启动的页面。图书馆自己的选项卡需要您登录（下载除外）；注销后，应用程序将在主页上打开。
+settings-open-on-desc = 应用启动时打开的页面。未登录时打开主页。
 settings-home = 首页
 settings-close-to-tray-desc-linux = 在托盘中保留图标。单击 × 隐藏窗口并保持音乐播放。图标的菜单可以将其恢复、隐藏或退出。单击系统媒体控件中的歌曲也会将其恢复，然后按 Ctrl+Q 退出。
 settings-close-to-tray-desc = 在托盘中保留图标。单击 × 隐藏窗口并保持音乐播放。单击该图标可将其恢复，或右键单击该图标可隐藏、显示或退出。

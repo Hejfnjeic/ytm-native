@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Tampilkan penilaian di samping durasi. Arahka
 settings-ratings-dim-disliked = Redupkan lagu yang tidak disuka
 settings-ratings-dim-disliked-desc = Lagu yang nggak kamu suka tampil dengan warna pudar di daftar lagu.
 settings-ratings-skip-disliked = Tidak suka langsung lompat ke lagu berikutnya
-settings-ratings-skip-disliked-desc = Lanjut ke lagu berikutnya setelah YouTube Music mengonfirmasi tidak suka. Tamu di Dengar bareng ikut pemutaran host.
+settings-ratings-skip-disliked-desc = Lanjut ke lagu berikutnya setelah YouTube Music mengonfirmasi tidak suka.
 settings-ratings-dislike-notices = Notifikasi tidak suka
 settings-ratings-dislike-notices-desc = Munculkan pesan saat "tidak suka" disimpan atau dibatalkan.
 settings-ratings-unlike-notices = Notifikasi hapus suka
@@ -96,7 +96,7 @@ settings-centre = Tengah
 ## Equalizer
 
 settings-equalizer = Equalizer
-settings-equalizer-desc = Atur suara dari bass dalam sampai treble. Cuma yang kamu dengar yang berubah: bukan unduhan, atau suara yang didengar orang lain di Dengar bareng.
+settings-equalizer-desc = Atur suara dari bass dalam sampai treble.
 settings-preset = Preset
 settings-custom = Kustom
 settings-equalizer-preset = Preset equalizer
@@ -228,7 +228,7 @@ settings-song-info-country-desc = Negara yang jadi acuan tangga lagu dan rekomen
 
 settings-window = Jendela
 settings-open-on = Halaman awal
-settings-open-on-desc = Halaman awal saat aplikasi dibuka. Tab di Koleksi butuh kamu masuk dulu, kecuali Unduhan; kalau belum masuk, aplikasi dibuka di Beranda.
+settings-open-on-desc = Halaman awal saat aplikasi dibuka. Kalau belum masuk, aplikasi dibuka di Beranda.
 settings-home = Beranda
 settings-close-to-tray-desc-linux = Simpan ikon di tray. Klik × bakal menyembunyikan jendela di sana dan musik tetap jalan. Menu di ikonnya bisa memunculkan lagi, menyembunyikan, atau keluar. Klik lagu di kontrol media sistem juga memunculkannya lagi, dan Ctrl+Q buat keluar.
 settings-close-to-tray-desc = Simpan ikon di tray. Klik × bakal menyembunyikan jendela di sana dan musik tetap jalan. Klik ikonnya buat memunculkan lagi, atau klik kanan buat menyembunyikan, menampilkan, atau keluar.

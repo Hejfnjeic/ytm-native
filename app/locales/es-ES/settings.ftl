@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = Muestra las valoraciones junto a la duración
 settings-ratings-dim-disliked = Atenuar canciones con No me gusta
 settings-ratings-dim-disliked-desc = Muestra las canciones con No me gusta en colores apagados en las listas.
 settings-ratings-skip-disliked = No me gusta salta a la siguiente
-settings-ratings-skip-disliked-desc = Avanza cuando YouTube Music confirma el No me gusta. Los invitados en Escuchar juntos siguen la reproducción del anfitrión.
+settings-ratings-skip-disliked-desc = Avanza cuando YouTube Music confirma el No me gusta.
 settings-ratings-dislike-notices = Notificaciones de No me gusta
 settings-ratings-dislike-notices-desc = Muestra un mensaje cuando se guarda o quita un No me gusta.
 settings-ratings-unlike-notices = Notificaciones al quitar Me gusta
@@ -94,7 +94,7 @@ settings-centre = Centro
 ## Equalizer
 
 settings-equalizer = Ecualizador
-settings-equalizer-desc = Da forma al sonido desde el grave profundo hasta el agudo. Solo cambia lo que oyes: no las descargas ni lo que oyen otros en un jam.
+settings-equalizer-desc = Da forma al sonido desde el grave profundo hasta el agudo.
 settings-preset = Preajuste
 settings-custom = Personalizado
 settings-equalizer-preset = Preajuste del ecualizador
@@ -218,7 +218,7 @@ settings-restart-now = Reiniciar ahora
 
 settings-window = Ventana
 settings-open-on = Abrir en
-settings-open-on-desc = La página con la que arranca la app. Las pestañas de Biblioteca requieren iniciar sesión, excepto Descargas; sin sesión, la app abre en Inicio.
+settings-open-on-desc = La página con la que arranca la app. Sin sesión, abre en Inicio.
 settings-home = Inicio
 settings-close-to-tray-desc-linux = Mantiene un icono en la bandeja. Pulsar × oculta la ventana ahí y la música sigue. El menú del icono la trae de vuelta, la oculta o cierra. Pulsar la canción en los controles multimedia del sistema también la trae, y Ctrl+Q cierra.
 settings-close-to-tray-desc = Mantiene un icono en la bandeja. Pulsar × oculta la ventana ahí y la música sigue. Pulsa el icono para traerla, o clic derecho para ocultar, mostrar o salir.

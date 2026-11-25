@@ -59,7 +59,7 @@ settings-ratings-list-icons-desc = إظهار التقييمات بجانب ال
 settings-ratings-dim-disliked = تعتيم الأغاني غير المعجب بها
 settings-ratings-dim-disliked-desc = عرض الأغاني غير المعجب بها بألوان باهتة في قوائم الأغاني.
 settings-ratings-skip-disliked = عدم الإعجاب يتخطّى إلى المقطع التالي
-settings-ratings-skip-disliked-desc = الانتقال بعد تأكيد YouTube Music لعدم الإعجاب. يتبع الضيوف في الاستماع معًا تشغيل المضيف.
+settings-ratings-skip-disliked-desc = الانتقال بعد تأكيد YouTube Music لعدم الإعجاب.
 settings-ratings-dislike-notices = إشعارات عدم الإعجاب
 settings-ratings-dislike-notices-desc = إظهار رسالة عند حفظ عدم الإعجاب أو إزالته.
 settings-ratings-unlike-notices = إشعارات إزالة الإعجاب
@@ -96,7 +96,7 @@ settings-centre = الوسط
 ## Equalizer
 
 settings-equalizer = المعادل الصوتي
-settings-equalizer-desc = تشكيل الصوت من الجهير العميق إلى التريبل. يتغيّر ما تسمعه أنت فقط؛ دون التنزيلات أو ما يسمعه الآخرون في الجلسة المشتركة.
+settings-equalizer-desc = تشكيل الصوت من الجهير العميق إلى التريبل.
 settings-preset = إعداد مسبق
 settings-custom = مخصّص
 settings-equalizer-preset = إعداد المعادل الصوتي المسبق
@@ -229,7 +229,7 @@ settings-song-info-country-desc = البلد الذي تُخصَّص له الر
 
 settings-window = النافذة
 settings-open-on = الفتح على
-settings-open-on-desc = الصفحة التي يبدأ بها التطبيق. تتطلب تبويبات المكتبة تسجيل الدخول باستثناء التنزيلات؛ وعند تسجيل الخروج، يُفتح التطبيق على الصفحة الرئيسية.
+settings-open-on-desc = الصفحة التي يبدأ بها التطبيق. عند تسجيل الخروج، يُفتح على الصفحة الرئيسية.
 settings-home = الصفحة الرئيسية
 settings-close-to-tray-desc-linux = يُبقي أيقونة في شريط النظام. يؤدي النقر على × إلى إخفاء النافذة هناك مع استمرار تشغيل الموسيقى. تتيح قائمة الأيقونة إظهارها أو إخفاءها أو إنهاء التطبيق. كما يؤدي النقر على الأغنية في عناصر تحكم الوسائط بالنظام إلى إظهار النافذة مجددًا، ويُنهي الاختصار Ctrl+Q التطبيق.
 settings-close-to-tray-desc = يُبقي أيقونة في شريط النظام. يؤدي النقر على × إلى إخفاء النافذة هناك مع استمرار تشغيل الموسيقى. انقر على الأيقونة لإظهارها مجددًا، أو انقر بزر الفأرة الأيمن لإخفائها أو إظهارها أو إنهاء التطبيق.

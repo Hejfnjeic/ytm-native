@@ -140,14 +140,26 @@ impl App {
             .with_decorations(!custom)
             .with_transparent(custom && crate::corners::available())
             .with_window_level(if self.mini.pinned { WindowLevel::AlwaysOnTop } else { WindowLevel::Normal });
-        // Drawn in passes of its own, not inside the main window's: a minimized main window
-        // gets no frames (none at all on Wayland), and this one must keep going.
-        let me = MainThread::new(self.me.clone());
-        ctx.show_viewport_deferred(viewport_id(), builder, move |ui, _class| {
-            let Some(app) = me.get().and_then(std::rc::Weak::upgrade) else { return };
-            let Ok(mut app) = app.try_borrow_mut() else { return };
-            app.mini_pass(ui);
-        });
+        // Dev hook: YTM_MINI_IMMEDIATE=1 draws it the Windows way elsewhere too.
+        if cfg!(windows) || super::dev_var("YTM_MINI_IMMEDIATE").is_some() {
+            // Windows: drawn inside the main window's passes (an immediate viewport). As a
+            // window with passes of its own, Windows hands out paints one window at a time
+            // and only when nothing else waits, so the main window starved while this one
+            // asked for 30-60 frames a second. A minimized main window still gets passes
+            // here (eframe paints it directly, see `ytm-native:` in its run.rs).
+            ctx.show_viewport_immediate(viewport_id(), builder, |ctx, _class| {
+                egui::CentralPanel::default().frame(egui::Frame::NONE).show(ctx, |ui| self.mini_pass(ui));
+            });
+        } else {
+            // Drawn in passes of its own, not inside the main window's: a minimized main
+            // window gets no frames on Wayland, and this one must keep going.
+            let me = MainThread::new(self.me.clone());
+            ctx.show_viewport_deferred(viewport_id(), builder, move |ui, _class| {
+                let Some(app) = me.get().and_then(std::rc::Weak::upgrade) else { return };
+                let Ok(mut app) = app.try_borrow_mut() else { return };
+                app.mini_pass(ui);
+            });
+        }
         self.keep_mini_above(now);
     }
 

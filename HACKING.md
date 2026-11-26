@@ -31,7 +31,7 @@ builds are usable: dependencies are optimized even there (`[profile.dev.package.
 | Path | What |
 |---|---|
 | `app/` | The player (crate `ytm-native`): `src/` Rust, `locales/` its text in 20 languages, `assets/` icon, fonts, the one theme, yt-dlp's EJS solver (Unlicense/MIT/ISC) |
-| `app/vendor/` | Patched copies of epaint (right-to-left text), souvlaki (MPRIS updates) and winit (X11 scale, Windows move/resize repaints), from ytm-rs, and eframe (Windows: a window starved of `WM_PAINT` is painted directly; look for `ytm-native:`); see `[patch.crates-io]` in `Cargo.toml` |
+| `app/vendor/` | Patched copies of epaint (right-to-left text), souvlaki (MPRIS updates) and winit (X11 scale, Windows move/resize repaints), from ytm-rs, and eframe (a minimized window painted directly up to 60 fps, for the lyrics window on Windows; look for `ytm-native:`); see `[patch.crates-io]` in `Cargo.toml` |
 | `probe/` | Early research tools for YouTube's API (identities, formats); not part of the app |
 | `scripts/` | install, Windows/Arch builds, release, headless test display |
 | `packaging/` | `.desktop` file, Arch `PKGBUILD` |
@@ -79,8 +79,11 @@ builds are usable: dependencies are optimized even there (`[profile.dev.package.
   wakes the UI. Playback resolution lives there too: resolve the stream, start the download,
   build the decoder, hand it to the audio engine.
 - **eframe runs `ui::Host`**, which shares the `App` (an `Rc<RefCell<App>>`) with the lyrics
-  window: that window is a deferred viewport with passes of its own, so it keeps going while
-  the main window is minimized.
+  window. On Linux that window is a deferred viewport with passes of its own (a minimized
+  window gets no frames on Wayland). On Windows it's an immediate viewport drawn in the main
+  window's passes: Windows hands out `WM_PAINT` one window at a time, and a second window
+  asking for 60 fps starved the main one (1.0.1); painting the starved one directly broke the
+  lyrics window's focus and input (1.0.2). `YTM_MINI_IMMEDIATE=1` tests the Windows way here.
 
 ### How YouTube is used
 

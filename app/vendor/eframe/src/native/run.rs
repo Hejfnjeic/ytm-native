@@ -24,7 +24,12 @@ use crate::{
 /// so we throttle their repaints to avoid busy-looping while still
 /// processing viewport commands like `Visible(true)`.
 /// See <https://github.com/emilk/egui/issues/7776>.
-const INVISIBLE_WINDOW_REPAINT_INTERVAL: Duration = Duration::from_millis(100);
+// ytm-native: 16 ms, not 100. A minimized main window on Windows is painted directly at
+// most this often, and it draws the lyrics window (an immediate viewport) in its passes:
+// at 100 ms the lyrics ran at 10 fps while the main window was minimized. The app asks
+// for no more than 4 frames a second while hidden with nothing else open, so this doesn't
+// busy-loop (egui#7776).
+const INVISIBLE_WINDOW_REPAINT_INTERVAL: Duration = Duration::from_millis(16);
 
 /// How long to wait for a requested `RedrawRequested` before running the app logic anyway.
 ///
@@ -206,9 +211,6 @@ impl<T: WinitApp> WinitAppWrapper<T> {
         let now = Instant::now();
 
         let mut invisible_window_ids = Vec::new();
-        // ytm-native: windows painted directly because their last `request_redraw` was never
-        // delivered (see below).
-        let mut starved_window_ids = Vec::new();
 
         self.windows_next_repaint_times
             .retain(|window_id, repaint_time| {
@@ -224,14 +226,6 @@ impl<T: WinitApp> WinitAppWrapper<T> {
                     // See: https://github.com/emilk/egui/issues/5229
                     if is_invisible_or_minimized(&window) {
                         invisible_window_ids.push(*window_id);
-                    } else if cfg!(windows) && self.windows_redraw_deadlines.contains_key(window_id) {
-                        // ytm-native: Windows hands out `WM_PAINT` (winit's RedrawRequested)
-                        // only when the thread has no other message, and to one window at a
-                        // time: with a second window that keeps asking for frames (the
-                        // lyrics window, 30-60 fps), the main window's paint never came, and
-                        // it froze while its logic ran. A redraw asked for and still not
-                        // delivered by the time the next one is due is painted directly.
-                        starved_window_ids.push(*window_id);
                     } else {
                         log::trace!("request_redraw for {window_id:?}");
                         // Don't switch to `ControlFlow::Poll` here. `request_redraw`
@@ -250,23 +244,6 @@ impl<T: WinitApp> WinitAppWrapper<T> {
                 }
                 false
             });
-
-        for window_id in &starved_window_ids {
-            if self.windows_redraw_deadlines.remove(window_id).is_some() {
-                let event_result =
-                    self.winit_app
-                        .run_ui_and_paint(event_loop, *window_id, PassMode::Full);
-                self.handle_event_result(event_loop, event_result);
-                // Still asked of Windows: while that paint doesn't come, the window stays
-                // here and is painted directly each time it's due; once it does, as before.
-                if let Some(window) = self.winit_app.window(*window_id) {
-                    window.request_redraw();
-                    self.windows_redraw_deadlines
-                        .entry(*window_id)
-                        .or_insert(Instant::now() + MISSED_REDRAW_TIMEOUT);
-                }
-            }
-        }
 
         // Paint invisible windows directly, since they won't receive
         // RedrawRequested events on Windows. This ensures that viewport

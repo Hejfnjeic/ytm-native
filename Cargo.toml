@@ -35,8 +35,8 @@ opt-level = 2
 # The X11 backend also requests saved window positions explicitly on KWin so the
 # full window's size doesn't constrain where the mini player can go.
 [patch.crates-io]
-# eframe on Windows: a window whose redraw Windows never delivers (the main window, while the
-# lyrics window keeps asking for frames) is painted directly: see "ytm-native:" in
+# eframe: a minimized window painted directly up to 60 times a second, not 10 (on Windows
+# the minimized main window draws the lyrics window): see "ytm-native:" in
 # app/vendor/eframe/src/native/run.rs.
 eframe = { path = "app/vendor/eframe" }
 epaint = { path = "app/vendor/epaint" }

@@ -151,6 +151,10 @@ struct Viewport {
     gl_surface: Option<glutin::surface::Surface<glutin::surface::WindowSurface>>,
     window: Option<Arc<Window>>,
     egui_winit: Option<egui_winit::State>,
+
+    /// ytm-native: minimized on a platform that can't say so (Wayland): `Some(false)` until
+    /// the window has lost focus, `Some(true)` after; regaining it means it's back.
+    unreported_minimized: Option<bool>,
 }
 
 impl Viewport {
@@ -673,7 +677,28 @@ impl GlowWinitRunning<'_> {
             let Some(window) = viewport.window.as_ref() else {
                 return Ok(EventResult::Wait);
             };
+            let was_minimized = viewport.info.minimized == Some(true);
             egui_winit::update_viewport_info(&mut viewport.info, &egui_ctx, window, false);
+            // ytm-native: Wayland doesn't tell a window it's minimized, so egui-winit read it
+            // as "not minimized" again on the next pass after the app minimized itself, and
+            // the whole UI was drawn whenever the compositor asked for a picture (KWin does
+            // for Alt+Tab, screen capture, task previews). It stays minimized until the
+            // window loses focus and then gets it back, which is what restoring it does; a
+            // minimized window isn't painted, so the compositor keeps its last picture.
+            if window.is_minimized().is_none() && was_minimized {
+                let focused = viewport.info.focused == Some(true);
+                let lost = viewport.unreported_minimized.get_or_insert(false);
+                if !focused {
+                    *lost = true;
+                }
+                if focused && *lost {
+                    viewport.unreported_minimized = None;
+                } else {
+                    viewport.info.minimized = Some(true);
+                }
+            } else if window.is_minimized().is_none() {
+                viewport.unreported_minimized = None;
+            }
 
             // A hidden window is not painted, since nothing would be shown — unless someone
             // wants the pixels anyway, e.g. to screenshot an app that is in the background:
@@ -1322,6 +1347,7 @@ impl GlutinWindowContext {
                 gl_surface: None,
                 window: window.map(Arc::new),
                 egui_winit: None,
+                unreported_minimized: None,
             },
         );
 
@@ -1647,6 +1673,7 @@ fn initialize_or_update_viewport<'a>(
                 window: None,
                 egui_winit: None,
                 gl_surface: None,
+                unreported_minimized: None,
             })
         }
 
@@ -1699,6 +1726,8 @@ fn is_viewport_or_descendant_visible(
     viewports.values().any(|child| {
         child.ids.parent == viewport_id
             && child.ids.this != viewport_id // ROOT is its own parent; avoid self-recursion.
+            // ytm-native: a deferred viewport draws in passes of its own, not the parent's.
+            && child.viewport_ui_cb.is_none()
             && is_viewport_or_descendant_visible(viewports, child.ids.this)
     })
 }

@@ -31,7 +31,7 @@ builds are usable: dependencies are optimized even there (`[profile.dev.package.
 | Path | What |
 |---|---|
 | `app/` | The player (crate `ytm-native`): `src/` Rust, `locales/` its text in 20 languages, `assets/` icon, fonts, the one theme, yt-dlp's EJS solver (Unlicense/MIT/ISC) |
-| `app/vendor/` | Patched copies of epaint (right-to-left text), souvlaki (MPRIS updates) and winit (X11 scale, Windows move/resize repaints), from ytm-rs, and eframe (a minimized window painted directly up to 60 fps, for the lyrics window on Windows; look for `ytm-native:`); see `[patch.crates-io]` in `Cargo.toml` |
+| `app/vendor/` | Patched copies of epaint (right-to-left text), souvlaki (MPRIS updates) and winit (X11 scale, Windows move/resize repaints), from ytm-rs, and eframe (a minimized window painted directly up to 60 fps, for the lyrics window on Windows; on Wayland a window the app minimized stays minimized until it loses and regains focus, so it isn't drawn when KWin asks for previews; look for `ytm-native:`); see `[patch.crates-io]` in `Cargo.toml` |
 | `probe/` | Early research tools for YouTube's API (identities, formats); not part of the app |
 | `scripts/` | install, Windows/Arch builds, release, headless test display |
 | `packaging/` | `.desktop` file, Arch `PKGBUILD` |
